@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- تمت إضافة viewport-fit=cover لتمتد التطبيق تحت النوتش -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>مدير المعاملات - كامل الشاشة</title>
+    <title>مدير المعاملات - كامل الشاشة مع Dynamic Island</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- SheetJS -->
@@ -50,7 +50,7 @@
         }
 
         body {
-            background-color: var(--bg-primary);
+            background-color: var(--bg-secondary); /* خلفية موحدة تمتد خلف Dynamic Island */
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
@@ -64,15 +64,19 @@
 
         .app-container {
             width: 100%;
-            max-width: 100%; /* إزالة الحد الأقصى السابق */
-            background-color: var(--bg-secondary);
-            /* إزالة border-left و border-right */
+            max-width: 100%;
+            /* لا خلفية هنا - ترث من body */
             display: flex;
             flex-direction: column;
             height: 100vh;
             max-height: 100vh;
             overflow: hidden;
             margin: 0 auto;
+            /* دفع المحتوى للمنطقة الآمنة */
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
         }
 
         .logo {
@@ -95,11 +99,10 @@
         }
 
         .header {
-            padding: 20px 24px 12px 24px; /* زيادة padding الجانبي قليلاً */
+            padding: 20px 24px 12px 24px;
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
-            background-color: var(--bg-secondary);
-            /* لا يوجد margin-top */
+            background-color: transparent; /* شفاف - تظهر خلفية body */
         }
 
         .header-top {
@@ -142,7 +145,7 @@
             background: var(--toolbar-bg);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            padding: 12px 18px; /* تكبير الأزرار قليلاً */
+            padding: 12px 18px;
             border-radius: 40px;
             font-size: 1rem;
             display: flex;
@@ -150,7 +153,7 @@
             gap: 6px;
             cursor: pointer;
             transition: 0.2s;
-            flex: 0 1 auto; /* السماح بالتصغير دون كسر */
+            flex: 0 1 auto;
             min-width: fit-content;
             justify-content: center;
             font-weight: 500;
@@ -176,7 +179,7 @@
         }
 
         .customers-list {
-            padding: 16px 20px 10px 20px; /* توسيع الهامش الجانبي */
+            padding: 16px 20px 10px 20px;
             flex: 1 1 auto;
             overflow-y: auto;
             scrollbar-width: thin;
@@ -198,7 +201,7 @@
         .customer-row {
             background: var(--bg-card);
             border-radius: 24px;
-            padding: 16px 22px; /* توسيع البطاقة */
+            padding: 16px 22px;
             margin-bottom: 14px;
             display: flex;
             align-items: center;
@@ -308,6 +311,7 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.25s ease, visibility 0.25s;
+            /* المودال يظهر فوق كل شيء ولا يتأثر بالـ safe area */
         }
 
         .modal-overlay.show {
@@ -318,7 +322,7 @@
         .modal-content {
             background: var(--modal-bg);
             width: 90%;
-            max-width: 600px; /* إبقاء المودال بمقاس معقول */
+            max-width: 600px;
             border-radius: 40px;
             padding: 28px;
             border: 1px solid var(--border-color);
@@ -332,7 +336,7 @@
 
         @media (min-width: 768px) {
             .modal-content {
-                max-width: 700px; /* توسيع قليلاً على الشاشات الكبيرة */
+                max-width: 700px;
             }
         }
 
@@ -574,7 +578,7 @@
     </div>
 </div>
 
-<!-- المودالات -->
+<!-- المودالات (بدون تغيير) -->
 <div class="modal-overlay" id="addModal"><div class="modal-content" id="addModalContent"><div class="modal-close" id="closeAddModalX"><i class="fas fa-times"></i></div></div></div>
 <div class="modal-overlay" id="detailsModal"><div class="modal-content" id="detailsContent"></div></div>
 <div class="modal-overlay" id="quickViewModal"><div class="modal-content" id="quickViewContent"></div></div>
