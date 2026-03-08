@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>مدير المعاملات - بروفي</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- SheetJS -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0f0f0f;
+            color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #1a1a1a;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            border: 1px solid #2c2c2c;
+            position: relative;
+        }
+
+        /* شعار جميل */
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logo i {
+            font-size: 2.2rem;
+            color: #ff4d4d;
+            background: linear-gradient(145deg, #ff4d4d, #b30000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 4px 8px rgba(255, 75, 75, 0.3));
+        }
+        .logo span {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #cccccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .header {
+            padding: 20px 20px 10px 20px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .btn-add {
+            background: linear-gradient(145deg, #ff4d4d, #cc0000);
+            border: none;
+            color: white;
+            width: 52px;
+            height: 52px;
+            border-radius: 30px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(255, 70, 70, 0.4);
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-add:hover {
+            background: linear-gradient(145deg, #ff6666, #e60000);
+            transform: scale(1.05);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .tool-btn {
+            background: #2d2d2d;
+            border: 1px solid #4a4a4a;
+            color: #f0f0f0;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1 1 auto;
+            justify-content: center;
+            font-weight: 500;
+        }
+
+        .tool-btn i {
+            font-size: 1rem;
+            color: #ff4d4d;
+        }
+
+        .tool-btn:hover {
+            background: #3d3d3d;
+            border-color: #ff4d4d;
+        }
+
+        .tool-btn.privacy-active {
+            background: #ff4d4d;
+            color: white;
+            border-color: #ff4d4d;
+        }
+        .tool-btn.privacy-active i {
+            color: white;
+        }
+
+        .customers-list {
+            padding: 16px 12px 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ff4d4d #1e1e1e;
+            position: relative;
+        }
+
+        .customers-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        .customers-list::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        .customers-list::-webkit-scrollbar-thumb {
+            background: #ff4d4d;
+            border-radius: 20px;
+        }
+
+        .customer-row {
+            background: #232323;
+            border-radius: 20px;
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #333;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+        }
+
+        .customer-row:hover {
+            border-color: #ff4d4d;
+            transform: translateY(-2px);
+        }
+
+        .customer-id {
+            background: #2e2e2e;
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #e0e0e0;
+            border: 1px solid #444;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 1rem;
+        }
+
+        .customer-id:hover {
+            background: #ff4d4d;
+            color: white;
+            border-color: #ff4d4d;
+        }
+
+        .customer-name {
+            flex: 2;
+            padding: 0 12px;
+            font-size: 1rem; /* تصغير الخط */
+            font-weight: 500;
+            cursor: pointer;
+            color: #ffffff;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .customer-name:hover {
+            color: #ff4d4d;
+        }
+
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 40px;
+            background: #333;
+            color: #ccc;
+        }
+
+        .status-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .status-btn {
+            border: none;
+            background: #333;
+            color: #ddd;
+            padding: 6px 10px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #4a4a4a;
+            white-space: nowrap;
+        }
+
+        .status-btn.sold {
+            background: #1e4a2b;
+            color: #b0ffb0;
+            border-color: #2e8b57;
+        }
+
+        .status-btn.booked {
+            background: #1e3f5a;
+            color: #a0d0ff;
+            border-color: #1e6f9f;
+        }
+
+        .customers-list.privacy-mode .customer-row *:not(.status-btn i):not(.btn) {
+            filter: blur(5px);
+            user-select: none;
+        }
+
+        /* زر العودة للأعلى */
+        .go-top {
+            position: sticky;
+            bottom: 20px;
+            left: 20px;
+            float: left;
+            width: 50px;
+            height: 50px;
+            background: #ff4d4d;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255, 70, 70, 0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: 0.2s;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .go-top:hover {
+            background: #ff6666;
+            transform: scale(1.1);
+        }
+
+        /* المودالات */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 16px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: #1f1f1f;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 36px;
+            padding: 24px;
+            border: 1px solid #3c3c3c;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+            transform: scale(0.9);
+            transition: transform 0.25s ease;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+        }
+
+        /* زر إغلاق X */
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            left: 16px; /* RTL */
+            background: #333;
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border: 1px solid #555;
+            transition: 0.2s;
+        }
+        .modal-close:hover {
+            background: #ff4d4d;
+            color: white;
+            border-color: #ff4d4d;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 1.8rem;
+            color: #fff;
+            border-right: 6px solid #ff4d4d;
+            padding-right: 16px;
+        }
+
+        .input-field {
+            margin-bottom: 18px;
+        }
+
+        .input-field label {
+            display: block;
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 6px;
+        }
+
+        .input-field input, .input-field select {
+            width: 100%;
+            background: #2b2b2b;
+            border: 1px solid #3f3f3f;
+            border-radius: 20px;
+            padding: 14px 18px;
+            color: #f0f0f0;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .input-field input:focus {
+            border-color: #ff4d4d;
+        }
+
+        .input-field input:disabled {
+            opacity: 0.7;
+            background: #222;
+        }
+
+        .extra-actions {
+            display: flex;
+            gap: 12px;
+            margin: 25px 0 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-chip {
+            background: #2d2d2d;
+            border: 1px solid #4a4a4a;
+            color: #ddd;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            flex: 1 1 auto;
+            justify-content: center;
+        }
+
+        .action-chip.active {
+            background: #ff4d4d;
+            color: white;
+            border-color: #ff4d4d;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(145deg, #ff4d4d, #cc0000);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #333;
+            color: #ccc;
+        }
+
+        .btn-danger {
+            background: #8b0000;
+            color: white;
+        }
+
+        .empty-list {
+            text-align: center;
+            color: #666;
+            padding: 40px 20px;
+            font-size: 1.2rem;
+            border: 2px dashed #333;
+            border-radius: 40px;
+            margin: 20px 0;
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .report-card {
+            background: #2b2b2b;
+            border-radius: 28px;
+            padding: 20px 12px;
+            text-align: center;
+            border: 1px solid #3f3f3f;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .report-card:hover {
+            border-color: #ff4d4d;
+            transform: scale(1.02);
+        }
+
+        .report-card i {
+            font-size: 2.5rem;
+            color: #ff4d4d;
+            margin-bottom: 10px;
+        }
+
+        .report-card h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .report-card .summary {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: white;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .report-table th {
+            text-align: right;
+            padding: 12px;
+            background: #333;
+            color: #ddd;
+        }
+
+        .report-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #3f3f3f;
+        }
+
+        .share-btn {
+            background: #2b2b2b;
+            border: 1px solid #ff4d4d;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        #fileImport {
+            display: none;
+        }
+
+        /* تصغير حجم الخط للاسم */
+        .customer-name {
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <div class="header-top">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <span>مدير المعاملات</span>
+            </div>
+            <button class="btn-add" id="openAddModalBtn"><i class="fas fa-plus"></i></button>
+        </div>
+        <div class="toolbar">
+            <button class="tool-btn" id="importBtn"><i class="fas fa-file-import"></i> استيراد</button>
+            <button class="tool-btn" id="exportBtn"><i class="fas fa-file-export"></i> تصدير</button>
+            <button class="tool-btn" id="privacyToggle"><i class="fas fa-eye"></i> خصوصية</button>
+            <button class="tool-btn" id="reportsBtn"><i class="fas fa-chart-pie"></i> تفاصيل المعاملات</button>
+        </div>
+        <input type="file" id="fileImport" accept=".xlsx, .xls, .csv">
+    </div>
+
+    <div class="customers-list" id="customersList">
+        <div class="empty-list">لا يوجد معاملات بعد<br> <i class="fas fa-plus-circle"></i></div>
+    </div>
+    <!-- زر العودة للأعلى -->
+    <div class="go-top" id="goTopBtn" title="العودة للأعلى"><i class="fas fa-arrow-up"></i></div>
+</div>
+
+<!-- مودال الإضافة -->
+<div class="modal-overlay" id="addModal"><div class="modal-content" id="addModalContent"><div class="modal-close" id="closeAddModalX"><i class="fas fa-times"></i></div></div></div>
+<!-- مودال التفاصيل (للتحرير) -->
+<div class="modal-overlay" id="detailsModal"><div class="modal-content" id="detailsContent"></div></div>
+<!-- مودال العرض السريع (قراءة فقط) -->
+<div class="modal-overlay" id="quickViewModal"><div class="modal-content" id="quickViewContent"></div></div>
+<!-- مودال البيع -->
+<div class="modal-overlay" id="sellModal"><div class="modal-content"><div class="modal-close" id="closeSellX"><i class="fas fa-times"></i></div><h2>إتمام البيع</h2><div id="sellSteps"></div><div class="modal-actions"><button class="btn btn-secondary" id="closeSellModal">إلغاء</button><button class="btn btn-primary" id="nextSellStep">التالي</button></div></div></div>
+<!-- مودال الحجز -->
+<div class="modal-overlay" id="bookingModal"><div class="modal-content"><div class="modal-close" id="closeBookingX"><i class="fas fa-times"></i></div><h2>تاريخ الحجز</h2><div class="input-field"><label>اختر التاريخ</label><input type="date" id="bookingDate"></div><div class="modal-actions"><button class="btn btn-secondary" id="closeBookingModal">إلغاء</button><button class="btn btn-primary" id="saveBookingBtn">حفظ</button></div></div></div>
+<!-- مودال التقارير -->
+<div class="modal-overlay" id="reportsModal"><div class="modal-content"><div class="modal-close" id="closeReportsX"><i class="fas fa-times"></i></div><h2>تفاصيل المعاملات</h2><div class="reports-grid" id="reportsGrid"></div><div class="modal-actions"><button class="btn btn-secondary" id="closeReportsModal">إغلاق</button></div></div></div>
+<!-- مودال عرض الجدول -->
+<div class="modal-overlay" id="tableModal"><div class="modal-content" id="tableModalContent"><div class="modal-close" id="closeTableX"><i class="fas fa-times"></i></div></div></div>
+
+<script>
+    (function() {
+        let customers = [];
+        let currentCustomerId = null;
+        let currentSellStep = 0;
+        let tempSellData = {};
+        let privacyMode = false;
+        let clickTimer = null; // للتمييز بين النقر الفردي والمزدوج
+
+        function generateId() { return Date.now() + Math.floor(Math.random() * 1000); }
+
+        function loadFromStorage() {
+            const stored = localStorage.getItem('customers');
+            if (stored) { try { customers = JSON.parse(stored); } catch(e) { customers = []; } }
+            else customers = [];
+            customers.forEach((c, idx) => { c.idStr = (idx+1).toString(); });
+        }
+        function saveToStorage() {
+            localStorage.setItem('customers', JSON.stringify(customers));
+        }
+
+        function renderCustomers() {
+            const container = document.getElementById('customersList');
+            if (!container) return;
+            if (customers.length === 0) {
+                container.innerHTML = '<div class="empty-list">لا يوجد معاملات بعد<br> <i class="fas fa-plus-circle"></i></div>';
+                return;
+            }
+
+            let html = '';
+            customers.forEach(c => {
+                const isSold = c.status === 'sold';
+                const isBooked = c.status === 'booked';
+                const isCancelled = c.status === 'cancelled';
+                const soldBtnClass = isSold ? 'status-btn sold' : 'status-btn';
+                const bookedBtnClass = isBooked ? 'status-btn booked' : 'status-btn';
+                const rowClass = isCancelled ? 'customer-row cancelled' : 'customer-row';
+
+                html += `
+                    <div class="${rowClass}" data-id="${c.id}">
+                        <div class="customer-id" data-id="${c.id}" data-action="share">${c.idStr}</div>
+                        <div class="customer-name" data-id="${c.id}" data-action="name">${c.name || '?'}</div>
+                        <div class="status-actions">
+                            <button class="${soldBtnClass}" data-id="${c.id}" data-action="sell"><i class="fas fa-check-circle"></i> تم البيع</button>
+                            <button class="${bookedBtnClass}" data-id="${c.id}" data-action="book"><i class="fas fa-calendar-alt"></i> تم الحجز</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            if (privacyMode) container.classList.add('privacy-mode');
+            else container.classList.remove('privacy-mode');
+        }
+
+        function updateCustomer(id, newData) {
+            const index = customers.findIndex(c => c.id == id);
+            if (index !== -1) {
+                customers[index] = { ...customers[index], ...newData };
+                saveToStorage();
+                renderCustomers();
+            }
+        }
+
+        // عرض سريع (نقرة واحدة)
+        function showQuickView(customer) {
+            const modal = document.getElementById('quickViewModal');
+            const content = document.getElementById('quickViewContent');
+            content.innerHTML = `
+                <div class="modal-close" id="closeQuickViewX"><i class="fas fa-times"></i></div>
+                <h2>معلومات العميل</h2>
+                <div class="input-field"><label>الاسم</label><input type="text" value="${customer.name || ''}" disabled></div>
+                <div class="input-field"><label>رقم التليفون</label><input type="text" value="${customer.phone || ''}" disabled></div>
+                <div class="input-field"><label>جواز السفر</label><input type="text" value="${customer.passport || ''}" disabled></div>
+                <div class="input-field"><label>الرقم الوطني</label><input type="text" value="${customer.nationalId || ''}" disabled></div>
+                <div class="input-field"><label>IBAN</label><input type="text" value="${customer.iban || ''}" disabled></div>
+                <div class="input-field"><label>سعر شراء البطاقة</label><input type="text" value="${customer.cardPurchasePrice || 0}" disabled></div>
+                <div class="input-field"><label>قيمة شحن المعاملة</label><input type="text" value="${customer.shippingValue || 0}" disabled></div>
+                <div class="input-field"><label>سعر بيع المعاملة</label><input type="text" value="${customer.salePrice || 0}" disabled></div>
+                <div class="extra-actions">
+                    <div class="action-chip ${customer.half ? 'active' : ''}"><i class="fas fa-divide"></i> بالنصف</div>
+                    <div class="action-chip ${customer.hasCard ? 'active' : ''}"><i class="fas fa-id-card"></i> لديه بطاقة</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="closeQuickViewBtn">إغلاق</button>
+                </div>
+            `;
+            modal.classList.add('show');
+            document.getElementById('closeQuickViewX').addEventListener('click', () => modal.classList.remove('show'));
+            document.getElementById('closeQuickViewBtn').addEventListener('click', () => modal.classList.remove('show'));
+        }
+
+        // تفاصيل قابلة للتعديل (نقر مزدوج)
+        function showDetailsModal(customer) {
+            const modal = document.getElementById('detailsModal');
+            const content = document.getElementById('detailsContent');
+            content.innerHTML = `
+                <div class="modal-close" id="closeDetailsX"><i class="fas fa-times"></i></div>
+                <h2>تعديل بيانات العميل</h2>
+                <div class="input-field"><label>الاسم</label><input type="text" id="detailName" value="${customer.name || ''}" readonly></div>
+                <div class="input-field"><label>رقم التليفون</label><input type="text" value="${customer.phone || ''}" readonly></div>
+                <div class="input-field"><label>جواز السفر</label><input type="text" value="${customer.passport || ''}" readonly></div>
+                <div class="input-field"><label>الرقم الوطني</label><input type="text" value="${customer.nationalId || ''}" readonly></div>
+                <div class="input-field"><label>IBAN</label><input type="text" value="${customer.iban || ''}" readonly></div>
+                <div class="input-field"><label>سعر شراء البطاقة</label><input type="number" id="detailCardPurchase" value="${customer.cardPurchasePrice || ''}" step="0.01"></div>
+                <div class="input-field"><label>قيمة شحن المعاملة</label><input type="number" id="detailShipping" value="${customer.shippingValue || ''}" step="0.01"></div>
+                <div class="input-field"><label>سعر بيع المعاملة</label><input type="number" id="detailSalePrice" value="${customer.salePrice || ''}" step="0.01"></div>
+                <div class="extra-actions">
+                    <div class="action-chip ${customer.half ? 'active' : ''}" id="detailHalfChip"><i class="fas fa-divide"></i> بالنصف</div>
+                    <div class="action-chip ${customer.hasCard ? 'active' : ''}" id="detailHasCardChip"><i class="fas fa-id-card"></i> لديه بطاقة</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="closeDetailsModal">إلغاء</button>
+                    <button class="btn btn-primary" id="saveDetailsBtn" data-id="${customer.id}">حفظ التعديلات</button>
+                    <button class="btn btn-danger" id="cancelTransactionBtn" data-id="${customer.id}">إلغاء المعاملة</button>
+                </div>
+            `;
+            modal.classList.add('show');
+
+            document.getElementById('detailHalfChip').addEventListener('click', function(e) { e.stopPropagation(); this.classList.toggle('active'); });
+            document.getElementById('detailHasCardChip').addEventListener('click', function(e) { e.stopPropagation(); this.classList.toggle('active'); });
+            document.getElementById('closeDetailsX').addEventListener('click', () => modal.classList.remove('show'));
+            document.getElementById('closeDetailsModal').addEventListener('click', () => modal.classList.remove('show'));
+            document.getElementById('saveDetailsBtn').addEventListener('click', function(e) {
+                const id = this.dataset.id;
+                updateCustomer(id, {
+                    cardPurchasePrice: parseFloat(document.getElementById('detailCardPurchase').value) || 0,
+                    shippingValue: parseFloat(document.getElementById('detailShipping').value) || 0,
+                    salePrice: parseFloat(document.getElementById('detailSalePrice').value) || 0,
+                    half: document.getElementById('detailHalfChip').classList.contains('active'),
+                    hasCard: document.getElementById('detailHasCardChip').classList.contains('active')
+                });
+                modal.classList.remove('show');
+            });
+            document.getElementById('cancelTransactionBtn').addEventListener('click', function(e) {
+                const id = this.dataset.id;
+                updateCustomer(id, { status: 'cancelled' });
+                modal.classList.remove('show');
+            });
+        }
+
+        // أحداث النقر على الاسم (تمييز النقر المفرد والمزدوج)
+        function handleNameClick(e, customer) {
+            if (clickTimer) {
+                clearTimeout(clickTimer);
+                clickTimer = null;
+                // نقر مزدوج: فتح التحرير
+                showDetailsModal(customer);
+            } else {
+                clickTimer = setTimeout(() => {
+                    clickTimer = null;
+                    // نقر مفرد: عرض سريع
+                    showQuickView(customer);
+                }, 250);
+            }
+        }
+
+        // باقي الدوال (openReportsModal, openTableModal, openSellModal, etc) كما هي مع إضافة أزرار X
+        // ... (نفس الكود السابق مع تعديلات الألوان وإضافة close buttons)
+
+        // دالة فتح التقارير
+        function openReportsModal() {
+            const grid = document.getElementById('reportsGrid');
+            const totalPurchases = customers.reduce((sum, c) => sum + (c.cardPurchasePrice || 0), 0);
+            const totalProfits = customers.reduce((sum, c) => sum + ((c.salePrice || 0) - (c.cardPurchasePrice || 0) - (c.shippingValue || 0)), 0);
+            const ongoingCount = customers.filter(c => c.status === 'pending' || !c.status).length;
+            const executedCount = customers.filter(c => c.status === 'sold').length;
+            const bookingsCount = customers.filter(c => c.status === 'booked').length;
+            const cancelledCount = customers.filter(c => c.status === 'cancelled').length;
+
+            grid.innerHTML = `
+                <div class="report-card" data-report="purchases"><i class="fas fa-shopping-cart"></i><h3>المشتريات</h3><div class="summary">${totalPurchases.toFixed(2)}</div></div>
+                <div class="report-card" data-report="profits"><i class="fas fa-chart-line"></i><h3>الأرباح</h3><div class="summary">${totalProfits.toFixed(2)}</div></div>
+                <div class="report-card" data-report="ongoing"><i class="fas fa-spinner"></i><h3>جارية</h3><div class="summary">${ongoingCount}</div></div>
+                <div class="report-card" data-report="executed"><i class="fas fa-check-double"></i><h3>منفذة</h3><div class="summary">${executedCount}</div></div>
+                <div class="report-card" data-report="bookings"><i class="fas fa-calendar-check"></i><h3>الحجوزات</h3><div class="summary">${bookingsCount}</div></div>
+                <div class="report-card" data-report="cancelled"><i class="fas fa-ban"></i><h3>ملغية</h3><div class="summary">${cancelledCount}</div></div>
+            `;
+
+            document.querySelectorAll('.report-card').forEach(card => {
+                card.addEventListener('click', () => { openTableModal(card.dataset.report); });
+            });
+
+            document.getElementById('reportsModal').classList.add('show');
+        }
+
+        function openTableModal(reportType) {
+            const modal = document.getElementById('tableModal');
+            const content = document.getElementById('tableModalContent');
+            let title = '', tableRows = '', totalValue = null;
+
+            switch(reportType) {
+                case 'purchases':
+                    title = 'المشتريات';
+                    tableRows = customers.map(c => `<tr><td>${c.name}</td><td>${(c.cardPurchasePrice || 0).toFixed(2)}</td></tr>`).join('');
+                    totalValue = customers.reduce((s, c) => s + (c.cardPurchasePrice || 0), 0);
+                    break;
+                case 'profits':
+                    title = 'الأرباح';
+                    tableRows = customers.map(c => {
+                        const profit = (c.salePrice || 0) - (c.cardPurchasePrice || 0) - (c.shippingValue || 0);
+                        return `<tr><td>${c.name}</td><td>${profit.toFixed(2)}</td></tr>`;
+                    }).join('');
+                    totalValue = customers.reduce((s, c) => s + ((c.salePrice || 0) - (c.cardPurchasePrice || 0) - (c.shippingValue || 0)), 0);
+                    break;
+                case 'ongoing':
+                    title = 'المعاملات الجارية';
+                    const ongoing = customers.filter(c => c.status === 'pending' || !c.status);
+                    tableRows = ongoing.map(c => `<tr><td>${c.name}</td><td>جارية</td></tr>`).join('');
+                    totalValue = ongoing.length;
+                    break;
+                case 'executed':
+                    title = 'المعاملات المنفذة';
+                    const executed = customers.filter(c => c.status === 'sold');
+                    tableRows = executed.map(c => `<tr><td>${c.name}</td><td>${(c.salePrice || 0).toFixed(2)}</td></tr>`).join('');
+                    totalValue = executed.length;
+                    break;
+                case 'bookings':
+                    title = 'الحجوزات';
+                    const booked = customers.filter(c => c.status === 'booked');
+                    tableRows = booked.map(c => `<tr><td>${c.name}</td><td>${c.bookingDate || 'غير محدد'}</td></tr>`).join('');
+                    totalValue = booked.length;
+                    break;
+                case 'cancelled':
+                    title = 'المعاملات الملغية';
+                    const cancelled = customers.filter(c => c.status === 'cancelled');
+                    tableRows = cancelled.map(c => `<tr><td>${c.name}</td><td>ملغية</td></tr>`).join('');
+                    totalValue = cancelled.length;
+                    break;
+            }
+
+            content.innerHTML = `
+                <div class="modal-close" id="closeTableX"><i class="fas fa-times"></i></div>
+                <h2>${title}</h2>
+                <div style="margin: 10px 0; color: #ff4d4d; font-size: 1.2rem;">الإجمالي: ${totalValue?.toFixed(2) ?? totalValue}</div>
+                <table class="report-table"><thead><tr><th>الاسم</th><th>${reportType==='purchases'?'سعر الشراء':reportType==='profits'?'الربح':'القيمة'}</th></tr></thead><tbody>${tableRows || '<tr><td colspan="2">لا توجد بيانات</td></tr>'}</tbody></table>
+                <button class="share-btn" id="shareReportBtn"><i class="fas fa-share-alt"></i> مشاركة التقرير</button>
+                <div class="modal-actions"><button class="btn btn-secondary" id="closeTableModal">إغلاق</button></div>
+            `;
+            modal.classList.add('show');
+
+            document.getElementById('shareReportBtn').addEventListener('click', () => {
+                let text = `${title}\nالإجمالي: ${totalValue}\n`;
+                text += customers.map(c => {
+                    if (reportType === 'purchases') return `${c.name}: ${c.cardPurchasePrice}`;
+                    if (reportType === 'profits') {
+                        const profit = (c.salePrice||0) - (c.cardPurchasePrice||0) - (c.shippingValue||0);
+                        return `${c.name}: ${profit.toFixed(2)}`;
+                    }
+                    if (reportType === 'ongoing' && (!c.status || c.status==='pending')) return c.name;
+                    if (reportType === 'executed' && c.status==='sold') return `${c.name}: ${c.salePrice}`;
+                    if (reportType === 'bookings' && c.status==='booked') return `${c.name}: ${c.bookingDate}`;
+                    if (reportType === 'cancelled' && c.status==='cancelled') return c.name;
+                    return null;
+                }).filter(Boolean).join('\n');
+                if (navigator.share) navigator.share({ title, text });
+                else navigator.clipboard.writeText(text).then(() => alert('تم نسخ التقرير'));
+            });
+
+            document.getElementById('closeTableX').addEventListener('click', () => modal.classList.remove('show'));
+            document.getElementById('closeTableModal').addEventListener('click', () => modal.classList.remove('show'));
+        }
+
+        // باقي الدوال (openAddModal, openSellModal, openBookingModal, import/export, etc)
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('show');
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('show'));
+        }
+
+        function shareCustomer(customer) {
+            const text = `العميل: ${customer.name}\nرقم التليفون: ${customer.phone}\nجواز السفر: ${customer.passport}\nالرقم الوطني: ${customer.nationalId}\nIBAN: ${customer.iban}`;
+            if (navigator.share) navigator.share({ title: 'بيانات العميل', text: text });
+            else navigator.clipboard?.writeText(text).then(() => alert('تم نسخ البيانات'));
+        }
+
+        function openSellModal(customer) {
+            currentCustomerId = customer.id;
+            currentSellStep = 0;
+            tempSellData = {
+                cardPurchasePrice: customer.cardPurchasePrice || '',
+                shippingValue: customer.shippingValue || '',
+                salePrice: customer.salePrice || ''
+            };
+            renderSellStep();
+            document.getElementById('sellModal').classList.add('show');
+        }
+
+        function renderSellStep() {
+            const stepContainer = document.getElementById('sellSteps');
+            const customer = customers.find(c => c.id == currentCustomerId);
+            if (!customer) return;
+
+            const steps = ['سعر شراء البطاقة', 'قيمة شحن المعاملة', 'سعر بيع المعاملة'];
+            const keys = ['cardPurchasePrice', 'shippingValue', 'salePrice'];
+            const currentKey = keys[currentSellStep];
+            const currentValue = tempSellData[currentKey] !== '' ? tempSellData[currentKey] : '';
+
+            stepContainer.innerHTML = `
+                <div style="margin-bottom:20px;color:#aaa;">الخطوة ${currentSellStep+1} من 3: ${steps[currentSellStep]}</div>
+                <div class="input-field"><label>${steps[currentSellStep]}</label><input type="number" id="sellStepInput" value="${currentValue}" step="0.01" placeholder="أدخل القيمة"></div>
+            `;
+
+            document.getElementById('nextSellStep').onclick = function() {
+                const inputVal = parseFloat(document.getElementById('sellStepInput').value) || 0;
+                tempSellData[keys[currentSellStep]] = inputVal;
+
+                if (currentSellStep < 2) {
+                    currentSellStep++;
+                    renderSellStep();
+                } else {
+                    updateCustomer(currentCustomerId, {
+                        cardPurchasePrice: tempSellData.cardPurchasePrice,
+                        shippingValue: tempSellData.shippingValue,
+                        salePrice: tempSellData.salePrice,
+                        status: 'sold'
+                    });
+                    closeAllModals();
+                }
+            };
+        }
+
+        function openBookingModal(customer) {
+            currentCustomerId = customer.id;
+            document.getElementById('bookingDate').value = customer.bookingDate || '';
+            document.getElementById('bookingModal').classList.add('show');
+        }
+
+        // تهيئة
+        window.addEventListener('load', function() {
+            loadFromStorage();
+            renderCustomers();
+
+            // إضافة محتوى مودال الإضافة
+            document.getElementById('addModalContent').innerHTML += `
+                <h2>إضافة معاملة</h2>
+                <div class="input-field"><label>الاسم</label><input type="text" id="name" placeholder="الاسم كاملاً"></div>
+                <div class="input-field"><label>رقم التليفون</label><input type="tel" inputmode="numeric" id="phone"></div>
+                <div class="input-field"><label>جواز السفر</label><input type="text" id="passport"></div>
+                <div class="input-field"><label>الرقم الوطني</label><input type="tel" inputmode="numeric" id="nationalId"></div>
+                <div class="input-field"><label>IBAN</label><input type="text" id="iban"></div>
+                <div class="input-field"><label>سعر شراء البطاقة</label><input type="number" id="cardPurchase" step="0.01"></div>
+                <div class="input-field"><label>قيمة شحن المعاملة</label><input type="number" id="shipping" step="0.01"></div>
+                <div class="input-field"><label>سعر بيع المعاملة</label><input type="number" id="salePrice" step="0.01"></div>
+                <div class="extra-actions">
+                    <div class="action-chip" id="halfChipAdd"><i class="fas fa-divide"></i> بالنصف</div>
+                    <div class="action-chip" id="hasCardChipAdd"><i class="fas fa-id-card"></i> لديه بطاقة</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="closeAddModalBtn">إلغاء</button>
+                    <button class="btn btn-primary" id="saveCustomerBtn">حفظ</button>
+                </div>
+            `;
+
+            // ربط الأحداث
+            document.getElementById('openAddModalBtn').addEventListener('click', openAddModal);
+            document.getElementById('closeAddModalBtn')?.addEventListener('click', closeAllModals);
+            document.getElementById('closeAddModalX')?.addEventListener('click', closeAllModals);
+            document.getElementById('halfChipAdd')?.addEventListener('click', function(){ this.classList.toggle('active'); });
+            document.getElementById('hasCardChipAdd')?.addEventListener('click', function(){ this.classList.toggle('active'); });
+
+            document.getElementById('saveCustomerBtn').addEventListener('click', function() {
+                const name = document.getElementById('name').value.trim();
+                if (!name) return alert('الاسم مطلوب');
+                const newCustomer = {
+                    id: generateId(),
+                    name, phone: document.getElementById('phone').value, passport: document.getElementById('passport').value,
+                    nationalId: document.getElementById('nationalId').value, iban: document.getElementById('iban').value,
+                    cardPurchasePrice: parseFloat(document.getElementById('cardPurchase').value) || 0,
+                    shippingValue: parseFloat(document.getElementById('shipping').value) || 0,
+                    salePrice: parseFloat(document.getElementById('salePrice').value) || 0,
+                    half: document.getElementById('halfChipAdd').classList.contains('active'),
+                    hasCard: document.getElementById('hasCardChipAdd').classList.contains('active'),
+                    status: 'pending', bookingDate: null,
+                    idStr: (customers.length+1).toString()
+                };
+                customers.push(newCustomer);
+                saveToStorage();
+                renderCustomers();
+                closeAllModals();
+            });
+
+            // تفويض الأحداث على القائمة
+            document.getElementById('customersList').addEventListener('click', function(e) {
+                const target = e.target.closest('[data-id]');
+                if (!target) return;
+                const id = target.dataset.id;
+                const customer = customers.find(c => c.id == id);
+                if (!customer) return;
+
+                if (target.classList.contains('customer-id') || target.dataset.action === 'share') {
+                    shareCustomer(customer);
+                } else if (target.dataset.action === 'sell') {
+                    openSellModal(customer);
+                } else if (target.dataset.action === 'book') {
+                    openBookingModal(customer);
+                } else if (target.classList.contains('customer-name') || target.dataset.action === 'name') {
+                    // نقر على الاسم: تمييز مفرد/مزدوج
+                    e.preventDefault();
+                    handleNameClick(e, customer);
+                }
+            });
+
+            // إغلاق المودالات عند النقر على الخلفية
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', function(e) { if (e.target === overlay) this.classList.remove('show'); });
+            });
+
+            // أزرار إغلاق X للمودالات الأخرى
+            document.getElementById('closeSellX')?.addEventListener('click', () => document.getElementById('sellModal').classList.remove('show'));
+            document.getElementById('closeBookingX')?.addEventListener('click', () => document.getElementById('bookingModal').classList.remove('show'));
+            document.getElementById('closeReportsX')?.addEventListener('click', () => document.getElementById('reportsModal').classList.remove('show'));
+            document.getElementById('closeReportsModal')?.addEventListener('click', () => document.getElementById('reportsModal').classList.remove('show'));
+            document.getElementById('closeSellModal')?.addEventListener('click', () => document.getElementById('sellModal').classList.remove('show'));
+            document.getElementById('closeBookingModal')?.addEventListener('click', () => document.getElementById('bookingModal').classList.remove('show'));
+
+            document.getElementById('saveBookingBtn').addEventListener('click', function() {
+                const date = document.getElementById('bookingDate').value;
+                if (currentCustomerId) updateCustomer(currentCustomerId, { status: 'booked', bookingDate: date });
+                document.getElementById('bookingModal').classList.remove('show');
+            });
+
+            // استيراد / تصدير
+            document.getElementById('importBtn').addEventListener('click', function() {
+                document.getElementById('fileImport').click();
+            });
+            document.getElementById('fileImport').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    importFromExcel(e.target.files[0]);
+                    e.target.value = '';
+                }
+            });
+            document.getElementById('exportBtn').addEventListener('click', exportToExcel);
+            document.getElementById('privacyToggle').addEventListener('click', togglePrivacy);
+
+            // زر التقارير
+            document.getElementById('reportsBtn').addEventListener('click', openReportsModal);
+
+            // زر العودة للأعلى
+            document.getElementById('goTopBtn').addEventListener('click', function() {
+                document.querySelector('.customers-list').scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        function exportToExcel() {
+            const wsData = customers.map(c => ({
+                'الاسم': c.name || '',
+                'رقم التليفون': c.phone || '',
+                'جواز السفر': c.passport || '',
+                'الرقم الوطني': c.nationalId || '',
+                'IBAN': c.iban || '',
+                'سعر شراء البطاقة': c.cardPurchasePrice || 0,
+                'قيمة شحن المعاملة': c.shippingValue || 0,
+                'سعر بيع المعاملة': c.salePrice || 0,
+                'الحالة': c.status || 'pending',
+                'بالنصف': c.half ? 'نعم' : 'لا',
+                'لديه بطاقة': c.hasCard ? 'نعم' : 'لا',
+                'تاريخ الحجز': c.bookingDate || ''
+            }));
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'العملاء');
+            XLSX.writeFile(wb, 'العملاء.xlsx');
+        }
+
+        function importFromExcel(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const wb = XLSX.read(data, { type: 'array' });
+                const sheet = wb.Sheets[wb.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                if (rows.length < 2) return;
+                const newCustomers = [];
+                for (let i=1; i<rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || row.length === 0) continue;
+                    const c = {
+                        id: generateId(),
+                        name: row[0] || '',
+                        phone: row[1] || '',
+                        passport: row[2] || '',
+                        nationalId: row[3] || '',
+                        iban: row[4] || '',
+                        cardPurchasePrice: parseFloat(row[5]) || 0,
+                        shippingValue: parseFloat(row[6]) || 0,
+                        salePrice: parseFloat(row[7]) || 0,
+                        status: row[8] || 'pending',
+                        half: row[9] === 'نعم' ? true : false,
+                        hasCard: row[10] === 'نعم' ? true : false,
+                        bookingDate: row[11] || null,
+                        idStr: ''
+                    };
+                    newCustomers.push(c);
+                }
+                if (newCustomers.length) {
+                    customers = [...customers, ...newCustomers];
+                    customers.forEach((c, idx) => { c.idStr = (idx+1).toString(); });
+                    saveToStorage();
+                    renderCustomers();
+                    alert(`تم استيراد ${newCustomers.length} عميل بنجاح.`);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function togglePrivacy() {
+            privacyMode = !privacyMode;
+            const list = document.getElementById('customersList');
+            const btn = document.getElementById('privacyToggle');
+            if (privacyMode) {
+                list.classList.add('privacy-mode');
+                btn.classList.add('privacy-active');
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i> خصوصية (مفعل)';
+            } else {
+                list.classList.remove('privacy-mode');
+                btn.classList.remove('privacy-active');
+                btn.innerHTML = '<i class="fas fa-eye"></i> خصوصية';
+            }
+        }
+    })();
+</script>
+</body>
+</html>
