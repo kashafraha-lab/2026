@@ -574,7 +574,7 @@
             <button class="tool-btn" id="darkModeToggle"><i class="fas fa-moon"></i> دارك</button>
             <button class="tool-btn" id="reportsBtn"><i class="fas fa-chart-pie"></i> تقارير</button>
             <!-- زر الإضافة الجديد بشكل مستطيل بحواف دائرية -->
-            <button class="btn-add-new" id="openAddModalBtn"><i class="fas fa-plus"></i> إضافة معاملة</button>
+            <button class="btn-add-new" id="openAddModalBtn"><i class="fas fa-plus-circle"></i> إضافة معاملة</button>
         </div>
         <input type="file" id="fileImport" accept=".xlsx, .xls, .csv">
     </div>
@@ -600,7 +600,7 @@
         let currentSellStep = 0;
         let tempSellData = {};
         let privacyMode = false;
-        let darkMode = true;
+        let darkMode = true; // default
 
         function generateId() { return Date.now() + Math.floor(Math.random() * 1000); }
 
@@ -611,6 +611,30 @@
         }
         function saveToStorage() {
             localStorage.setItem('customers', JSON.stringify(customers));
+        }
+
+        // دالة لحفظ تفضيل الوضع الداكن
+        function saveDarkModePreference(isDark) {
+            localStorage.setItem('darkMode', isDark ? 'dark' : 'light');
+        }
+
+        // دالة لتحميل تفضيل الوضع الداكن
+        function loadDarkModePreference() {
+            const pref = localStorage.getItem('darkMode');
+            if (pref === 'light') return false;
+            if (pref === 'dark') return true;
+            return true; // default dark
+        }
+
+        function applyDarkMode(isDark) {
+            const btn = document.getElementById('darkModeToggle');
+            if (isDark) {
+                document.body.classList.remove('light-mode');
+                if (btn) btn.innerHTML = '<i class="fas fa-moon"></i> دارك';
+            } else {
+                document.body.classList.add('light-mode');
+                if (btn) btn.innerHTML = '<i class="fas fa-sun"></i> لايت';
+            }
         }
 
         function renderCustomers() {
@@ -963,19 +987,33 @@
 
         function toggleDarkMode() {
             darkMode = !darkMode;
-            const btn = document.getElementById('darkModeToggle');
-            if (darkMode) {
-                document.body.classList.remove('light-mode');
-                btn.innerHTML = '<i class="fas fa-moon"></i> دارك';
+            applyDarkMode(darkMode);
+            saveDarkModePreference(darkMode);
+        }
+
+        function togglePrivacy() {
+            privacyMode = !privacyMode;
+            const list = document.getElementById('customersList');
+            const btn = document.getElementById('privacyToggle');
+            if (privacyMode) {
+                list.classList.add('privacy-mode');
+                btn.classList.add('privacy-active');
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i> خصوصية (مفعل)';
             } else {
-                document.body.classList.add('light-mode');
-                btn.innerHTML = '<i class="fas fa-sun"></i> لايت';
+                list.classList.remove('privacy-mode');
+                btn.classList.remove('privacy-active');
+                btn.innerHTML = '<i class="fas fa-eye"></i> خصوصية';
             }
         }
 
         // تهيئة الصفحة
         window.addEventListener('load', function() {
             loadFromStorage();
+
+            // استعادة تفضيل الوضع الداكن
+            darkMode = loadDarkModePreference();
+            applyDarkMode(darkMode);
+
             renderCustomers();
 
             document.getElementById('addModalContent').innerHTML += `
@@ -1144,21 +1182,6 @@
                 }
             };
             reader.readAsArrayBuffer(file);
-        }
-
-        function togglePrivacy() {
-            privacyMode = !privacyMode;
-            const list = document.getElementById('customersList');
-            const btn = document.getElementById('privacyToggle');
-            if (privacyMode) {
-                list.classList.add('privacy-mode');
-                btn.classList.add('privacy-active');
-                btn.innerHTML = '<i class="fas fa-eye-slash"></i> خصوصية (مفعل)';
-            } else {
-                list.classList.remove('privacy-mode');
-                btn.classList.remove('privacy-active');
-                btn.innerHTML = '<i class="fas fa-eye"></i> خصوصية';
-            }
         }
     })();
 </script>
