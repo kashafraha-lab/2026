@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>مدير المعاملات - تمرير داخلي فقط</title>
+    <title>مدير المعاملات - تصميم احترافي</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- SheetJS -->
@@ -53,12 +53,12 @@
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
+            flex-direction: column;
+            padding: 0; /* إزالة أي حشو */
+            margin: 0;
             transition: background-color 0.3s, color 0.3s;
             font-size: 16px;
-            overflow: hidden; /* يمنع تمرير الصفحة بالكامل */
+            overflow: hidden; /* منع التمرير العام */
         }
 
         .app-container {
@@ -71,7 +71,8 @@
             flex-direction: column;
             height: 100vh;
             max-height: 100vh;
-            overflow: hidden; /* يضمن عدم تمرير خارج الحاوية */
+            overflow: hidden;
+            margin: 0 auto; /* توسيط أفقي فقط */
         }
 
         .logo {
@@ -97,6 +98,7 @@
             padding: 20px 20px 12px 20px;
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
+            background-color: var(--bg-secondary); /* لضمان الثبات */
         }
 
         .header-top {
@@ -556,7 +558,7 @@
         <input type="file" id="fileImport" accept=".xlsx, .xls, .csv">
     </div>
 
-    <!-- قائمة العملاء فقط -->
+    <!-- قائمة العملاء -->
     <div class="customers-list" id="customersList">
         <div class="empty-list">لا يوجد معاملات بعد<br> <i class="fas fa-plus-circle"></i></div>
     </div>
