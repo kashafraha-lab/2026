@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>مدير المعاملات - واجهة ثابتة</title>
+    <title>مدير المعاملات - واجهة رئيسية كاملة</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- SheetJS -->
@@ -57,39 +57,41 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8px;
+            padding: 0; /* إزالة الحواف لاستغلال الشاشة بالكامل */
             transition: background-color 0.3s, color 0.3s;
+            font-size: 16px; /* حجم أساسي مناسب */
         }
 
         .app-container {
             width: 100%;
             max-width: 600px;
             background-color: var(--bg-secondary);
-            border-radius: 28px;
+            border-radius: 0; /* إزالة التدوير لملء الشاشة */
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             overflow: hidden;
-            border: 1px solid var(--border-color);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
             position: relative;
             transition: background-color 0.3s;
             display: flex;
             flex-direction: column;
-            height: 95vh; /* استخدام ارتفاع ثابت لملء الشاشة */
-            max-height: 800px;
+            height: 100vh; /* ملء الشاشة عمودياً */
+            max-height: 100vh;
         }
 
         /* شعار */
         .logo {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         .logo i {
-            font-size: 2rem;
+            font-size: 2.5rem; /* تكبير الشعار */
             color: var(--accent-color);
             filter: drop-shadow(0 4px 8px rgba(0, 184, 148, 0.3));
         }
         .logo span {
-            font-size: 1.6rem;
+            font-size: 2rem; /* تكبير النص */
             font-weight: 700;
             background: linear-gradient(135deg, var(--text-primary), #cccccc);
             -webkit-background-clip: text;
@@ -98,7 +100,7 @@
         }
 
         .header {
-            padding: 16px 16px 8px 16px;
+            padding: 20px 20px 12px 20px;
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
         }
@@ -107,21 +109,21 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .btn-add {
             background: var(--accent-gradient);
             border: none;
             color: white;
-            width: 48px;
-            height: 48px;
-            border-radius: 28px;
-            font-size: 22px;
+            width: 60px; /* تكبير */
+            height: 60px;
+            border-radius: 30px;
+            font-size: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 6px 16px rgba(0, 184, 148, 0.4);
+            box-shadow: 0 8px 20px rgba(0, 184, 148, 0.5);
             cursor: pointer;
             transition: 0.2s;
             border: 1px solid rgba(255,255,255,0.2);
@@ -134,21 +136,21 @@
 
         .toolbar {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             flex-wrap: wrap;
-            margin-top: 6px;
+            margin-top: 8px;
         }
 
         .tool-btn {
             background: var(--toolbar-bg);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            padding: 6px 12px;
-            border-radius: 30px;
-            font-size: 0.8rem;
+            padding: 10px 14px; /* تكبير */
+            border-radius: 40px;
+            font-size: 1rem; /* تكبير الخط */
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             cursor: pointer;
             transition: 0.2s;
             flex: 1 1 auto;
@@ -157,7 +159,7 @@
         }
 
         .tool-btn i {
-            font-size: 1rem;
+            font-size: 1.2rem; /* تكبير الأيقونة */
             color: var(--accent-color);
         }
 
@@ -177,16 +179,16 @@
 
         /* قائمة العملاء - تأخذ المساحة المتبقية وتمرير داخلي */
         .customers-list {
-            padding: 12px 12px 8px 12px;
+            padding: 16px 16px 10px 16px;
             flex: 1 1 auto;
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: var(--accent-color) var(--bg-primary);
-            min-height: 0; /* مهم لـ flex */
+            min-height: 0;
         }
 
         .customers-list::-webkit-scrollbar {
-            width: 4px;
+            width: 5px;
         }
         .customers-list::-webkit-scrollbar-track {
             background: var(--bg-primary);
@@ -198,27 +200,27 @@
 
         .customer-row {
             background: var(--bg-card);
-            border-radius: 18px;
-            padding: 10px 14px;
-            margin-bottom: 8px;
+            border-radius: 24px; /* تكبير التدوير */
+            padding: 14px 18px; /* تكبير */
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border: 1px solid var(--border-color);
             transition: all 0.2s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .customer-row:hover {
             border-color: var(--accent-color);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
         }
 
         .customer-id {
             background: var(--bg-input);
-            width: 36px;
-            height: 36px;
-            border-radius: 18px;
+            width: 44px; /* تكبير */
+            height: 44px;
+            border-radius: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -227,7 +229,7 @@
             border: 1px solid var(--border-color);
             cursor: pointer;
             transition: 0.2s;
-            font-size: 0.95rem;
+            font-size: 1.1rem;
         }
 
         .customer-id:hover {
@@ -238,15 +240,15 @@
 
         .customer-name {
             flex: 2;
-            padding: 0 10px;
-            font-size: 0.9rem;
+            padding: 0 14px;
+            font-size: 1.1rem; /* تكبير */
             font-weight: 500;
             cursor: pointer;
             color: var(--text-primary);
             transition: 0.2s;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
         }
 
         .customer-name:hover {
@@ -254,8 +256,8 @@
         }
 
         .status-badge {
-            font-size: 0.65rem;
-            padding: 3px 6px;
+            font-size: 0.8rem;
+            padding: 4px 8px;
             border-radius: 30px;
             background: var(--bg-input);
             color: var(--text-secondary);
@@ -263,7 +265,7 @@
 
         .status-actions {
             display: flex;
-            gap: 4px;
+            gap: 6px;
             align-items: center;
         }
 
@@ -271,12 +273,12 @@
             border: none;
             background: var(--bg-input);
             color: var(--text-primary);
-            padding: 5px 8px;
+            padding: 8px 12px; /* تكبير */
             border-radius: 30px;
-            font-size: 0.75rem;
+            font-size: 0.9rem; /* تكبير */
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
             cursor: pointer;
             transition: 0.2s;
             border: 1px solid var(--border-color);
@@ -296,7 +298,7 @@
         }
 
         .customers-list.privacy-mode .customer-row *:not(.status-btn i):not(.btn) {
-            filter: blur(4px);
+            filter: blur(5px);
             user-select: none;
         }
 
@@ -305,7 +307,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 16px 12px 16px;
+            padding: 12px 20px 18px 20px;
             border-top: 1px solid var(--border-color);
             flex-shrink: 0;
         }
@@ -314,15 +316,15 @@
             background: var(--accent-color);
             border: none;
             color: white;
-            width: 44px;
-            height: 44px;
-            border-radius: 26px;
+            width: 60px; /* تكبير */
+            height: 60px;
+            border-radius: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
+            font-size: 2rem; /* تكبير الأيقونة */
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.4);
+            box-shadow: 0 6px 16px rgba(0, 184, 148, 0.5);
             transition: 0.2s;
         }
 
@@ -335,13 +337,13 @@
             background: var(--bg-input);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            width: 44px;
-            height: 44px;
-            border-radius: 26px;
+            width: 60px;
+            height: 60px;
+            border-radius: 30px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.8rem; /* تكبير */
             cursor: pointer;
             transition: 0.2s;
         }
@@ -352,13 +354,13 @@
             border-color: var(--accent-color);
         }
 
-        /* باقي الأنماط (المودالات) تبقى كما هي مع تحسينات طفيفة */
+        /* المودالات - نفس التنسيق مع تحسينات طفيفة */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -377,9 +379,9 @@
         .modal-content {
             background: var(--modal-bg);
             width: 100%;
-            max-width: 480px;
-            border-radius: 32px;
-            padding: 22px;
+            max-width: 520px;
+            border-radius: 40px;
+            padding: 28px;
             border: 1px solid var(--border-color);
             box-shadow: 0 30px 60px rgba(0,0,0,0.7);
             transform: scale(0.9);
@@ -395,17 +397,17 @@
 
         .modal-close {
             position: absolute;
-            top: 14px;
-            left: 14px;
+            top: 18px;
+            left: 18px;
             background: var(--bg-input);
-            width: 36px;
-            height: 36px;
-            border-radius: 18px;
+            width: 42px;
+            height: 42px;
+            border-radius: 21px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-secondary);
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             cursor: pointer;
             border: 1px solid var(--border-color);
             transition: 0.2s;
@@ -417,33 +419,33 @@
         }
 
         .modal-content h2 {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
             font-weight: 600;
-            font-size: 1.6rem;
+            font-size: 2rem; /* تكبير */
             color: var(--text-primary);
             border-right: 6px solid var(--accent-color);
-            padding-right: 14px;
+            padding-right: 18px;
         }
 
         .input-field {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
 
         .input-field label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 1rem;
             color: var(--text-secondary);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
         }
 
         .input-field input, .input-field select {
             width: 100%;
             background: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 18px;
-            padding: 12px 16px;
+            border-radius: 28px;
+            padding: 16px 20px; /* تكبير */
             color: var(--text-primary);
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             outline: none;
             transition: border 0.2s;
         }
@@ -454,8 +456,8 @@
 
         .extra-actions {
             display: flex;
-            gap: 10px;
-            margin: 20px 0 12px;
+            gap: 12px;
+            margin: 28px 0 18px;
             flex-wrap: wrap;
         }
 
@@ -463,12 +465,12 @@
             background: var(--bg-input);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            padding: 8px 14px;
-            border-radius: 30px;
-            font-size: 0.95rem;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-size: 1.1rem;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             cursor: pointer;
             transition: 0.2s;
             flex: 1 1 auto;
@@ -484,16 +486,16 @@
         .modal-actions {
             display: flex;
             justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 14px;
+            margin-top: 28px;
         }
 
         .btn {
-            padding: 10px 22px;
-            border-radius: 36px;
+            padding: 14px 28px;
+            border-radius: 40px;
             border: none;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             cursor: pointer;
             transition: 0.2s;
         }
@@ -516,25 +518,25 @@
         .empty-list {
             text-align: center;
             color: var(--text-secondary);
-            padding: 30px 16px;
-            font-size: 1.1rem;
+            padding: 40px 20px;
+            font-size: 1.3rem;
             border: 2px dashed var(--border-color);
-            border-radius: 32px;
-            margin: 10px 0;
+            border-radius: 40px;
+            margin: 20px 0;
         }
 
-        /* شبكة التقارير مصغرة قليلاً */
+        /* شبكة التقارير */
         .reports-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin: 16px 0;
+            gap: 16px;
+            margin: 20px 0;
         }
 
         .report-card {
             background: var(--bg-card);
-            border-radius: 24px;
-            padding: 16px 8px;
+            border-radius: 32px;
+            padding: 24px 12px;
             text-align: center;
             border: 1px solid var(--border-color);
             cursor: pointer;
@@ -543,23 +545,23 @@
 
         .report-card:hover {
             border-color: var(--accent-color);
-            transform: scale(1.02);
+            transform: scale(1.03);
         }
 
         .report-card i {
-            font-size: 2rem;
+            font-size: 2.8rem; /* تكبير */
             color: var(--accent-color);
-            margin-bottom: 6px;
+            margin-bottom: 10px;
         }
 
         .report-card h3 {
-            font-size: 1rem;
-            margin-bottom: 4px;
+            font-size: 1.2rem;
+            margin-bottom: 6px;
             color: var(--text-primary);
         }
 
         .report-card .summary {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: var(--accent-color);
         }
@@ -567,19 +569,19 @@
         .report-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 16px 0;
-            font-size: 0.9rem;
+            margin: 20px 0;
+            font-size: 1rem;
         }
 
         .report-table th {
             text-align: right;
-            padding: 10px;
+            padding: 14px;
             background: var(--bg-input);
             color: var(--text-primary);
         }
 
         .report-table td {
-            padding: 8px 10px;
+            padding: 12px 14px;
             border-bottom: 1px solid var(--border-color);
         }
 
@@ -587,14 +589,14 @@
             background: var(--bg-input);
             border: 1px solid var(--accent-color);
             color: var(--text-primary);
-            padding: 8px 16px;
-            border-radius: 30px;
+            padding: 12px 24px;
+            border-radius: 40px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 6px;
-            margin-top: 12px;
-            font-size: 0.9rem;
+            gap: 10px;
+            margin-top: 16px;
+            font-size: 1rem;
         }
 
         #fileImport {
@@ -795,7 +797,7 @@
             }
         }
 
-        // دوال التقارير (مختصرة)
+        // دوال التقارير (مختصرة للبقاء ضمن الحد)
         function openReportsModal() {
             const grid = document.getElementById('reportsGrid');
             const totalPurchases = customers.reduce((sum, c) => sum + (c.cardPurchasePrice || 0), 0);
@@ -869,7 +871,7 @@
             content.innerHTML = `
                 <div class="modal-close" id="closeTableX"><i class="fas fa-times"></i></div>
                 <h2>${title}</h2>
-                <div style="margin: 8px 0; color: var(--accent-color); font-size: 1.1rem;">الإجمالي: ${totalValue?.toFixed(2) ?? totalValue}</div>
+                <div style="margin: 10px 0; color: var(--accent-color); font-size: 1.2rem;">الإجمالي: ${totalValue?.toFixed(2) ?? totalValue}</div>
                 <table class="report-table"><thead><tr><th>الاسم</th><th>${reportType==='purchases'?'سعر الشراء':reportType==='profits'?'الربح':'القيمة'}</th></tr></thead><tbody>${tableRows || '<tr><td colspan="2">لا توجد بيانات</td></tr>'}</tbody></table>
                 <button class="share-btn" id="shareReportBtn"><i class="fas fa-share-alt"></i> مشاركة التقرير</button>
                 <div class="modal-actions"><button class="btn btn-secondary" id="closeTableModal">إغلاق</button></div>
@@ -932,7 +934,7 @@
             const currentValue = tempSellData[currentKey] !== '' ? tempSellData[currentKey] : '';
 
             stepContainer.innerHTML = `
-                <div style="margin-bottom:16px;color:var(--text-secondary);">الخطوة ${currentSellStep+1} من 3: ${steps[currentSellStep]}</div>
+                <div style="margin-bottom:16px;color:var(--text-secondary); font-size:1.1rem;">الخطوة ${currentSellStep+1} من 3: ${steps[currentSellStep]}</div>
                 <div class="input-field"><label>${steps[currentSellStep]}</label><input type="number" id="sellStepInput" value="${currentValue}" step="0.01" placeholder="أدخل القيمة"></div>
             `;
 
@@ -1088,9 +1090,82 @@
             });
         });
 
-        function exportToExcel() { /* ... */ }
-        function importFromExcel(file) { /* ... */ }
-        function togglePrivacy() { /* ... */ }
+        function exportToExcel() {
+            const wsData = customers.map(c => ({
+                'الاسم': c.name || '',
+                'رقم التليفون': c.phone || '',
+                'جواز السفر': c.passport || '',
+                'الرقم الوطني': c.nationalId || '',
+                'IBAN': c.iban || '',
+                'سعر شراء البطاقة': c.cardPurchasePrice || 0,
+                'قيمة شحن المعاملة': c.shippingValue || 0,
+                'سعر بيع المعاملة': c.salePrice || 0,
+                'الحالة': c.status || 'pending',
+                'بالنصف': c.half ? 'نعم' : 'لا',
+                'لديه بطاقة': c.hasCard ? 'نعم' : 'لا',
+                'تاريخ الحجز': c.bookingDate || ''
+            }));
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'العملاء');
+            XLSX.writeFile(wb, 'العملاء.xlsx');
+        }
+
+        function importFromExcel(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const data = new Uint8Array(e.target.result);
+                const wb = XLSX.read(data, { type: 'array' });
+                const sheet = wb.Sheets[wb.SheetNames[0]];
+                const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                if (rows.length < 2) return;
+                const newCustomers = [];
+                for (let i=1; i<rows.length; i++) {
+                    const row = rows[i];
+                    if (!row || row.length === 0) continue;
+                    const c = {
+                        id: generateId(),
+                        name: row[0] || '',
+                        phone: row[1] || '',
+                        passport: row[2] || '',
+                        nationalId: row[3] || '',
+                        iban: row[4] || '',
+                        cardPurchasePrice: parseFloat(row[5]) || 0,
+                        shippingValue: parseFloat(row[6]) || 0,
+                        salePrice: parseFloat(row[7]) || 0,
+                        status: row[8] || 'pending',
+                        half: row[9] === 'نعم' ? true : false,
+                        hasCard: row[10] === 'نعم' ? true : false,
+                        bookingDate: row[11] || null,
+                        idStr: ''
+                    };
+                    newCustomers.push(c);
+                }
+                if (newCustomers.length) {
+                    customers = [...customers, ...newCustomers];
+                    customers.forEach((c, idx) => { c.idStr = (idx+1).toString(); });
+                    saveToStorage();
+                    renderCustomers();
+                    alert(`تم استيراد ${newCustomers.length} عميل بنجاح.`);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function togglePrivacy() {
+            privacyMode = !privacyMode;
+            const list = document.getElementById('customersList');
+            const btn = document.getElementById('privacyToggle');
+            if (privacyMode) {
+                list.classList.add('privacy-mode');
+                btn.classList.add('privacy-active');
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i> خصوصية (مفعل)';
+            } else {
+                list.classList.remove('privacy-mode');
+                btn.classList.remove('privacy-active');
+                btn.innerHTML = '<i class="fas fa-eye"></i> خصوصية';
+            }
+        }
     })();
 </script>
 </body>
