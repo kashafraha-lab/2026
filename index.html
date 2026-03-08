@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>مدير المعاملات - واجهة مبسطة</title>
+    <title>مدير المعاملات - تمرير داخلي فقط</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- SheetJS -->
@@ -58,6 +58,7 @@
             padding: 0;
             transition: background-color 0.3s, color 0.3s;
             font-size: 16px;
+            overflow: hidden; /* يمنع تمرير الصفحة بالكامل */
         }
 
         .app-container {
@@ -70,7 +71,7 @@
             flex-direction: column;
             height: 100vh;
             max-height: 100vh;
-            overflow: hidden;
+            overflow: hidden; /* يضمن عدم تمرير خارج الحاوية */
         }
 
         .logo {
@@ -555,13 +556,13 @@
         <input type="file" id="fileImport" accept=".xlsx, .xls, .csv">
     </div>
 
-    <!-- قائمة العملاء فقط، بدون أزرار سفلى -->
+    <!-- قائمة العملاء فقط -->
     <div class="customers-list" id="customersList">
         <div class="empty-list">لا يوجد معاملات بعد<br> <i class="fas fa-plus-circle"></i></div>
     </div>
 </div>
 
-<!-- المودالات (كما هي) -->
+<!-- المودالات (بدون تغيير) -->
 <div class="modal-overlay" id="addModal"><div class="modal-content" id="addModalContent"><div class="modal-close" id="closeAddModalX"><i class="fas fa-times"></i></div></div></div>
 <div class="modal-overlay" id="detailsModal"><div class="modal-content" id="detailsContent"></div></div>
 <div class="modal-overlay" id="quickViewModal"><div class="modal-content" id="quickViewContent"></div></div>
