@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>مدير المعاملات - كامل الشاشة مع Dynamic Island</title>
+    <title>مدير المعاملات - مع آلة حاسبة متطورة</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
@@ -29,6 +29,8 @@
             --toolbar-bg: #2b2b2b;
             --modal-bg: #1f1f1f;
             --font-size-base: 15px;
+            --bottom-nav-bg: #1c1c1e;
+            --calculator-btn: #2d2d2d;
         }
 
         body.light-mode {
@@ -45,6 +47,8 @@
             --danger-color: #b30000;
             --toolbar-bg: #e0e0e0;
             --modal-bg: #fafafa;
+            --bottom-nav-bg: #f2f2f7;
+            --calculator-btn: #e5e5e5;
         }
 
         body {
@@ -75,18 +79,29 @@
             padding-right: env(safe-area-inset-right);
         }
 
+        /* الشريط العلوي */
+        .top-bar {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-secondary);
+            flex-shrink: 0;
+        }
+
         .logo {
             display: flex;
             align-items: center;
             gap: 8px;
         }
         .logo i {
-            font-size: 2rem;
+            font-size: 1.8rem;
             color: var(--accent-color);
             filter: drop-shadow(0 4px 8px rgba(0, 184, 148, 0.3));
         }
         .logo span {
-            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-size: 1.4rem;
             font-weight: 700;
             background: linear-gradient(135deg, var(--text-primary), #cccccc);
             -webkit-background-clip: text;
@@ -94,87 +109,44 @@
             letter-spacing: -0.5px;
         }
 
-        .header {
-            padding: 16px 20px 8px 20px;
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
-            background-color: transparent;
-        }
-
-        .header-top {
+        .top-actions {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
+            gap: 10px;
         }
 
-        /* الزر الدائري القديم - تم إخفاؤه */
-        .btn-add-old {
-            display: none;
-        }
-
-        /* زر الإضافة الجديد في شريط الأدوات */
-        .toolbar {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 8px;
-            align-items: center;
-        }
-
-        .tool-btn, .btn-add-new {
+        .top-btn {
             background: var(--toolbar-bg);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            padding: 10px 16px;
-            border-radius: 30px;
-            font-size: 0.95rem;
-            display: inline-flex;
+            width: 42px;
+            height: 42px;
+            border-radius: 21px;
+            display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: center;
             cursor: pointer;
             transition: 0.2s;
-            font-weight: 500;
-            white-space: nowrap;
+            font-size: 1.2rem;
         }
-
-        .btn-add-new {
-            background: var(--accent-gradient);
-            color: white;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.4);
-        }
-
-        .btn-add-new i {
-            font-size: 1.1rem;
-        }
-
-        .tool-btn i {
-            font-size: 1.1rem;
+        .top-btn i {
             color: var(--accent-color);
         }
-
-        .tool-btn:hover {
+        .top-btn:hover {
             background: var(--bg-card);
             border-color: var(--accent-color);
         }
-
-        .btn-add-new:hover {
-            background: linear-gradient(145deg, #00ce9a, #006b4f);
-            transform: scale(1.02);
-        }
-
-        .tool-btn.privacy-active {
+        .top-btn.privacy-active {
             background: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
         }
-        .tool-btn.privacy-active i {
+        .top-btn.privacy-active i {
             color: white;
         }
 
+        /* قائمة العملاء */
         .customers-list {
-            padding: 12px 16px 8px 16px;
+            padding: 12px 16px;
             flex: 1 1 auto;
             overflow-y: auto;
             scrollbar-width: thin;
@@ -193,6 +165,67 @@
             border-radius: 20px;
         }
 
+        /* الشريط السفلي */
+        .bottom-nav {
+            background-color: var(--bottom-nav-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 6px 16px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-shrink: 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            transition: 0.2s;
+            cursor: pointer;
+            flex: 1;
+            padding: 4px 0;
+            border-radius: 30px;
+        }
+        .nav-item i {
+            font-size: 1.3rem;
+            margin-bottom: 2px;
+        }
+        .nav-item span {
+            font-size: 0.65rem;
+        }
+
+        .nav-item.active {
+            color: var(--accent-color);
+        }
+
+        .nav-item.add-large {
+            background: var(--accent-gradient);
+            color: white;
+            border-radius: 40px;
+            padding: 8px 16px;
+            margin: 0 10px;
+            flex: 0 0 auto;
+            min-width: 70px;
+            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.5);
+        }
+        .nav-item.add-large i {
+            font-size: 1.6rem;
+            margin-bottom: 0;
+        }
+        .nav-item.add-large span {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .nav-item.left, .nav-item.right {
+            flex: 1;
+        }
+
+        /* باقي الأنماط (مودالات، بطاقات) */
         .customer-row {
             background: var(--bg-card);
             border-radius: 20px;
@@ -292,12 +325,79 @@
             border-color: #1e6f9f;
         }
 
-        /* وضع الخصوصية: فقط الأزرار تبقى واضحة */
+        /* وضع الخصوصية */
         .customers-list.privacy-mode .customer-row *:not(.status-btn, .btn) {
             filter: blur(4px);
             user-select: none;
         }
 
+        /* مودال الآلة الحاسبة المتطورة */
+        .calc-expression {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px 24px 0 0;
+            padding: 10px 18px;
+            font-size: 1rem;
+            text-align: left;
+            direction: ltr;
+            color: var(--text-secondary);
+            border-bottom: none;
+            overflow-x: auto;
+            white-space: nowrap;
+            min-height: 40px;
+        }
+        .calc-display {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 24px 24px;
+            padding: 20px 18px;
+            font-size: 2rem;
+            text-align: left;
+            direction: ltr;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            overflow-x: auto;
+            white-space: nowrap;
+            border-top: none;
+        }
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .calc-btn {
+            background: var(--calculator-btn);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            font-size: 1.4rem;
+            padding: 15px 0;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.1s;
+            text-align: center;
+            font-weight: 500;
+        }
+        .calc-btn.operator {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-hover);
+        }
+        .calc-btn.equals {
+            background: var(--accent-gradient);
+            color: white;
+            grid-column: span 2;
+        }
+        .calc-btn.clear {
+            background: var(--danger-color);
+            color: white;
+        }
+        .calc-btn.percent {
+            background: #4a4a4a;
+            color: white;
+        }
+
+        /* باقي المودالات */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -559,32 +659,79 @@
 </head>
 <body>
 <div class="app-container">
-    <div class="header">
-        <div class="header-top">
-            <div class="logo">
-                <i class="fas fa-chart-line"></i>
-                <span>مدير المعاملات</span>
-            </div>
-            <!-- الزر الدائري القديم مخفي -->
+    <!-- الشريط العلوي -->
+    <div class="top-bar">
+        <div class="logo">
+            <i class="fas fa-chart-line"></i>
+            <span>مدير المعاملات</span>
         </div>
-        <div class="toolbar">
-            <button class="tool-btn" id="importBtn"><i class="fas fa-file-import"></i> استيراد</button>
-            <button class="tool-btn" id="exportBtn"><i class="fas fa-file-export"></i> تصدير</button>
-            <button class="tool-btn" id="privacyToggle"><i class="fas fa-eye"></i> خصوصية</button>
-            <button class="tool-btn" id="darkModeToggle"><i class="fas fa-moon"></i> دارك</button>
-            <button class="tool-btn" id="reportsBtn"><i class="fas fa-chart-pie"></i> تقارير</button>
-            <!-- زر الإضافة الجديد بشكل مستطيل بحواف دائرية -->
-            <button class="btn-add-new" id="openAddModalBtn"><i class="fas fa-plus-circle"></i> إضافة معاملة</button>
+        <div class="top-actions">
+            <button class="top-btn" id="importBtn" title="استيراد"><i class="fas fa-file-import"></i></button>
+            <button class="top-btn" id="exportBtn" title="تصدير"><i class="fas fa-file-export"></i></button>
+            <button class="top-btn" id="darkModeToggle" title="الوضع الداكن"><i class="fas fa-moon"></i></button>
+            <button class="top-btn" id="privacyToggle" title="خصوصية"><i class="fas fa-eye"></i></button>
         </div>
-        <input type="file" id="fileImport" accept=".xlsx, .xls, .csv">
     </div>
 
+    <!-- قائمة العملاء -->
     <div class="customers-list" id="customersList">
         <div class="empty-list">لا يوجد معاملات بعد<br> <i class="fas fa-plus-circle"></i></div>
     </div>
+
+    <!-- الشريط السفلي -->
+    <div class="bottom-nav">
+        <div class="nav-item left" id="reportsBtn">
+            <i class="fas fa-chart-pie"></i>
+            <span>تقارير</span>
+        </div>
+        <div class="nav-item add-large" id="openAddModalBtn">
+            <i class="fas fa-plus-circle"></i>
+            <span>إضافة</span>
+        </div>
+        <div class="nav-item right" id="calculatorBtn">
+            <i class="fas fa-calculator"></i>
+            <span>آلة حاسبة</span>
+        </div>
+    </div>
+
+    <input type="file" id="fileImport" accept=".xlsx, .xls, .csv">
 </div>
 
-<!-- المودالات -->
+<!-- مودال الآلة الحاسبة المتطورة -->
+<div class="modal-overlay" id="calculatorModal">
+    <div class="modal-content">
+        <div class="modal-close" id="closeCalculatorX"><i class="fas fa-times"></i></div>
+        <h2>آلة حاسبة</h2>
+        <div class="calc-expression" id="calcExpression"></div>
+        <div class="calc-display" id="calcDisplay">0</div>
+        <div class="calculator-grid">
+            <div class="calc-btn clear" data-value="C">C</div>
+            <div class="calc-btn percent" data-value="%">%</div>
+            <div class="calc-btn operator" data-value="/">÷</div>
+            <div class="calc-btn operator" data-value="*">×</div>
+            <div class="calc-btn" data-value="7">7</div>
+            <div class="calc-btn" data-value="8">8</div>
+            <div class="calc-btn" data-value="9">9</div>
+            <div class="calc-btn operator" data-value="-">-</div>
+            <div class="calc-btn" data-value="4">4</div>
+            <div class="calc-btn" data-value="5">5</div>
+            <div class="calc-btn" data-value="6">6</div>
+            <div class="calc-btn operator" data-value="+">+</div>
+            <div class="calc-btn" data-value="1">1</div>
+            <div class="calc-btn" data-value="2">2</div>
+            <div class="calc-btn" data-value="3">3</div>
+            <div class="calc-btn equals" data-value="=">=</div>
+            <div class="calc-btn" data-value="0">0</div>
+            <div class="calc-btn" data-value="00">00</div>
+            <div class="calc-btn" data-value=".">.</div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" id="closeCalculatorBtn">إغلاق</button>
+        </div>
+    </div>
+</div>
+
+<!-- باقي المودالات (نفس الشيء) -->
 <div class="modal-overlay" id="addModal"><div class="modal-content" id="addModalContent"><div class="modal-close" id="closeAddModalX"><i class="fas fa-times"></i></div></div></div>
 <div class="modal-overlay" id="detailsModal"><div class="modal-content" id="detailsContent"></div></div>
 <div class="modal-overlay" id="quickViewModal"><div class="modal-content" id="quickViewContent"></div></div>
@@ -600,7 +747,14 @@
         let currentSellStep = 0;
         let tempSellData = {};
         let privacyMode = false;
-        let darkMode = true; // default
+        let darkMode = true;
+
+        // متغيرات الآلة الحاسبة المتطورة
+        let calcInput = '0';           // الرقم الحالي المعروض
+        let calcExpression = '';       // العملية كاملة
+        let prevValue = null;          // الرقم السابق
+        let currentOperator = null;    // العملية الحالية
+        let shouldResetInput = false;  // هل نبدأ رقم جديد بعد عملية
 
         function generateId() { return Date.now() + Math.floor(Math.random() * 1000); }
 
@@ -613,27 +767,25 @@
             localStorage.setItem('customers', JSON.stringify(customers));
         }
 
-        // دالة لحفظ تفضيل الوضع الداكن
         function saveDarkModePreference(isDark) {
             localStorage.setItem('darkMode', isDark ? 'dark' : 'light');
         }
 
-        // دالة لتحميل تفضيل الوضع الداكن
         function loadDarkModePreference() {
             const pref = localStorage.getItem('darkMode');
             if (pref === 'light') return false;
             if (pref === 'dark') return true;
-            return true; // default dark
+            return true;
         }
 
         function applyDarkMode(isDark) {
             const btn = document.getElementById('darkModeToggle');
             if (isDark) {
                 document.body.classList.remove('light-mode');
-                if (btn) btn.innerHTML = '<i class="fas fa-moon"></i> دارك';
+                if (btn) btn.innerHTML = '<i class="fas fa-moon"></i>';
             } else {
                 document.body.classList.add('light-mode');
-                if (btn) btn.innerHTML = '<i class="fas fa-sun"></i> لايت';
+                if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
             }
         }
 
@@ -653,7 +805,7 @@
                 const soldBtnClass = isSold ? 'status-btn sold' : 'status-btn';
                 const bookedBtnClass = isBooked ? 'status-btn booked' : 'status-btn';
                 const rowClass = isCancelled ? 'customer-row cancelled' : 'customer-row';
-                const idStr = (index + 1).toString(); // حساب رقم العرض بدون تخزين
+                const idStr = (index + 1).toString();
 
                 html += `
                     <div class="${rowClass}" data-id="${c.id}">
@@ -680,16 +832,123 @@
             }
         }
 
-        // تعطيل حقل سعر الشراء عند تفعيل "نصف"
-        function toggleHalfField(modalPrefix) {
-            const halfChip = document.getElementById(modalPrefix + 'HalfChip');
-            const purchaseField = document.getElementById(modalPrefix + 'CardPurchase');
-            if (!halfChip || !purchaseField) return;
-            const isActive = halfChip.classList.contains('active');
-            purchaseField.disabled = isActive;
-            if (isActive) purchaseField.value = ''; // إفراغ القيمة
+        // دوال الآلة الحاسبة المتطورة
+        function updateCalcDisplay() {
+            const exprEl = document.getElementById('calcExpression');
+            const dispEl = document.getElementById('calcDisplay');
+            if (exprEl) exprEl.innerText = calcExpression || ' ';
+            if (dispEl) dispEl.innerText = calcInput;
         }
 
+        function handleCalcButton(val) {
+            if (val === 'C') {
+                // مسح كامل
+                calcInput = '0';
+                calcExpression = '';
+                prevValue = null;
+                currentOperator = null;
+                shouldResetInput = false;
+                updateCalcDisplay();
+                return;
+            }
+
+            if (val === '=') {
+                // تنفيذ العملية
+                if (currentOperator && prevValue !== null) {
+                    const current = parseFloat(calcInput);
+                    let result;
+                    switch(currentOperator) {
+                        case '+': result = prevValue + current; break;
+                        case '-': result = prevValue - current; break;
+                        case '*': result = prevValue * current; break;
+                        case '/': result = prevValue / current; break;
+                        default: result = current;
+                    }
+                    calcInput = result.toString();
+                    calcExpression = ''; // نعبر أن العملية انتهت
+                    prevValue = null;
+                    currentOperator = null;
+                    shouldResetInput = true;
+                } else {
+                    // إذا ضغط = بدون عملية، نعيد نفس الرقم
+                }
+                updateCalcDisplay();
+                return;
+            }
+
+            if (val === '%') {
+                // معالجة النسبة المئوية
+                if (currentOperator && prevValue !== null) {
+                    // إذا كان هناك عملية سابقة، نحول الرقم الحالي إلى نسبة من الرقم السابق
+                    const current = parseFloat(calcInput);
+                    const percentValue = (prevValue * current) / 100;
+                    // نطبق العملية على الفور
+                    let result;
+                    switch(currentOperator) {
+                        case '+': result = prevValue + percentValue; break;
+                        case '-': result = prevValue - percentValue; break;
+                        case '*': result = prevValue * (current / 100); break; // ضرب نسبة
+                        case '/': result = prevValue / (current / 100); break; // قسمة نسبة
+                        default: result = percentValue;
+                    }
+                    calcInput = result.toString();
+                    calcExpression = ''; // ننهي العملية
+                    prevValue = null;
+                    currentOperator = null;
+                    shouldResetInput = true;
+                } else {
+                    // بدون عملية: تحويل الرقم الحالي إلى نسبة مئوية (قسمة على 100)
+                    calcInput = (parseFloat(calcInput) / 100).toString();
+                }
+                updateCalcDisplay();
+                return;
+            }
+
+            if (['+', '-', '*', '/'].includes(val)) {
+                // إذا كان هناك عملية سابقة، ننفذها أولاً
+                if (currentOperator && prevValue !== null && !shouldResetInput) {
+                    const current = parseFloat(calcInput);
+                    let result;
+                    switch(currentOperator) {
+                        case '+': result = prevValue + current; break;
+                        case '-': result = prevValue - current; break;
+                        case '*': result = prevValue * current; break;
+                        case '/': result = prevValue / current; break;
+                        default: result = current;
+                    }
+                    prevValue = result;
+                    calcInput = result.toString();
+                } else if (prevValue === null) {
+                    // أول عملية
+                    prevValue = parseFloat(calcInput);
+                }
+                currentOperator = val;
+                // بناء التعبير
+                calcExpression = prevValue + ' ' + currentOperator + ' ';
+                shouldResetInput = true;
+                updateCalcDisplay();
+                return;
+            }
+
+            // أرقام أو نقطة
+            if (shouldResetInput) {
+                calcInput = (val === '.' ? '0.' : val);
+                shouldResetInput = false;
+            } else {
+                if (val === '.' && calcInput.includes('.')) return;
+                if (calcInput === '0' && val !== '.') calcInput = val;
+                else calcInput += val;
+            }
+            // تحديث التعبير إذا كنا في منتصف عملية
+            if (currentOperator && prevValue !== null) {
+                calcExpression = prevValue + ' ' + currentOperator + ' ' + calcInput;
+            } else {
+                calcExpression = ''; // إذا لم تكن هناك عملية، نترك التعبير فارغاً
+            }
+            updateCalcDisplay();
+        }
+
+        // دوال المودالات (كما هي سابقة)
         function showQuickView(customer) {
             const modal = document.getElementById('quickViewModal');
             const content = document.getElementById('quickViewContent');
@@ -743,7 +1002,6 @@
             `;
             modal.classList.add('show');
 
-            // ربط أحداث النصف في شاشة التعديل
             document.getElementById('detailHalfChip').addEventListener('click', function(e) {
                 e.stopPropagation();
                 this.classList.toggle('active');
@@ -794,9 +1052,9 @@
         }
 
         function openReportsModal() {
-            const grid = document.getElementById('reportsGrid');
-            const totalPurchases = customers.reduce((sum, c) => sum + (c.half ? 0 : (c.cardPurchasePrice || 0)), 0);
-            const totalProfits = customers.reduce((sum, c) => {
+            const activeCustomers = customers.filter(c => c.status !== 'cancelled');
+            const totalPurchases = activeCustomers.reduce((sum, c) => sum + (c.half ? 0 : (c.cardPurchasePrice || 0)), 0);
+            const totalProfits = activeCustomers.reduce((sum, c) => {
                 const cost = c.half ? 0 : (c.cardPurchasePrice || 0);
                 return sum + ((c.salePrice || 0) - cost - (c.shippingValue || 0));
             }, 0);
@@ -805,6 +1063,7 @@
             const bookingsCount = customers.filter(c => c.status === 'booked').length;
             const cancelledCount = customers.filter(c => c.status === 'cancelled').length;
 
+            const grid = document.getElementById('reportsGrid');
             grid.innerHTML = `
                 <div class="report-card" data-report="purchases"><i class="fas fa-shopping-cart"></i><h3>المشتريات</h3><div class="summary">${totalPurchases.toFixed(2)}</div></div>
                 <div class="report-card" data-report="profits"><i class="fas fa-chart-line"></i><h3>الأرباح</h3><div class="summary">${totalProfits.toFixed(2)}</div></div>
@@ -827,30 +1086,33 @@
             let title = '', tableRows = '', totalValue = null;
 
             switch(reportType) {
-                case 'purchases':
+                case 'purchases': {
                     title = 'المشتريات';
-                    tableRows = customers.map(c => {
+                    const active = customers.filter(c => c.status !== 'cancelled');
+                    tableRows = active.map(c => {
                         const purchaseValue = c.half ? 'نصف' : (c.cardPurchasePrice || 0).toFixed(2);
                         return `<tr><td>${c.name}</td><td>${purchaseValue}</td></tr>`;
                     }).join('');
-                    totalValue = customers.reduce((s, c) => s + (c.half ? 0 : (c.cardPurchasePrice || 0)), 0);
+                    totalValue = active.reduce((s, c) => s + (c.half ? 0 : (c.cardPurchasePrice || 0)), 0);
                     break;
-                case 'profits':
+                }
+                case 'profits': {
                     title = 'الأرباح';
-                    tableRows = customers.map(c => {
+                    const active = customers.filter(c => c.status !== 'cancelled');
+                    tableRows = active.map(c => {
                         const cost = c.half ? 0 : (c.cardPurchasePrice || 0);
                         const profit = (c.salePrice || 0) - cost - (c.shippingValue || 0);
                         return `<tr><td>${c.name}</td><td>${profit.toFixed(2)}</td></tr>`;
                     }).join('');
-                    totalValue = customers.reduce((s, c) => {
+                    totalValue = active.reduce((s, c) => {
                         const cost = c.half ? 0 : (c.cardPurchasePrice || 0);
                         return s + ((c.salePrice || 0) - cost - (c.shippingValue || 0));
                     }, 0);
                     break;
+                }
                 case 'ongoing':
                     title = 'المعاملات الجارية';
                     const ongoing = customers.filter(c => c.status === 'pending' || !c.status);
-                    // عرض عمود واحد فقط (الاسم)
                     tableRows = ongoing.map(c => `<tr><td colspan="2" style="text-align:center;">${c.name}</td></tr>`).join('');
                     totalValue = ongoing.length;
                     break;
@@ -874,7 +1136,6 @@
                     break;
             }
 
-            // تخصيص الجدول حسب التقرير (إذا كان عمود واحد ندمج الخلايا)
             let tableHeader = '';
             if (reportType === 'ongoing' || reportType === 'executed' || reportType === 'cancelled') {
                 tableHeader = '<tr><th colspan="2">الاسم</th></tr>';
@@ -998,11 +1259,11 @@
             if (privacyMode) {
                 list.classList.add('privacy-mode');
                 btn.classList.add('privacy-active');
-                btn.innerHTML = '<i class="fas fa-eye-slash"></i> خصوصية (مفعل)';
+                btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
             } else {
                 list.classList.remove('privacy-mode');
                 btn.classList.remove('privacy-active');
-                btn.innerHTML = '<i class="fas fa-eye"></i> خصوصية';
+                btn.innerHTML = '<i class="fas fa-eye"></i>';
             }
         }
 
@@ -1010,12 +1271,12 @@
         window.addEventListener('load', function() {
             loadFromStorage();
 
-            // استعادة تفضيل الوضع الداكن
             darkMode = loadDarkModePreference();
             applyDarkMode(darkMode);
 
             renderCustomers();
 
+            // إضافة محتوى مودال الإضافة
             document.getElementById('addModalContent').innerHTML += `
                 <h2>إضافة معاملة</h2>
                 <div class="input-field"><label>الاسم</label><input type="text" id="name" placeholder="الاسم كاملاً"></div>
@@ -1036,7 +1297,6 @@
                 </div>
             `;
 
-            // ربط حدث النصف في شاشة الإضافة
             document.getElementById('halfChipAdd').addEventListener('click', function() {
                 this.classList.toggle('active');
                 const purchaseField = document.getElementById('cardPurchase');
@@ -1072,6 +1332,7 @@
                 closeAllModals();
             });
 
+            // أحداث القائمة
             document.getElementById('customersList').addEventListener('click', function(e) {
                 const target = e.target.closest('[data-id]');
                 if (!target) return;
@@ -1095,6 +1356,7 @@
                 overlay.addEventListener('click', function(e) { if (e.target === overlay) this.classList.remove('show'); });
             });
 
+            // أزرار المودالات الأخرى
             document.getElementById('closeSellX')?.addEventListener('click', () => document.getElementById('sellModal').classList.remove('show'));
             document.getElementById('closeBookingX')?.addEventListener('click', () => document.getElementById('bookingModal').classList.remove('show'));
             document.getElementById('closeReportsX')?.addEventListener('click', () => document.getElementById('reportsModal').classList.remove('show'));
@@ -1108,6 +1370,7 @@
                 document.getElementById('bookingModal').classList.remove('show');
             });
 
+            // أزرار الاستيراد/التصدير
             document.getElementById('importBtn').addEventListener('click', function() {
                 document.getElementById('fileImport').click();
             });
@@ -1121,8 +1384,32 @@
             document.getElementById('privacyToggle').addEventListener('click', togglePrivacy);
             document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
             document.getElementById('reportsBtn').addEventListener('click', openReportsModal);
+
+            // آلة حاسبة
+            document.getElementById('calculatorBtn').addEventListener('click', () => {
+                document.getElementById('calculatorModal').classList.add('show');
+                // إعادة تعيين العرض
+                calcInput = '0';
+                calcExpression = '';
+                prevValue = null;
+                currentOperator = null;
+                shouldResetInput = false;
+                updateCalcDisplay();
+            });
+
+            document.getElementById('closeCalculatorX').addEventListener('click', () => document.getElementById('calculatorModal').classList.remove('show'));
+            document.getElementById('closeCalculatorBtn').addEventListener('click', () => document.getElementById('calculatorModal').classList.remove('show'));
+
+            // أزرار الآلة الحاسبة
+            document.querySelectorAll('.calc-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const val = btn.dataset.value;
+                    handleCalcButton(val);
+                });
+            });
         });
 
+        // دوال Excel
         function exportToExcel() {
             const wsData = customers.map(c => ({
                 'الاسم': c.name || '',
