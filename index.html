@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- تمت إضافة viewport-fit=cover لتمتد التطبيق تحت النوتش -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>مدير المعاملات - امتداد كامل</title>
+    <title>مدير المعاملات - كامل الشاشة</title>
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- SheetJS -->
@@ -64,17 +64,15 @@
 
         .app-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 100%; /* إزالة الحد الأقصى السابق */
             background-color: var(--bg-secondary);
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
+            /* إزالة border-left و border-right */
             display: flex;
             flex-direction: column;
             height: 100vh;
             max-height: 100vh;
             overflow: hidden;
-            margin: 0 auto; /* توسيط أفقي فقط */
-            /* لا يوجد margin أو padding علوي */
+            margin: 0 auto;
         }
 
         .logo {
@@ -88,7 +86,7 @@
             filter: drop-shadow(0 4px 8px rgba(0, 184, 148, 0.3));
         }
         .logo span {
-            font-size: 2rem;
+            font-size: clamp(1.8rem, 5vw, 2.5rem);
             font-weight: 700;
             background: linear-gradient(135deg, var(--text-primary), #cccccc);
             -webkit-background-clip: text;
@@ -97,7 +95,7 @@
         }
 
         .header {
-            padding: 20px 20px 12px 20px;
+            padding: 20px 24px 12px 24px; /* زيادة padding الجانبي قليلاً */
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
             background-color: var(--bg-secondary);
@@ -135,16 +133,16 @@
 
         .toolbar {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             flex-wrap: wrap;
-            margin-top: 8px;
+            margin-top: 12px;
         }
 
         .tool-btn {
             background: var(--toolbar-bg);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            padding: 10px 14px;
+            padding: 12px 18px; /* تكبير الأزرار قليلاً */
             border-radius: 40px;
             font-size: 1rem;
             display: flex;
@@ -152,7 +150,8 @@
             gap: 6px;
             cursor: pointer;
             transition: 0.2s;
-            flex: 1 1 auto;
+            flex: 0 1 auto; /* السماح بالتصغير دون كسر */
+            min-width: fit-content;
             justify-content: center;
             font-weight: 500;
         }
@@ -177,7 +176,7 @@
         }
 
         .customers-list {
-            padding: 16px 16px 10px 16px;
+            padding: 16px 20px 10px 20px; /* توسيع الهامش الجانبي */
             flex: 1 1 auto;
             overflow-y: auto;
             scrollbar-width: thin;
@@ -199,8 +198,8 @@
         .customer-row {
             background: var(--bg-card);
             border-radius: 24px;
-            padding: 14px 18px;
-            margin-bottom: 12px;
+            padding: 16px 22px; /* توسيع البطاقة */
+            margin-bottom: 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -239,7 +238,7 @@
         .customer-name {
             flex: 2;
             padding: 0 14px;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 500;
             cursor: pointer;
             color: var(--text-primary);
@@ -255,20 +254,22 @@
 
         .status-actions {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .status-btn {
             border: none;
             background: var(--bg-input);
             color: var(--text-primary);
-            padding: 8px 12px;
+            padding: 10px 16px;
             border-radius: 30px;
-            font-size: 0.9rem;
+            font-size: 1rem;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             cursor: pointer;
             transition: 0.2s;
             border: 1px solid var(--border-color);
@@ -316,8 +317,8 @@
 
         .modal-content {
             background: var(--modal-bg);
-            width: 100%;
-            max-width: 520px;
+            width: 90%;
+            max-width: 600px; /* إبقاء المودال بمقاس معقول */
             border-radius: 40px;
             padding: 28px;
             border: 1px solid var(--border-color);
@@ -327,6 +328,12 @@
             max-height: 85vh;
             overflow-y: auto;
             position: relative;
+        }
+
+        @media (min-width: 768px) {
+            .modal-content {
+                max-width: 700px; /* توسيع قليلاً على الشاشات الكبيرة */
+            }
         }
 
         .modal-overlay.show .modal-content {
@@ -567,7 +574,7 @@
     </div>
 </div>
 
-<!-- المودالات (بدون تغيير) -->
+<!-- المودالات -->
 <div class="modal-overlay" id="addModal"><div class="modal-content" id="addModalContent"><div class="modal-close" id="closeAddModalX"><i class="fas fa-times"></i></div></div></div>
 <div class="modal-overlay" id="detailsModal"><div class="modal-content" id="detailsContent"></div></div>
 <div class="modal-overlay" id="quickViewModal"><div class="modal-content" id="quickViewContent"></div></div>
