@@ -564,14 +564,17 @@
             });
         }
 
-        // دالة حساب الربح حسب الطلب (خصم الشراء)
+        // دالة حساب الربح للمعاملة (تستخدم فقط للمعاملات المباعة done === true)
         function calculateProfit(item) {
+            // نحسب الربح فقط إذا كانت المعاملة مباعة (done) ولديها سعر بيع
+            if (!item.done || !item.sellPrice || parseFloat(item.sellPrice) <= 0) return 0;
+            
             let buy = parseFloat(item.buyPrice) || 0;
             let charge = parseFloat(item.chargePrice) || 0;
             let sell = parseFloat(item.sellPrice) || 0;
             let disc = parseFloat(item.discount) || 0;
             let finalSell = sell - (sell * (disc / 100));
-            let profit = finalSell - charge - buy;  // خصم الشراء
+            let profit = finalSell - charge - buy;  // خصم الشراء والشحن
             if (item.isHalf) profit = profit / 2;
             return profit;
         }
@@ -597,14 +600,14 @@
                 if (item.cancelled && type !== 'cancelled') return false; 
                 
                 if (type === 'profit') {
-                    let profit = calculateProfit(item);
-                    return profit > 0;  // نعرض فقط الإيجابي، لكن يمكن تعديل الشرط حسب الرغبة
+                    // نعرض فقط المعاملات المباعة والتي ربحها >0 (يمكن تعديل الشرط)
+                    return item.done && calculateProfit(item) > 0;
                 }
                 if (type === 'purchases') return (parseFloat(item.buyPrice) > 0);
-                if (type === 'pending') return !item.done;
-                if (type === 'done') return item.done;
+                if (type === 'pending') return !item.done && !item.cancelled;
+                if (type === 'done') return item.done && !item.cancelled;
                 if (type === 'cancelled') return item.cancelled;
-                if (type === 'booked') return item.bookingDate && !item.done;
+                if (type === 'booked') return item.bookingDate && !item.done && !item.cancelled;
                 return false;
             });
 
@@ -882,7 +885,8 @@
             transactions.forEach(item => {
                 if(item.cancelled) cancelled++;
                 else {
-                    totalProfit += calculateProfit(item);
+                    // الأرباح تحتسب فقط للمعاملات المباعة
+                    if (item.done) totalProfit += calculateProfit(item);
                     totalBuy += parseFloat(item.buyPrice) || 0;
                     if (item.done) done++; else pending++;
                     if (item.bookingDate && !item.done) booked++;
