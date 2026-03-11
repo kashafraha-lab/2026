@@ -564,13 +564,14 @@
             });
         }
 
-        // دالة حساب الربح حسب الطلب الجديد (بدون خصم سعر الشراء)
+        // دالة حساب الربح حسب الطلب (خصم الشراء)
         function calculateProfit(item) {
-            let sell = parseFloat(item.sellPrice) || 0;
+            let buy = parseFloat(item.buyPrice) || 0;
             let charge = parseFloat(item.chargePrice) || 0;
+            let sell = parseFloat(item.sellPrice) || 0;
             let disc = parseFloat(item.discount) || 0;
             let finalSell = sell - (sell * (disc / 100));
-            let profit = finalSell - charge;  // لم نطرح buyPrice
+            let profit = finalSell - charge - buy;  // خصم الشراء
             if (item.isHalf) profit = profit / 2;
             return profit;
         }
@@ -881,7 +882,6 @@
             transactions.forEach(item => {
                 if(item.cancelled) cancelled++;
                 else {
-                    // استخدام دالة الربح الجديدة
                     totalProfit += calculateProfit(item);
                     totalBuy += parseFloat(item.buyPrice) || 0;
                     if (item.done) done++; else pending++;
@@ -991,7 +991,7 @@
             let isHalf = document.getElementById('det_halfMode').checked; 
             
             let finalSell = sell - (sell * (disc / 100));
-            let profit = (finalSell - charge); // بدون خصم سعر الشراء
+            let profit = finalSell - charge - buy; // خصم الشراء
             if (isHalf) profit = profit / 2;
             
             let profitEl = document.getElementById('det_profit_val');
