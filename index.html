@@ -9,8 +9,9 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="2026">
-    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=2026&background=2E8B57&color=fff&size=512&font-size=0.35&bold=true&length=4">
-    <link rel="icon" href="https://ui-avatars.com/api/?name=2026&background=2E8B57&color=fff&size=512&font-size=0.35&bold=true&length=4">
+    <!-- أيقونة الهوم سكرين: 26 -->
+    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=26&background=2E8B57&color=fff&size=512&font-size=0.5&bold=true&length=2">
+    <link rel="icon" href="https://ui-avatars.com/api/?name=26&background=2E8B57&color=fff&size=512&font-size=0.5&bold=true&length=2">
 
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -543,13 +544,13 @@
             }
         }
 
+        // دالة التنبيهات – لم نعد نمسح التواريخ القديمة، فقط ننبه للغد
         function checkNotifications() {
             const today = new Date();
             today.setHours(0,0,0,0);
             const tomorrow = new Date(today);
             tomorrow.setDate(today.getDate() + 1);
 
-            let changed = false;
             transactions.forEach((item, index) => {
                 if(item.bookingDate) {
                     const bDate = new Date(item.bookingDate);
@@ -557,16 +558,21 @@
                     
                     if(bDate.getTime() === tomorrow.getTime()) {
                         showToast(`تنبيه: حجز ${item.name} غداً!`, 'info');
-                    } else if (bDate.getTime() < today.getTime()) {
-                        item.bookingDate = ""; 
-                        changed = true;
                     }
+                    // لم نعد نمسح التواريخ القديمة
                 }
             });
-            if(changed) {
-                localStorage.setItem('app2026_pro_db', JSON.stringify(transactions));
-                renderTable();
-            }
+        }
+
+        // دالة حساب الربح حسب الطلب الجديد (بدون خصم سعر الشراء)
+        function calculateProfit(item) {
+            let sell = parseFloat(item.sellPrice) || 0;
+            let charge = parseFloat(item.chargePrice) || 0;
+            let disc = parseFloat(item.discount) || 0;
+            let finalSell = sell - (sell * (disc / 100));
+            let profit = finalSell - charge;  // لم نطرح buyPrice
+            if (item.isHalf) profit = profit / 2;
+            return profit;
         }
 
         function showFilteredList(type, title) {
@@ -590,10 +596,8 @@
                 if (item.cancelled && type !== 'cancelled') return false; 
                 
                 if (type === 'profit') {
-                    let buy = parseFloat(item.buyPrice) || 0, charge = parseFloat(item.chargePrice) || 0, sell = parseFloat(item.sellPrice) || 0, disc = parseFloat(item.discount) || 0;
-                    let finalSell = sell - (sell * (disc / 100));
-                    let profit = item.isHalf ? ((finalSell - charge) / 2) : (finalSell - charge - buy);
-                    return profit > 0;
+                    let profit = calculateProfit(item);
+                    return profit > 0;  // نعرض فقط الإيجابي، لكن يمكن تعديل الشرط حسب الرغبة
                 }
                 if (type === 'purchases') return (parseFloat(item.buyPrice) > 0);
                 if (type === 'pending') return !item.done;
@@ -603,18 +607,27 @@
                 return false;
             });
 
+            // ترتيب الحجوزات حسب التاريخ (الأقدم أولاً)
+            if (type === 'booked') {
+                filtered.sort((a, b) => {
+                    let dateA = a.item.bookingDate ? new Date(a.item.bookingDate).getTime() : 0;
+                    let dateB = b.item.bookingDate ? new Date(b.item.bookingDate).getTime() : 0;
+                    return dateA - dateB; // تصاعدي (أقدم)
+                });
+            }
+
             if (filtered.length === 0) {
                 tbody.innerHTML = "<tr><td colspan='3' style='padding:20px; color:var(--text-sub);'>لا توجد بيانات مطابقة</td></tr>";
                 currentShareText += "لا توجد بيانات مطابقة";
             } else {
+                let totalProfit = 0;
                 filtered.forEach(({item, index}, i) => {
                     let infoCell = '';
                     let plainInfo = '';
 
                     if (type === 'profit') {
-                        let buy = parseFloat(item.buyPrice) || 0, charge = parseFloat(item.chargePrice) || 0, sell = parseFloat(item.sellPrice) || 0, disc = parseFloat(item.discount) || 0;
-                        let finalSell = sell - (sell * (disc / 100));
-                        let profit = item.isHalf ? ((finalSell - charge) / 2) : (finalSell - charge - buy);
+                        let profit = calculateProfit(item);
+                        totalProfit += profit;
                         infoCell = `<td style="color:var(--money-green); font-weight:bold;">+${profit.toFixed(2)}</td>`;
                         plainInfo = `الربح: ${profit.toFixed(2)}`;
                     } else if (type === 'purchases') {
@@ -641,6 +654,11 @@
                     }
                     tbody.appendChild(tr);
                 });
+
+                // إضافة الإجمالي لنوع الأرباح
+                if (type === 'profit') {
+                    currentShareText += `\nإجمالي الأرباح: ${totalProfit.toFixed(2)}`;
+                }
             }
             openModal('genericListModal');
         }
@@ -863,10 +881,9 @@
             transactions.forEach(item => {
                 if(item.cancelled) cancelled++;
                 else {
-                    let buy = parseFloat(item.buyPrice) || 0, charge = parseFloat(item.chargePrice) || 0, sell = parseFloat(item.sellPrice) || 0, disc = parseFloat(item.discount) || 0;
-                    let finalSell = sell - (sell * (disc / 100));
-                    totalProfit += item.isHalf ? ((finalSell - charge) / 2) : (finalSell - charge - buy);
-                    totalBuy += buy;
+                    // استخدام دالة الربح الجديدة
+                    totalProfit += calculateProfit(item);
+                    totalBuy += parseFloat(item.buyPrice) || 0;
                     if (item.done) done++; else pending++;
                     if (item.bookingDate && !item.done) booked++;
                 }
@@ -974,7 +991,8 @@
             let isHalf = document.getElementById('det_halfMode').checked; 
             
             let finalSell = sell - (sell * (disc / 100));
-            let profit = isHalf ? ((finalSell - charge) / 2) : (finalSell - charge - buy);
+            let profit = (finalSell - charge); // بدون خصم سعر الشراء
+            if (isHalf) profit = profit / 2;
             
             let profitEl = document.getElementById('det_profit_val');
             profitEl.innerText = profit.toFixed(2);
