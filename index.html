@@ -9,7 +9,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="2026">
-    <!-- أيقونة الهوم سكرين: 26 -->
     <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=26&background=2E8B57&color=fff&size=512&font-size=0.5&bold=true&length=2">
     <link rel="icon" href="https://ui-avatars.com/api/?name=26&background=2E8B57&color=fff&size=512&font-size=0.5&bold=true&length=2">
 
@@ -95,6 +94,7 @@
         .stat-value { font-size: 15px; font-weight: 800; color: var(--text-main); margin-top: 2px; }
 
         .toggle-stats-btn { background: var(--card-bg); border: 1.5px solid var(--money-green); padding: 6px 15px; border-radius: 25px; font-size: 13px; cursor: pointer; color: var(--money-green); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; font-weight: 700; font-family: 'Cairo', sans-serif;}
+        .estimated-profit-btn { background: var(--card-bg); border: 1.5px solid var(--accent-blue); padding: 6px 15px; border-radius: 25px; font-size: 13px; cursor: pointer; color: var(--accent-blue); margin-bottom: 15px; display: flex; align-items: center; gap: 8px; font-weight: 700; font-family: 'Cairo', sans-serif;}
 
         .search-area { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; flex-wrap: wrap; }
         .search-container { flex: 1.5; min-width: 250px; position: relative; }
@@ -213,9 +213,32 @@
         input:checked + .slider:before { transform: translateX(16px); }
 
         .custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 20000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
-        .modal-content { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.3); width: 90%; max-width: 400px; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: scaleUp 0.3s; }
+        .modal-content { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.3); width: 90%; max-width: 400px; padding: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); animation: scaleUp 0.3s; position: relative; }
         @keyframes scaleUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal-header { font-weight: 800; font-size: 16px; margin-bottom: 15px; text-align: center; color: var(--money-green); }
+
+        .modal-header { 
+            font-weight: 800; 
+            font-size: 16px; 
+            margin-bottom: 15px; 
+            text-align: center; 
+            color: var(--money-green);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-header .close-btn {
+            background: transparent;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-sub);
+            padding: 0 5px;
+            line-height: 1;
+        }
+        .modal-header .close-btn:hover {
+            color: var(--danger-red);
+        }
+
         .modal-body { display: flex; flex-direction: column; gap: 12px; }
         .modal-footer { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center;}
         .modal-btn { flex: 1; padding: 10px; border-radius: 8px; border: none; font-weight: 800; cursor: pointer; font-size: 13px; font-family: 'Cairo', sans-serif; min-width: 100px; }
@@ -233,14 +256,131 @@
         .info-val { font-size: 12.5px; font-weight: 700; color: var(--text-main); word-break: break-all; cursor: pointer; display: block; }
         .profit-card { background: var(--money-green); color: white; padding: 15px; border-radius: 10px; text-align: center; font-size: 15px; font-weight: 800; margin-top: 10px; transition: background 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .profit-card span { font-size: 20px; display: block; margin-top: 5px; }
+
+        /* مودال الأرباح التقريبية - تصميم البطاقات */
+        .estimated-modal-content {
+            max-width: 95%;
+            width: 650px;
+        }
+        .estimated-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+            padding: 5px;
+        }
+        .estimated-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .card-header {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--money-green);
+            margin-bottom: 12px;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 5px;
+        }
+        .card-fields {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1.5fr; /* شحن وبيع أوسع */
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .field-group label {
+            font-size: 10px;
+            color: var(--text-sub);
+            font-weight: 700;
+        }
+        .field-with-copy {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .field-with-copy input {
+            flex: 1;
+            padding: 8px 6px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-main);
+            font-size: 13px;
+            font-weight: 600;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .field-with-copy input:disabled {
+            background-color: rgba(0,0,0,0.05);
+            color: var(--text-sub);
+            cursor: not-allowed;
+        }
+        .copy-btn {
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--accent-blue);
+        }
+        .copy-btn:hover {
+            transform: scale(1.1);
+        }
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+        .half-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .half-option input {
+            transform: scale(1.2);
+            margin: 0;
+        }
+        .card-profit {
+            font-weight: 800;
+            color: var(--money-green);
+            font-size: 14px;
+        }
+        .total-profit-bar {
+            background: var(--money-green);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 800;
+            margin: 15px 0;
+        }
     </style>
 </head>
 <body>
 
-    <!-- مودال تأكيد مسح الكل -->
+    <!-- ======================== مودالات ======================== -->
+
+    <!-- مودال مسح الكل -->
     <div id="clearAllModal" class="custom-modal">
         <div class="modal-content" style="max-width: 300px;">
-            <div class="modal-header" style="color: var(--danger-red);">⚠️ تحذير</div>
+            <div class="modal-header" style="color: var(--danger-red);">
+                <span>⚠️ تحذير</span>
+                <button class="close-btn" onclick="closeModal('clearAllModal')">&times;</button>
+            </div>
             <div class="modal-body" style="text-align: center; font-size: 16px; font-weight: bold;">
                 هل أنت متأكد من مسح جميع البيانات؟ لا يمكن التراجع عن هذا الإجراء.
             </div>
@@ -251,9 +391,13 @@
         </div>
     </div>
 
+    <!-- مودال حذف -->
     <div id="deleteModal" class="custom-modal">
         <div class="modal-content" style="max-width: 300px;">
-            <div class="modal-header" style="color: var(--danger-red);">⚠️ تأكيد الحذف</div>
+            <div class="modal-header" style="color: var(--danger-red);">
+                <span>⚠️ تأكيد الحذف</span>
+                <button class="close-btn" onclick="closeModal('deleteModal')">&times;</button>
+            </div>
             <div class="modal-body" style="text-align: center; font-size: 16px; font-weight: bold;">
                 هل تريد الحذف؟
             </div>
@@ -264,9 +408,13 @@
         </div>
     </div>
 
+    <!-- مودال تأكيد إلغاء المعاملة -->
     <div id="cancelConfirmModal" class="custom-modal">
         <div class="modal-content" style="max-width: 300px;">
-            <div class="modal-header" style="color: var(--danger-red);">⚠️ تأكيد الإلغاء</div>
+            <div class="modal-header" style="color: var(--danger-red);">
+                <span>⚠️ تأكيد الإلغاء</span>
+                <button class="close-btn" onclick="closeModal('cancelConfirmModal')">&times;</button>
+            </div>
             <div class="modal-body" style="text-align: center; font-size: 16px; font-weight: bold;">
                 هل أنت متأكد من تغيير حالة المعاملة؟
             </div>
@@ -277,9 +425,13 @@
         </div>
     </div>
 
+    <!-- مودال استرجاع -->
     <div id="restoreConfirmModal" class="custom-modal">
         <div class="modal-content" style="max-width: 300px;">
-            <div class="modal-header" style="color: var(--accent-blue);">⚠️ تأكيد التفعيل</div>
+            <div class="modal-header" style="color: var(--accent-blue);">
+                <span>⚠️ تأكيد التفعيل</span>
+                <button class="close-btn" onclick="closeModal('restoreConfirmModal')">&times;</button>
+            </div>
             <div class="modal-body" style="text-align: center; font-size: 16px; font-weight: bold;">
                 هل أنت متأكد من تفعيل هذه المعاملة؟
             </div>
@@ -290,9 +442,13 @@
         </div>
     </div>
 
+    <!-- مودال الحجز -->
     <div id="dateModal" class="custom-modal">
         <div class="modal-content">
-            <div class="modal-header">📅 موعد الحجز</div>
+            <div class="modal-header">
+                <span>📅 موعد الحجز</span>
+                <button class="close-btn" onclick="closeModal('dateModal')">&times;</button>
+            </div>
             <div class="modal-body">
                 <div class="form-group"><label>تاريخ الحجز</label><input type="date" id="m_bookingDate"></div>
             </div>
@@ -304,14 +460,17 @@
         </div>
     </div>
 
+    <!-- مودال التعديل السريع -->
     <div id="quickEditModal" class="custom-modal">
         <div class="modal-content">
-            <div class="modal-header" id="qe_title">تعديل</div>
+            <div class="modal-header" id="qe_title">
+                <span>تعديل</span>
+                <button class="close-btn" onclick="closeModal('quickEditModal')">&times;</button>
+            </div>
             <div class="modal-body">
                 <div class="form-group" id="qe_input_group">
                     <input type="number" id="qe_input" inputmode="decimal" placeholder="0.00">
                 </div>
-                
                 <label class="half-row" for="qe_halfMode" id="qe_half_container" style="display:none; margin: 10px 0 0 0; border: 1px solid var(--border-color);">
                     <span style="font-weight: 800;">معاملة بالنصف</span>
                     <div class="switch">
@@ -327,9 +486,13 @@
         </div>
     </div>
 
+    <!-- مودال القوائم العامة (فلترة) -->
     <div id="genericListModal" class="custom-modal">
         <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header" id="genericListTitle">📋 قائمة المعاملات</div>
+            <div class="modal-header" id="genericListTitle">
+                <span>📋 قائمة المعاملات</span>
+                <button class="close-btn" onclick="closeModal('genericListModal')">&times;</button>
+            </div>
             <div style="max-height: 300px; overflow-y: auto;">
                 <table class="booking-list-table">
                     <thead id="genericListHead">
@@ -345,9 +508,29 @@
         </div>
     </div>
 
+    <!-- مودال الأرباح التقريبية -->
+    <div id="estimatedProfitModal" class="custom-modal">
+        <div class="modal-content estimated-modal-content">
+            <div class="modal-header">
+                <span>💰 الأرباح التقريبية (المعاملات الجارية والمحجوزة)</span>
+                <button class="close-btn" onclick="closeModal('estimatedProfitModal')">&times;</button>
+            </div>
+            <div class="estimated-cards" id="estimatedCardsContainer"></div>
+            <div class="total-profit-bar" id="estimatedTotalProfit">إجمالي الأرباح المتوقعة: 0.00</div>
+            <div class="modal-footer">
+                <button class="modal-btn btn-share" onclick="shareEstimatedProfit()">📤 مشاركة</button>
+                <button class="modal-btn btn-close" onclick="closeModal('estimatedProfitModal')">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال التفاصيل -->
     <div id="detailsModal" class="custom-modal">
         <div class="modal-content" style="max-width: 450px;">
-            <div class="modal-header">📄 تفاصيل المعاملة</div>
+            <div class="modal-header">
+                <span>📄 تفاصيل المعاملة</span>
+                <button class="close-btn" onclick="closeModal('detailsModal')">&times;</button>
+            </div>
             <div class="modal-body" style="gap: 12px;">
                 <div class="info-grid">
                     <div class="info-item" title="اضغط للنسخ"><span class="info-label">رقم الهاتف</span><span class="info-val" id="det_phone" onclick="copyText(this.innerText)"></span></div>
@@ -357,16 +540,13 @@
                     <div class="info-item" title="اضغط للنسخ"><span class="info-label">تاريخ الإضافة</span><span class="info-val" id="det_date" onclick="copyText(this.innerText)"></span></div>
                     <div class="info-item" title="اضغط للنسخ"><span class="info-label">IBAN</span><span class="info-val" id="det_iban" onclick="copyText(this.innerText)"></span></div>
                 </div>
-
                 <hr style="width:100%; border:0; border-top:1px solid var(--border-color); margin: 2px 0;">
-
                 <div class="form-container" style="box-shadow:none; padding:0; margin:0; background:transparent; display: grid;">
                     <div class="form-group"><label>شراء البطاقة</label><input type="number" inputmode="decimal" id="det_buy" oninput="calcDetProfit()"></div>
                     <div class="form-group"><label>قيمة الشحن</label><input type="number" inputmode="decimal" id="det_charge" oninput="calcDetProfit()"></div>
                     <div class="form-group"><label>سعر البيع</label><input type="number" inputmode="decimal" id="det_sell" oninput="calcDetProfit()"></div>
                     <div class="form-group"><label>الخصم %</label><input type="number" inputmode="decimal" id="det_disc" oninput="calcDetProfit()"></div>
                 </div>
-
                 <label class="half-row" for="det_halfMode" style="margin: 5px 0; border: 1px solid var(--border-color);">
                     <span style="font-weight: 800;">معاملة بالنصف</span>
                     <div class="switch">
@@ -374,13 +554,11 @@
                         <span class="slider"></span>
                     </div>
                 </label>
-                
                 <div class="profit-card" id="profit_card_bg">
                     صافي الربح
                     <span id="det_profit_val">0.00</span>
                 </div>
             </div>
-            
             <div class="modal-footer">
                 <button class="modal-btn btn-confirm" onclick="saveDetails()">💾 حفظ التعديلات</button>
                 <button class="modal-btn btn-close" onclick="closeModal('detailsModal')">✖ إغلاق</button>
@@ -390,6 +568,7 @@
 
     <div id="toast-container"></div>
 
+    <!-- ======================== رأس التطبيق ======================== -->
     <div class="header">
         <div class="brand">
             <div class="app-icon">26</div>
@@ -404,10 +583,17 @@
         </div>
     </div>
 
-    <button class="toggle-stats-btn" onclick="toggleStats(); haptic(15)">
-        <span id="statsIcon">📊</span> ملخص الحسابات
-    </button>
+    <!-- أزرار ملخص الحسابات والأرباح التقريبية -->
+    <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 15px;">
+        <button class="toggle-stats-btn" onclick="toggleStats(); haptic(15)">
+            <span id="statsIcon">📊</span> ملخص الحسابات
+        </button>
+        <button class="estimated-profit-btn" onclick="openEstimatedProfitModal(); haptic(15)">
+            💰 الأرباح التقريبية
+        </button>
+    </div>
 
+    <!-- ملخص الحسابات -->
     <div class="stats-container" id="statsContainer">
         <div class="stats-grid">
             <div class="stat-card" onclick="showFilteredList('profit', '💰 قائمة الأرباح')"><div class="stat-icon-circle bg-profit">$</div><div class="stat-label">الأرباح</div><div class="stat-value" id="totalProfitDisplay">0.00</div></div>
@@ -419,6 +605,7 @@
         </div>
     </div>
 
+    <!-- بحث وترتيب -->
     <div class="search-area">
         <div class="search-container">
             <span class="search-icon">🔍</span>
@@ -439,7 +626,7 @@
         </div>
     </div>
 
-    <!-- شريط التنقل السريع بين الأقسام - أزرار بجانب بعضها -->
+    <!-- شريط التنقل السريع بين الأقسام -->
     <div class="section-nav">
         <button class="section-nav-btn nav-done" onclick="scrollToSection('done-section')">✅ تم البيع</button>
         <button class="section-nav-btn nav-booked" onclick="scrollToSection('booked-section')">📅 تم الحجز</button>
@@ -447,10 +634,12 @@
         <button class="section-nav-btn nav-cancelled" onclick="scrollToSection('cancelled-section')">✖ ملغي</button>
     </div>
 
+    <!-- زر إضافة معاملة جديدة -->
     <button id="showFormBtn" class="btn-add" style="width: 100%; margin-bottom: 15px; height: 50px; font-size: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" onclick="openMainForm(); haptic(15)">
         ➕ إضافة معاملة جديدة
     </button>
 
+    <!-- نموذج الإدخال (يظهر عند الضغط على الزر) -->
     <div class="form-container" id="mainFormContainer" style="display: none;">
         <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end; margin-bottom: -5px;">
             <button type="button" onclick="clearInputs(); haptic(10)" style="background: transparent; border: none; font-size: 16px; cursor: pointer; color: var(--danger-red); padding: 0;" title="إغلاق">✖</button>
@@ -482,6 +671,7 @@
         </div>
     </div>
 
+    <!-- الجدول الرئيسي -->
     <div class="table-container" id="tableWrapper">
         <table id="mainTable">
             <thead>
@@ -593,9 +783,20 @@
             });
         }
 
-        // ======================== حساب الربح (مع خصم الشراء) ========================
+        // ======================== حساب الربح ========================
         function calculateProfit(item) {
             if (!item.done || !item.sellPrice || parseFloat(item.sellPrice) <= 0) return 0;
+            let buy = parseFloat(item.buyPrice) || 0;
+            let charge = parseFloat(item.chargePrice) || 0;
+            let sell = parseFloat(item.sellPrice) || 0;
+            let disc = parseFloat(item.discount) || 0;
+            let finalSell = sell - (sell * (disc / 100));
+            let profit = finalSell - charge - buy;
+            if (item.isHalf) profit = profit / 2;
+            return profit;
+        }
+
+        function calculateExpectedProfit(item) {
             let buy = parseFloat(item.buyPrice) || 0;
             let charge = parseFloat(item.chargePrice) || 0;
             let sell = parseFloat(item.sellPrice) || 0;
@@ -1073,7 +1274,6 @@
                 item.name?.toLowerCase().includes(searchTerm) || item.phone?.includes(searchTerm)
             );
 
-            // تجميع الصفوف حسب الفئات
             let doneRows = filtered.filter(row => !row.item.cancelled && row.item.done);
             let bookedRows = filtered.filter(row => !row.item.cancelled && !row.item.done && row.item.bookingDate);
             let pendingRows = filtered.filter(row => !row.item.cancelled && !row.item.done && !row.item.bookingDate);
@@ -1116,7 +1316,6 @@
                 tbody.appendChild(tr);
             };
 
-            // رسم الأقسام بالترتيب مع إضافة الفواصل
             if (doneRows.length > 0) {
                 addSectionHeader(tbody, '✅ تم البيع', 'header-done', 'done-section');
                 doneRows.forEach(drawRow);
@@ -1193,7 +1392,7 @@
             renderTable(); window.scrollTo({top: 0, behavior: 'smooth'});
         }
 
-        // ======================== حفظ البيانات (إضافة/تحديث) ========================
+        // ======================== حفظ البيانات ========================
         function saveData() {
             haptic(30); const editIdx = parseInt(document.getElementById('editIndex').value);
             if (!document.getElementById('name').value) { showToast('الاسم مطلوب!', 'error'); return; }
@@ -1304,6 +1503,191 @@
             }; 
             reader.readAsArrayBuffer(e.target.files[0]); 
         }
+
+        // ======================== الأرباح التقريبية (تصميم البطاقات) ========================
+        let saveTimeout = null;
+        let lastChargeValue = '';
+        let lastSellValue = '';
+
+        function scheduleSave(index) {
+            if (saveTimeout) clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                localStorage.setItem('app2026_pro_db', JSON.stringify(transactions));
+                saveTimeout = null;
+                updateEstimatedTotal();
+            }, 500);
+        }
+
+        function calculateCardProfit(card) {
+            let buy = parseFloat(card.querySelector('.est-buy').value) || 0;
+            let charge = parseFloat(card.querySelector('.est-charge').value) || 0;
+            let sell = parseFloat(card.querySelector('.est-sell').value) || 0;
+            let disc = parseFloat(card.dataset.discount) || 0;
+            let isHalf = card.querySelector('.est-half').checked;
+            let finalSell = sell - (sell * (disc / 100));
+            let profit = finalSell - charge - buy;
+            if (isHalf) profit = profit / 2;
+            return profit;
+        }
+
+        function updateEstimatedTotal() {
+            let total = 0;
+            document.querySelectorAll('.estimated-card').forEach(card => {
+                total += calculateCardProfit(card);
+            });
+            document.getElementById('estimatedTotalProfit').innerText = `إجمالي الأرباح المتوقعة: ${total.toFixed(2)}`;
+        }
+
+        window.copyLastValue = function(fieldType, cardIndex) {
+            const cards = document.querySelectorAll('.estimated-card');
+            if (cardIndex >= cards.length) return;
+            const card = cards[cardIndex];
+            let input;
+            if (fieldType === 'charge') {
+                input = card.querySelector('.est-charge');
+                if (lastChargeValue !== '') input.value = lastChargeValue;
+            } else if (fieldType === 'sell') {
+                input = card.querySelector('.est-sell');
+                if (lastSellValue !== '') input.value = lastSellValue;
+            }
+            updateCardProfit(input, cardIndex);
+        };
+
+        window.updateCardProfit = function(element, cardIndex) {
+            const cards = document.querySelectorAll('.estimated-card');
+            if (cardIndex >= cards.length) return;
+            const card = cards[cardIndex];
+            const idx = card.dataset.index;
+
+            const buyInput = card.querySelector('.est-buy');
+            const chargeInput = card.querySelector('.est-charge');
+            const sellInput = card.querySelector('.est-sell');
+            const halfCheck = card.querySelector('.est-half');
+
+            const buy = buyInput.value;
+            const charge = chargeInput.value;
+            const sell = sellInput.value;
+            const isHalf = halfCheck.checked;
+
+            // معالجة خيار النصف: تعطيل حقل الشراء وجعله 0
+            if (isHalf) {
+                if (!buyInput.dataset.originalBuy && buy !== '') {
+                    buyInput.dataset.originalBuy = buy;
+                }
+                buyInput.value = '0';
+                buyInput.disabled = true;
+            } else {
+                if (buyInput.dataset.originalBuy) {
+                    buyInput.value = buyInput.dataset.originalBuy;
+                    delete buyInput.dataset.originalBuy;
+                }
+                buyInput.disabled = false;
+            }
+
+            if (charge) lastChargeValue = charge;
+            if (sell) lastSellValue = sell;
+
+            if (idx !== undefined && transactions[idx]) {
+                transactions[idx].buyPrice = buyInput.value;
+                transactions[idx].chargePrice = charge;
+                transactions[idx].sellPrice = sell;
+                transactions[idx].isHalf = isHalf;
+                scheduleSave(idx);
+            }
+
+            const profit = calculateCardProfit(card);
+            card.querySelector('.card-profit span').innerText = profit.toFixed(2);
+            updateEstimatedTotal();
+        };
+
+        window.openEstimatedProfitModal = function() {
+            haptic(20);
+            const container = document.getElementById('estimatedCardsContainer');
+            container.innerHTML = '';
+
+            const filtered = transactions
+                .map((item, index) => ({ item, index }))
+                .filter(({ item }) => !item.cancelled && !item.done);
+
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:20px;">لا توجد معاملات جارية أو محجوزة</div>';
+                document.getElementById('estimatedTotalProfit').innerText = 'إجمالي الأرباح المتوقعة: 0.00';
+                openModal('estimatedProfitModal');
+                return;
+            }
+
+            filtered.forEach(({ item, index }, i) => {
+                const card = document.createElement('div');
+                card.className = 'estimated-card';
+                card.dataset.index = index;
+                card.dataset.discount = item.discount || 0;
+
+                const buyVal = item.buyPrice || '';
+                const chargeVal = item.chargePrice || '';
+                const sellVal = item.sellPrice || '';
+                const halfChecked = item.isHalf ? 'checked' : '';
+
+                card.innerHTML = `
+                    <div class="card-header">👤 ${item.name}</div>
+                    <div class="card-fields">
+                        <div class="field-group">
+                            <label>شراء</label>
+                            <input type="number" class="est-buy" value="${buyVal}" placeholder="0" min="0" step="0.01" oninput="updateCardProfit(this, ${i})">
+                        </div>
+                        <div class="field-group">
+                            <label>شحن</label>
+                            <div class="field-with-copy">
+                                <input type="number" class="est-charge" value="${chargeVal}" placeholder="0" min="0" step="0.01" oninput="updateCardProfit(this, ${i})">
+                                <button class="copy-btn" onclick="copyLastValue('charge', ${i}); haptic(10)" title="استخدم آخر قيمة شحن">📋</button>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>بيع</label>
+                            <div class="field-with-copy">
+                                <input type="number" class="est-sell" value="${sellVal}" placeholder="0" min="0" step="0.01" oninput="updateCardProfit(this, ${i})">
+                                <button class="copy-btn" onclick="copyLastValue('sell', ${i}); haptic(10)" title="استخدم آخر قيمة بيع">📋</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <label class="half-option">
+                            <input type="checkbox" class="est-half" ${halfChecked} onchange="updateCardProfit(this, ${i})"> نصف
+                        </label>
+                        <div class="card-profit">الربح: <span>0.00</span></div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+                updateCardProfit(null, i);
+            });
+
+            updateEstimatedTotal();
+            openModal('estimatedProfitModal');
+        };
+
+        window.shareEstimatedProfit = function() {
+            let text = "💰 الأرباح التقريبية (المعاملات الجارية والمحجوزة)\n\n";
+            let total = 0;
+            const cards = document.querySelectorAll('.estimated-card');
+            cards.forEach((card, i) => {
+                const name = card.querySelector('.card-header').innerText.replace('👤 ', '');
+                const buy = card.querySelector('.est-buy').value || '0';
+                const charge = card.querySelector('.est-charge').value || '0';
+                const sell = card.querySelector('.est-sell').value || '0';
+                const half = card.querySelector('.est-half').checked ? 'نصف' : 'كامل';
+                const profit = card.querySelector('.card-profit span').innerText;
+                total += parseFloat(profit);
+                text += `${i+1}. ${name} | شراء: ${buy} | شحن: ${charge} | بيع: ${sell} | ${half} | ربح: ${profit}\n`;
+            });
+            text += `\nإجمالي الأرباح المتوقعة: ${total.toFixed(2)}`;
+
+            if (navigator.share) {
+                navigator.share({ title: 'الأرباح التقريبية', text: text }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(text);
+                showToast('تم نسخ القائمة', 'info');
+            }
+        };
 
         // ======================== بدء التشغيل ========================
         window.onload = () => {
