@@ -27,15 +27,17 @@ i{display:inline-flex;font-style:normal}small{color:var(--sub);font-size:12px}
 h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .ib{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--cd);border:1px solid var(--bd);transition:transform .12s}
 .ib:active,.btn:active,.ab:active,.ia:active,.pey:active{transform:scale(.94)}
-/* ==== years ==== */
+
+/* years bar */
 .ychips{display:flex;gap:8px;overflow-x:auto;padding:4px 1px 12px;scrollbar-width:none}
 .ychips::-webkit-scrollbar{display:none}
-.ychips button{flex:0 0 auto;height:40px;padding:0 16px;border-radius:13px;background:var(--cd);border:1px solid var(--bd);color:var(--sub);font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:7px;transition:.2s}
+.ychips button{flex:0 0 auto;height:40px;padding:0 14px;border-radius:13px;background:var(--cd);border:1px solid var(--bd);color:var(--sub);font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:7px;transition:.2s}
 .ychips button.on{background:var(--ac);border-color:var(--ac);color:#fff;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 32%,transparent)}
 .ychips em{font-style:normal;font-size:11px;padding:1px 7px;border-radius:99px;background:var(--bg);color:var(--sub);font-weight:600}
 .ychips button.on em{background:rgba(255,255,255,.24);color:#fff}
 .ychips .add{width:40px;padding:0;justify-content:center}
-/* ==== summary ==== */
+
+/* summary */
 .sm{background:var(--cd);border:1px solid var(--bd);border-radius:24px;overflow:hidden;margin:2px 0 14px}
 .pfw{position:relative}
 .pf{width:100%;padding:20px 20px 16px;text-align:start;display:grid;gap:2px}
@@ -48,7 +50,8 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .gr3 button{padding:12px 2px;display:grid;justify-items:center;gap:1px}
 .gr3 button+button{border-inline-start:1px solid var(--bd)}
 .gr3 i{color:var(--ac)}.gr3 b{font-size:16px;font-weight:600}.gr3 span{font-size:11px;color:var(--sub)}
-/* ==== search ==== */
+
+/* search */
 .sr{display:flex;gap:8px;margin-bottom:10px}
 .se{flex:1;display:flex;align-items:center;gap:8px;padding:0 14px;height:46px;border-radius:14px;background:var(--cd);border:1px solid var(--bd);color:var(--sub)}
 .se input{flex:1;min-width:0;border:0;background:none;outline:0;height:100%;color:var(--tx)}
@@ -56,7 +59,8 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 1px 12px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
 .chips button{flex:0 0 auto;padding:6px 16px;border-radius:99px;background:var(--cd);border:1px solid var(--bd);color:var(--sub);font-size:13px}
 .chips button.on{background:var(--tx);border-color:var(--tx);color:var(--bg)}
-/* ==== list ==== */
+
+/* list */
 #list{background:var(--cd);border:1px solid var(--bd);border-radius:24px;overflow:hidden}
 #list.pv{filter:blur(12px);pointer-events:none;user-select:none}
 .c{position:relative;padding:14px 22px 14px 14px;border-bottom:1px solid var(--bd)}
@@ -81,7 +85,8 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .em{text-align:center;color:var(--sub);padding:40px 16px}.em p{margin:8px 0 0}
 .fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:30;display:flex;align-items:center;gap:8px;height:54px;padding:0 26px;border-radius:99px;color:#fff;font-weight:600;background:var(--ac);box-shadow:0 10px 26px color-mix(in srgb,var(--ac) 42%,transparent);transition:transform .12s}
 .fab:active{transform:translateX(-50%) scale(.95)}
-/* ==== modals ==== */
+
+/* modals */
 .bg{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background:rgba(8,8,24,.5);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}.bg.on{display:flex}
 .sh{width:100%;max-width:520px;max-height:92vh;overflow:auto;background:var(--cd);border-radius:28px 28px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));animation:up .28s cubic-bezier(.2,.9,.3,1)}
 @keyframes up{from{transform:translateY(50px);opacity:0}}
@@ -103,7 +108,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .ii{text-align:start;padding:10px 12px;border-radius:12px;background:var(--bg);display:grid;gap:2px;min-width:0}.ii b{font-size:13px;font-weight:500;word-break:break-all}
 .pc{margin-top:12px;padding:14px;border-radius:16px;text-align:center;color:#fff;background:var(--ok);transition:.3s}.pc b{display:block;font-size:26px}
 .lr{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--bd)}.lr b{flex:1;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ln{color:var(--sub);width:22px;flex:none}.g{color:var(--ok)}
-.mini{padding:6px 12px;border-radius:10px;background:var(--acs);color:var(--ac);font-weight:500}
+.mini{padding:6px 12px;border-radius:10px;background:var(--acs);color:var(--ac);font-weight:500;font-size:12.5px;white-space:nowrap}
 .s2{font-size:12px;color:var(--sub);margin:16px 0 8px;font-weight:500}
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:5px;background:var(--bg);border-radius:14px}.seg button{height:40px;border-radius:10px;color:var(--sub);font-weight:500}.seg button.on{background:var(--cd);color:var(--ac)}
 .sws{display:flex;gap:10px;flex-wrap:wrap}.sws button,.sws label{width:36px;height:36px;border-radius:50%;border:3px solid var(--cd);box-shadow:0 0 0 2px var(--bd);position:relative;overflow:hidden}
@@ -115,6 +120,17 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .toast.s svg{color:#34d399}.toast.e svg{color:#fb7185}.toast.i svg{color:#7dd3fc}
 .tact{background:rgba(255,255,255,.18);color:#fff;padding:4px 13px;border-radius:99px;font-size:12px;font-weight:600;flex:none}
 .hint{font-size:11.5px;color:var(--sub);text-align:center;padding:0 0 10px}
+
+/* snapshot & year-manage rows */
+.row{display:flex;align-items:flex-start;gap:10px;padding:12px 4px;border-bottom:1px solid var(--bd)}
+.row:last-child{border-bottom:0}
+.row .info{flex:1;min-width:0}
+.row .info b{display:block;font-weight:600;font-size:13.5px;word-break:break-word}
+.row .info small{display:block;color:var(--sub);font-size:11.5px;margin-top:3px}
+.row .info .tag{display:inline-flex;margin-inline-start:6px;font-size:10.5px;padding:1px 8px;vertical-align:middle}
+.row .acts{display:flex;gap:6px;flex:none;align-items:center}
+.row .acts .mini{padding:7px 12px;font-size:12px}
+.badge-count{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 8px;border-radius:99px;background:var(--acs);color:var(--ac);font-size:11.5px;font-weight:600}
 </style>
 </head>
 <body>
@@ -230,13 +246,41 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="th"><h2>الإعدادات</h2><button class="ib" data-x="set" aria-label="إغلاق"><i data-ic="x"></i></button></div>
 <div class="s2">المظهر</div><div class="seg" id="seg"><button data-m="auto">تلقائي</button><button data-m="light">فاتح</button><button data-m="dark">داكن</button></div>
 <div class="s2">لون التطبيق</div><div class="sws" id="sw"></div>
+
+<div class="s2">حفظ واستعادة البيانات</div>
+<div class="ac2" style="margin-top:0">
+  <button class="btn pr" id="bSnapNew"><i data-ic="save"></i>حفظ نسخة الآن</button>
+  <button class="btn" id="bSnapView"><i data-ic="history"></i>النسخ المحفوظة (<span id="snapCount">0</span>)</button>
+</div>
+
+<div class="s2">إدارة السنوات</div>
+<div class="ac2" style="margin-top:0">
+  <button class="btn" id="bYrMg"><i data-ic="cal"></i>فتح إدارة السنوات</button>
+</div>
+
 <div class="s2">نسخ احتياطي كامل (JSON)</div>
 <div class="ac2" style="margin-top:0"><button class="btn" id="bExJ"><i data-ic="down"></i>تصدير نسخة</button><button class="btn" id="bImJ"><i data-ic="up"></i>استيراد نسخة</button></div>
 <div class="s2">ملفات Excel</div>
 <div class="ac2" style="margin-top:0"><button class="btn" id="bEx"><i data-ic="down"></i>تصدير Excel</button><button class="btn" id="bIm"><i data-ic="up"></i>استيراد Excel</button></div>
-<div class="s2">إدارة</div>
+<div class="s2">إحصائيات</div>
 <div class="ac2" style="margin-top:0"><button class="btn" id="bStat"><i data-ic="chart"></i>إحصائيات شاملة</button></div>
-<div class="ac2" style="margin-top:8px"><button class="btn dg" id="bWipe"><i data-ic="trash"></i>حذف كل البيانات</button></div>
+<div class="s2">منطقة الخطر</div>
+<div class="ac2" style="margin-top:0"><button class="btn dg" id="bWipe"><i data-ic="trash"></i>حذف كل البيانات</button></div>
+</div></div>
+
+<!-- ===== SNAPSHOTS ===== -->
+<div class="bg" id="snaps"><div class="sh">
+<div class="th"><h2>النسخ المحفوظة</h2><button class="ib" data-x="snaps" aria-label="إغلاق"><i data-ic="x"></i></button></div>
+<div id="snB" style="max-height:55vh;overflow:auto"></div>
+<div class="ac2"><button class="btn" id="snClean"><i data-ic="trash"></i>حذف النسخ التلقائية</button></div>
+</div></div>
+
+<!-- ===== YEAR MANAGEMENT ===== -->
+<div class="bg" id="yrMg"><div class="sh">
+<div class="th"><h2>إدارة السنوات</h2><button class="ib" data-x="yrMg" aria-label="إغلاق"><i data-ic="x"></i></button></div>
+<div style="font-size:12px;color:var(--sub);margin-bottom:10px">اختر سنة لحذفها، أو احذف جميع معاملاتها. يمكنك التراجع مباشرة أو استعادة من نسخة محفوظة.</div>
+<div id="yrB" style="max-height:50vh;overflow:auto"></div>
+<div class="ac2"><button class="btn pr" id="yrAdd"><i data-ic="plus"></i>إضافة سنة جديدة</button></div>
 </div></div>
 
 <!-- ===== STATS ===== -->
@@ -262,7 +306,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <script>
 "use strict";
 const $ = i => document.getElementById(i);
-const KEY = 'app2026_pro_db', TK = 'app2026_theme', SK = 'app2026_settings_v2';
+const KEY = 'app2026_pro_db', TK = 'app2026_theme', SK = 'app2026_settings_v2', SNAPK = 'app2026_snapshots_v1';
 
 /* ============ ICONS ============ */
 const I = {
@@ -288,7 +332,10 @@ const I = {
   chevDown:'m6 9 6 6 6-6',
   copy:'M20 9h-9a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2z|M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1',
   chart:'M3 3v18h18|M7 15l4-5 3 3 5-7',
-  note:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z|M14 2v6h6'
+  note:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z|M14 2v6h6',
+  save:'M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z|M17 21v-8H7v8|M7 3v5h8',
+  history:'M3 12a9 9 0 1 0 3-6.7L3 8|M3 3v5h5|M12 7v5l3 2',
+  rotate:'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8|M3 3v5h5'
 };
 const ic = (n, s = 19) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${(I[n]||'').split('|').map(d => `<path d="${d}"/>`).join('')}</svg>`;
 document.querySelectorAll('[data-ic]').forEach(e => e.innerHTML = ic(e.dataset.ic, +e.dataset.s || 19));
@@ -314,7 +361,8 @@ function toast(m, t = 's') {
 function toastAct(m, label, cb) {
   const el = document.createElement('div');
   el.className = 'toast i';
-  el.innerHTML = `<span>${esc(m)}</span><button class="tact">${esc(label)}</button>`;
+  el.innerHTML = `<span></span><button class="tact">${esc(label)}</button>`;
+  el.firstChild.textContent = m;
   $('ts').appendChild(el);
   const btn = el.querySelector('.tact');
   let done = false;
@@ -374,7 +422,6 @@ try { matchMedia('(prefers-color-scheme:dark)').addEventListener('change', apply
 let tx = [];
 try { const raw = JSON.parse(localStorage.getItem(KEY) || '[]'); if (Array.isArray(raw)) tx = raw; } catch(e){}
 tx = tx.filter(t => t && typeof t === 'object');
-// migrate: ensure year + notes exist
 tx.forEach(t => {
   if (!t.year) {
     let y = curYear;
@@ -386,12 +433,129 @@ tx.forEach(t => {
   if (typeof t.rowColor !== 'string') t.rowColor = '#ffffff';
 });
 
-const save = () => { try { localStorage.setItem(KEY, JSON.stringify(tx)); } catch(e) { toast('تعذر حفظ البيانات', 'e'); } };
+const save = () => {
+  try { localStorage.setItem(KEY, JSON.stringify(tx)); return true; }
+  catch(e) { toast('تعذر حفظ البيانات، الذاكرة ممتلئة', 'e'); return false; }
+};
 
 const calc = t => {
   const b = num(t.buyPrice), c = num(t.chargePrice), s = num(t.sellPrice), d = num(t.discount);
   const f = s - s * d / 100;
   return t.isHalf ? (f - c) / 2 : f - c - b;
+};
+
+/* ============ SNAPSHOTS ============ */
+let snaps = [];
+try { const raw = JSON.parse(localStorage.getItem(SNAPK) || '[]'); if (Array.isArray(raw)) snaps = raw; } catch(e){}
+snaps = snaps.filter(s => s && typeof s === 'object' && Array.isArray(s.tx));
+
+function saveSnaps() {
+  try { localStorage.setItem(SNAPK, JSON.stringify(snaps)); return true; }
+  catch(e) { return false; }
+}
+function trimSnaps() {
+  while (snaps.length > 25) {
+    let removed = false;
+    for (let i = snaps.length - 1; i >= 0; i--) {
+      if (snaps[i].auto) { snaps.splice(i, 1); removed = true; break; }
+    }
+    if (!removed) snaps.pop();
+  }
+}
+function createSnapshot(name, auto) {
+  const s = {
+    id: 'snap_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
+    name: name || ('نسخة ' + new Date().toLocaleString('en-GB')),
+    ts: Date.now(),
+    auto: !!auto,
+    tx: JSON.parse(JSON.stringify(tx)),
+    extraYears: S.extraYears.slice(),
+    year: S.year
+  };
+  snaps.unshift(s);
+  trimSnaps();
+  if (!saveSnaps()) {
+    // rollback and try again by trimming more
+    snaps.shift();
+    trimSnaps();
+    if (!saveSnaps()) {
+      // last resort: drop oldest snapshots
+      while (snaps.length > 3 && !saveSnaps()) snaps.pop();
+      if (!saveSnaps()) { toast('تعذر إنشاء نسخة، احذف نسخاً قديمة', 'e'); return null; }
+    }
+  }
+  updateSnapCount();
+  return s;
+}
+function updateSnapCount() { $('snapCount').textContent = snaps.length; }
+
+function restoreSnapshot(id) {
+  const s = snaps.find(x => x.id === id);
+  if (!s) { toast('النسخة غير موجودة', 'e'); return; }
+  const curCount = tx.length;
+  ask('استعادة النسخة',
+    `سيتم استبدال البيانات الحالية (${curCount} معاملة) ببيانات هذه النسخة (${s.tx.length} معاملة). سيتم حفظ نسخة تلقائية من الحالة الحالية قبل الاستعادة.`,
+    'استعادة', () => {
+      // auto snapshot current state
+      createSnapshot('قبل استعادة: ' + s.name, true);
+      tx = JSON.parse(JSON.stringify(s.tx));
+      S.extraYears = Array.isArray(s.extraYears) ? s.extraYears.slice() : [];
+      S.year = null;
+      saveS(); save();
+      closeM('snaps');
+      render();
+      toast('تم استعادة النسخة بنجاح');
+    }, 0);
+}
+function deleteSnapshot(id) {
+  const i = snaps.findIndex(x => x.id === id);
+  if (i < 0) return;
+  const s = snaps[i];
+  ask('حذف النسخة', 'هل تريد حذف نسخة «' + s.name + '» نهائياً؟', 'حذف', () => {
+    snaps.splice(i, 1);
+    saveSnaps();
+    renderSnaps();
+    updateSnapCount();
+    toast('تم حذف النسخة', 'e');
+  });
+}
+function renderSnaps() {
+  if (!snaps.length) {
+    $('snB').innerHTML = '<div class="em">' + ic('history', 40) + '<p>لا توجد نسخ محفوظة بعد</p></div>';
+    return;
+  }
+  $('snB').innerHTML = snaps.map(s => {
+    const d = new Date(s.ts);
+    const dt = d.toLocaleDateString('en-GB') + ' — ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    const badge = s.auto ? '<span class="tag" style="background:var(--bg);color:var(--sub)">تلقائي</span>' : '';
+    return `<div class="row">
+      <div class="info">
+        <b>${esc(s.name)}${badge}</b>
+        <small>${dt} • ${s.tx.length} معاملة${s.extraYears && s.extraYears.length ? ' • ' + s.extraYears.join('،') : ''}</small>
+      </div>
+      <div class="acts">
+        <button class="mini" data-snres="${s.id}">${ic('rotate',14)} استعادة</button>
+        <button class="ia d" data-sndel="${s.id}" aria-label="حذف" style="width:34px;height:34px">${ic('trash',17)}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+$('snB').onclick = e => {
+  const r = e.target.closest('[data-snres]');
+  if (r) { restoreSnapshot(r.dataset.snres); return; }
+  const d = e.target.closest('[data-sndel]');
+  if (d) { deleteSnapshot(d.dataset.sndel); }
+};
+$('snClean').onclick = () => {
+  const n = snaps.filter(s => s.auto).length;
+  if (!n) { toast('لا توجد نسخ تلقائية', 'i'); return; }
+  ask('حذف النسخ التلقائية', `سيتم حذف ${n} نسخة تلقائية. النسخ اليدوية لن تتأثر.`, 'حذف', () => {
+    snaps = snaps.filter(s => !s.auto);
+    saveSnaps();
+    renderSnaps();
+    updateSnapCount();
+    toast('تم حذف النسخ التلقائية', 'e');
+  });
 };
 
 /* ============ YEARS ============ */
@@ -409,6 +573,66 @@ function selYear() {
   saveS();
   return S.year;
 }
+function deleteYear(y) {
+  const count = tx.filter(t => +t.year === y).length;
+  const inExtra = S.extraYears.indexOf(+y) > -1;
+  if (!count && !inExtra) { toast('السنة غير موجودة', 'e'); return; }
+  const msg = count > 0
+    ? `سيتم حذف ${count} معاملة من سنة ${y}. يمكن التراجع مباشرة بعد الحذف.`
+    : `سيتم حذف سنة ${y} الفارغة من القائمة.`;
+  ask('حذف سنة ' + y, msg, 'حذف', () => {
+    const snap = createSnapshot('قبل حذف سنة ' + y, true);
+    const removedTx = tx.filter(t => +t.year === y);
+    tx = tx.filter(t => +t.year !== y);
+    S.extraYears = S.extraYears.filter(x => +x !== y);
+    if (+S.year === +y) S.year = null;
+    save(); saveS();
+    closeM('yrMg'); closeM('snaps');
+    render();
+    toastAct('تم حذف سنة ' + y, 'تراجع', () => {
+      if (!snap) return;
+      tx = JSON.parse(JSON.stringify(snap.tx));
+      S.extraYears = snap.extraYears.slice();
+      if (snap.year) S.year = snap.year;
+      save(); saveS(); render();
+      toast('تم استرجاع السنة');
+    });
+  });
+}
+function renderYrMg() {
+  const ys = years();
+  $('yrB').innerHTML = ys.length ? ys.map(y => {
+    const count = tx.filter(t => +t.year === y).length;
+    const done = tx.filter(t => +t.year === y && t.done && !t.cancelled).length;
+    const pend = tx.filter(t => +t.year === y && !t.done && !t.cancelled).length;
+    const canc = tx.filter(t => +t.year === y && t.cancelled).length;
+    return `<div class="row">
+      <div class="info">
+        <b>سنة ${y}</b>
+        <small>${count} معاملة • ${done} منفذة • ${pend} جارية${canc ? ' • ' + canc + ' ملغية' : ''}</small>
+      </div>
+      <div class="acts">
+        <span class="badge-count">${count}</span>
+        <button class="ia d" data-yrdel="${y}" aria-label="حذف السنة">${ic('trash',17)}</button>
+      </div>
+    </div>`;
+  }).join('') : '<div class="em">لا توجد سنوات</div>';
+}
+$('yrB').onclick = e => {
+  const b = e.target.closest('[data-yrdel]');
+  if (!b) return;
+  deleteYear(+b.dataset.yrdel);
+};
+$('yrAdd').onclick = () => {
+  closeM('yrMg');
+  inputBox('إضافة سنة', 'أدخل السنة الجديدة (مثال: 2028)', '', val => {
+    const y = parseInt(val, 10);
+    if (!y || y < 2000 || y > 2100) { toast('سنة غير صالحة', 'e'); return; }
+    if (years().indexOf(y) === -1) S.extraYears.push(y);
+    S.year = y; saveS(); render();
+    toast('تمت إضافة سنة ' + y);
+  }, 'number');
+};
 
 /* ============ SEARCH / SORT ============ */
 const pd = s => { if (!s) return 0; const p = String(s).split('/'); return p.length === 3 ? new Date(+p[2], +p[1] - 1, +p[0]).getTime() : (new Date(s).getTime() || 0); };
@@ -525,7 +749,7 @@ $('yr').onclick = e => {
     inputBox('إضافة سنة', 'أدخل السنة الجديدة (مثال: 2028)', '', val => {
       const y = parseInt(val, 10);
       if (!y || y < 2000 || y > 2100) { toast('سنة غير صالحة', 'e'); return; }
-      if (S.extraYears.indexOf(y) === -1 && !tx.some(t => +t.year === y)) S.extraYears.push(y);
+      if (years().indexOf(y) === -1) S.extraYears.push(y);
       S.year = y; saveS(); render(); toast('تمت إضافة سنة ' + y);
     }, 'number');
     return;
@@ -607,7 +831,7 @@ let cur = -1, step = '';
 function sale(i) {
   cur = i;
   const t = tx[i]; if (!t) return;
-  const q = $('qe_in'), em = v => v === undefined || v === null || v === '' || v === '0' && false;
+  const q = $('qe_in');
   q.disabled = false; q.value = '';
   $('qe_g').style.opacity = 1;
   $('qe_half').checked = false;
@@ -860,6 +1084,7 @@ $('bStat').onclick = () => {
       <div class="ii"><small>صافي الأرباح</small><b style="color:${gP >= 0 ? 'var(--ok)' : 'var(--no)'}">${fmt(gP)}</b></div>
       <div class="ii"><small>إجمالي المشتريات</small><b>${fmt(gB)}</b></div>
       <div class="ii"><small>عدد السنوات</small><b>${ys.length}</b></div>
+      <div class="ii"><small>النسخ المحفوظة</small><b>${snaps.length}</b></div>
     </div>`;
   $('stB').innerHTML = html;
   openM('stt');
@@ -872,6 +1097,17 @@ $('bPv').onclick = () => {
   toast(on ? 'تم إخفاء البيانات' : 'تم إظهار البيانات', 'i');
 };
 $('bSet').onclick = () => openM('set');
+
+/* ============ SNAPSHOT BUTTONS ============ */
+$('bSnapNew').onclick = () => {
+  inputBox('حفظ نسخة', 'أدخل اسماً للنسخة (اختياري)', 'نسخة ' + new Date().toLocaleString('en-GB'), val => {
+    const name = (val || '').trim() || ('نسخة ' + new Date().toLocaleString('en-GB'));
+    const s = createSnapshot(name, false);
+    if (s) toast('تم حفظ النسخة (' + s.tx.length + ' معاملة)');
+  });
+};
+$('bSnapView').onclick = () => { renderSnaps(); openM('snaps'); };
+$('bYrMg').onclick = () => { renderYrMg(); openM('yrMg'); };
 
 /* ============ EXPORT / IMPORT ============ */
 $('bEx').onclick = () => {
@@ -906,7 +1142,8 @@ $('fi').onchange = e => {
         bookingDate: o.bookingDate || '', rowColor: o.rowColor || '#ffffff'
       }));
       closeM('set');
-      ask('استيراد نسخة', 'سيتم استبدال البيانات الحالية بـ ' + data.length + ' معاملة من الملف.', 'استيراد', () => {
+      ask('استيراد نسخة', 'سيتم استبدال البيانات الحالية بـ ' + data.length + ' معاملة من الملف. سيتم حفظ نسخة تلقائية من الحالة الحالية.', 'استيراد', () => {
+        createSnapshot('قبل استيراد Excel', true);
         tx = data; save(); render(); toast('تم استيراد البيانات');
       }, 0);
     } catch(x) { toast('الملف غير صالح', 'e'); }
@@ -916,7 +1153,7 @@ $('fi').onchange = e => {
 
 $('bExJ').onclick = () => {
   try {
-    const payload = { v: 2, exported: new Date().toISOString(), extraYears: S.extraYears, tx: tx };
+    const payload = { v: 2, exported: new Date().toISOString(), extraYears: S.extraYears, tx: tx, snaps: snaps.slice(0, 20) };
     const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -936,17 +1173,24 @@ $('fj').onchange = e => {
       const data = Array.isArray(o) ? o : o.tx;
       if (!Array.isArray(data) || !data.length) throw 0;
       const extra = Array.isArray(o.extraYears) ? o.extraYears : [];
+      const importedSnaps = Array.isArray(o.snaps) ? o.snaps.filter(s => s && Array.isArray(s.tx)) : [];
       data.forEach(t => {
         if (!t.year) { const m = String(t.date || '').match(/(\d{4})/); t.year = m ? +m[1] : curYear; }
         if (typeof t.notes !== 'string') t.notes = '';
         if (typeof t.rowColor !== 'string') t.rowColor = '#ffffff';
       });
       closeM('set');
-      ask('استيراد نسخة احتياطية', 'سيتم استبدال البيانات الحالية بـ ' + data.length + ' معاملة.', 'استيراد', () => {
+      ask('استيراد نسخة احتياطية', 'سيتم استبدال البيانات الحالية بـ ' + data.length + ' معاملة' + (importedSnaps.length ? ' و' + importedSnaps.length + ' نسخة محفوظة.' : '.'), 'استيراد', () => {
+        createSnapshot('قبل استيراد JSON', true);
         tx = data;
         S.extraYears = extra;
         S.year = null;
-        saveS(); save(); render(); toast('تم استيراد النسخة الاحتياطية');
+        if (importedSnaps.length) {
+          snaps = importedSnaps.concat(snaps).slice(0, 25);
+          saveSnaps();
+        }
+        saveS(); save(); render(); updateSnapCount();
+        toast('تم استيراد النسخة الاحتياطية');
       }, 0);
     } catch(x) { toast('الملف غير صالح', 'e'); }
   };
@@ -954,9 +1198,20 @@ $('fj').onchange = e => {
 };
 
 $('bWipe').onclick = () => {
-  ask('حذف كل البيانات', 'سيتم حذف جميع المعاملات نهائياً ولا يمكن التراجع. هل أنت متأكد؟', 'نعم، احذف الكل', () => {
-    tx = []; S.extraYears = []; S.year = null;
-    save(); saveS(); closeM('set'); render(); toast('تم حذف كل البيانات', 'e');
+  ask('حذف كل البيانات', 'سيتم حذف جميع المعاملات والسنوات نهائياً. سيتم حفظ نسخة تلقائية قبل الحذف.', 'نعم، احذف الكل', () => {
+    const snap = createSnapshot('قبل حذف كل البيانات', true);
+    tx = [];
+    S.extraYears = [];
+    S.year = null;
+    save(); saveS(); closeM('set'); render();
+    toastAct('تم حذف كل البيانات', 'تراجع', () => {
+      if (!snap) return;
+      tx = JSON.parse(JSON.stringify(snap.tx));
+      S.extraYears = snap.extraYears.slice();
+      if (snap.year) S.year = snap.year;
+      save(); saveS(); render();
+      toast('تم استرجاع البيانات');
+    });
   });
 };
 
@@ -992,11 +1247,11 @@ function checkN() {
 
 /* ============ BOOT ============ */
 (function boot() {
-  // apply saved UI prefs
   $('so').value = S.sortBy || 'none';
   [...$('fl').children].forEach(b => b.classList.toggle('on', b.dataset.f === (S.flt || 'all')));
   applyProfitUI();
   applyTheme();
+  updateSnapCount();
   render();
   checkN();
 })();
