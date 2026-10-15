@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>إدارة المعاملات</title>
 <meta name="theme-color" content="#f2f3f8">
 <meta name="mobile-web-app-capable" content="yes">
@@ -18,16 +18,18 @@
 [data-theme=dark]{--bg:#0a0b16;--cd:#14162a;--tx:#eef0ff;--sub:#9296b8;--bd:#25283f;--ok:#2fd39a;--no:#ff6b88;--wn:#ffb02e;color-scheme:dark}
 [data-theme=amoled]{--bg:#000;--cd:#0a0a0a;--tx:#f5f5ff;--sub:#8a8ab0;--bd:#1a1a1a;--ok:#2fd39a;--no:#ff6b88;--wn:#ffb02e;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{touch-action:manipulation;overscroll-behavior:none}
 body{margin:0;font:400 14px/1.55 'Readex Pro',system-ui,Tahoma,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:120px;overflow-x:hidden}
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none;padding:0}
 i{display:inline-flex;font-style:normal}small{color:var(--sub);font-size:12px}
 .w{max-width:720px;margin:auto;padding:0 14px}
 .hd{position:sticky;top:0;z-index:20;padding:calc(env(safe-area-inset-top) + 10px) 0 10px;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
-.hi,.lg,.hb{display:flex;align-items:center}.hi{justify-content:space-between}.lg{gap:12px}.hb{gap:8px}
+.hi,.lg,.hb{display:flex;align-items:center}.hi{justify-content:space-between}.lg{gap:12px}.hb{gap:6px}
 .mk{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:#fff;font-weight:700;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 78%,#fff) 0%,var(--ac) 60%,color-mix(in srgb,var(--ac) 72%,#000) 100%);box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 32%,transparent)}
 h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
-.ib{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--cd);border:1px solid var(--bd);transition:transform .12s}
+.ib{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;background:var(--cd);border:1px solid var(--bd);transition:transform .12s}
 .ib:active,.btn:active,.ab:active,.ia:active,.eye-mini:active{transform:scale(.94)}
+.ib.wa{color:#25d366}
 
 .ychips{display:flex;gap:8px;overflow-x:auto;padding:4px 1px 10px;scrollbar-width:none}
 .ychips::-webkit-scrollbar{display:none}
@@ -49,7 +51,6 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .recent .av{width:26px;height:26px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:11px;flex:none}
 .recent button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-/* summary */
 .sm{position:relative;background:var(--cd);border:1px solid var(--bd);border-radius:24px;overflow:hidden;margin:2px 0 14px}
 .eye-mini{position:absolute;top:12px;inset-inline-start:12px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--sub);background:var(--bg);border:1px solid var(--bd);z-index:3;transition:transform .12s,color .15s,background .15s}
 .eye-mini:hover{color:var(--ac);background:var(--acs)}
@@ -231,7 +232,6 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .moveControls button:disabled{opacity:.35;pointer-events:none}
 .moveControls button svg{color:var(--ac)}
 
-/* ========== AUTOCOMPLETE ========== */
 .acwrap{position:relative}
 .sugg{position:absolute;top:calc(100% + 4px);inset-inline:0;background:var(--cd);border:1px solid var(--bd);border-radius:14px;box-shadow:0 14px 36px rgba(0,0,0,.18);max-height:236px;overflow:auto;z-index:70;display:none;padding:5px}
 .sugg.on{display:block;animation:suggIn .16s ease-out}
@@ -244,15 +244,30 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .sugg .sg .info b{display:block;font-weight:600;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
 .sugg .sg .info small{font-size:11px;color:var(--sub);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
 .sugg .sg .yr{font-size:10.5px;color:var(--sub);background:var(--bg);padding:2px 8px;border-radius:6px;flex:none;font-weight:600}
-.sugg .sugg-empty{padding:12px;text-align:center;color:var(--sub);font-size:12.5px}
+
+.waBanner{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;background:linear-gradient(135deg,#25d366 0%,#128c7e 100%);color:#fff;margin:2px 0 14px;box-shadow:0 8px 20px rgba(37,211,102,.25);transition:transform .15s;width:100%;text-align:start}
+.waBanner:active{transform:scale(.98)}
+.waBanner .wa-ic{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.2);display:grid;place-items:center;flex:none}
+.waBanner .wa-txt{flex:1;min-width:0}
+.waBanner .wa-txt b{display:block;font-weight:700;font-size:14.5px;margin-bottom:1px}
+.waBanner .wa-txt small{color:rgba(255,255,255,.85);font-size:11.5px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style>
 </head>
 <body>
 <header class="hd"><div class="w hi">
 <div class="lg"><span class="mk" id="mkIcon"></span><div><h1>إدارة المعاملات</h1><small id="sub"></small></div></div>
-<div class="hb"><button class="ib" id="bPv" aria-label="إخفاء البيانات"><i data-ic="eye"></i></button><button class="ib" id="bSet" aria-label="الإعدادات"><i data-ic="set"></i></button></div>
+<div class="hb">
+<button class="ib wa" id="bWa" aria-label="مجموعة واتساب"><i data-ic="wa"></i></button>
+<button class="ib" id="bPv" aria-label="إخفاء البيانات"><i data-ic="eye"></i></button>
+<button class="ib" id="bSet" aria-label="الإعدادات"><i data-ic="set"></i></button>
+</div>
 </div></header>
 <div class="w">
+
+<button class="waBanner" id="waBanner">
+  <span class="wa-ic"><i data-ic="wa" data-s="22"></i></span>
+  <span class="wa-txt"><b>مجموعة الواتساب</b><small id="waHint">اضغط للانضمام إلى المجموعة العامة</small></span>
+</button>
 
 <div class="ychips" id="yr"></div>
 <div class="mchips" id="mo"></div>
@@ -262,10 +277,10 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <button class="eye-mini" id="pEye" aria-label="إظهار/إخفاء الأرباح"><i data-ic="eyeoff" data-s="14"></i></button>
 <div class="pfw">
   <div class="pf">
-    <span class="pf-lbl">صافي الأرباح</span>
+    <span class="pf-lbl">الربح بعد الشراء</span>
     <strong id="sP">•••••</strong>
     <div class="pf-sub">
-      <span>الأرباح من المنفذة</span>
+      <span>صافي الربح</span>
       <b id="sP2">•••••</b>
     </div>
     <span id="hE" class="pf-note"></span>
@@ -433,6 +448,10 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="s2">الهدف السنوي لصافي الربح</div>
 <div class="f"><input type="number" step="any" inputmode="decimal" id="setGoal" placeholder="مثال: 50000"></div>
 
+<div class="s2">رابط مجموعة واتساب</div>
+<div class="f"><input type="url" id="setWa" placeholder="https://chat.whatsapp.com/..." dir="ltr" style="text-align:left"></div>
+<small style="display:block;color:var(--sub);font-size:11px;margin-top:4px;padding:0 4px">الصق رابط دعوة المجموعة العامة، وسيفتحها الزر من الشاشة الرئيسية مباشرة.</small>
+
 <div class="s2">النسخ الاحتياطية</div>
 <div class="ac2" style="margin-top:0">
   <button class="btn pr" id="bSnapNew"><i data-ic="save"></i>حفظ نسخة الآن</button>
@@ -490,6 +509,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="kbdRow"><small>حفظ (داخل النماذج)</small><span class="kbd">Ctrl + S</span></div>
 <div class="kbdRow"><small>إظهار/إخفاء الأرباح</small><span class="kbd">P</span></div>
 <div class="kbdRow"><small>إظهار/إخفاء كل البيانات</small><span class="kbd">H</span></div>
+<div class="kbdRow"><small>فتح مجموعة واتساب</small><span class="kbd">W</span></div>
 <div class="kbdRow"><small>تبديل المظهر</small><span class="kbd">Ctrl + D</span></div>
 <div class="kbdRow"><small>الإعدادات</small><span class="kbd">Ctrl + ,</span></div>
 </div></div>
@@ -511,6 +531,31 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 "use strict";
 const $ = i => document.getElementById(i);
 const KEY='app2026_pro_db',TK='app2026_theme',SK='app2026_settings_v2',SNAPK='app2026_snapshots_v1';
+
+/* ============ منع الزوم ============ */
+(function(){
+  // منع pinch zoom على Safari/iOS
+  document.addEventListener('gesturestart', e => e.preventDefault(), {passive:false});
+  document.addEventListener('gesturechange', e => e.preventDefault(), {passive:false});
+  document.addEventListener('gestureend', e => e.preventDefault(), {passive:false});
+  // منع double-tap zoom
+  let lastTouch = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - lastTouch <= 320){
+      if (!e.target.closest('input,textarea,select,[contenteditable]')) e.preventDefault();
+    }
+    lastTouch = now;
+  }, {passive:false});
+  // منع Ctrl+wheel zoom على الكمبيوتر
+  document.addEventListener('wheel', e => { if (e.ctrlKey) e.preventDefault(); }, {passive:false});
+  // منع Ctrl + / Ctrl - / Ctrl 0
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey||e.metaKey) && (e.key==='+'||e.key==='-'||e.key==='='||e.key==='0')){
+      e.preventDefault();
+    }
+  });
+})();
 
 /* ============ ICONS ============ */
 const I = {
@@ -542,7 +587,8 @@ const I = {
   rotate:'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8|M3 3v5h5',
   keyboard:'M2 6h20v12H2z|M6 10h.01|M10 10h.01|M14 10h.01|M18 10h.01|M7 14h10',
   more:'M12 6v.01|M12 12v.01|M12 18v.01',
-  move:'M5 9l-3 3 3 3|M9 5l3-3 3 3|M15 19l-3 3-3-3|M19 9l3 3-3 3|M2 12h20|M12 2v20'
+  move:'M5 9l-3 3 3 3|M9 5l3-3 3 3|M15 19l-3 3-3-3|M19 9l3 3-3 3|M2 12h20|M12 2v20',
+  wa:'M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.5-.7L3 21l1.9-5.4A8.4 8.4 0 0 1 4 11.5a8.5 8.5 0 1 1 17 0z|M9 10c0 3 2 5 5 5l1-1.5-2-.7-.7.7c-1-.4-2-1.4-2.3-2.3l.7-.7L10 9 9 10z'
 };
 const ic=(n,s=19)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${(I[n]||'').split('|').map(d=>`<path d="${d}"/>`).join('')}</svg>`;
 document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic,+e.dataset.s||19));
@@ -559,7 +605,7 @@ const uid=()=>'tx_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice
 const toAr=s=>String(s).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
 const DOTS='•••••';
 
-let S={year:null,hideProfit:true,hideData:false,extraYears:[],sortBy:'none',flt:'all',month:'all',numerals:'western',goal:0,collapsed:[],recent:[]};
+let S={year:null,hideProfit:true,hideData:false,extraYears:[],sortBy:'none',flt:'all',month:'all',numerals:'western',goal:0,collapsed:[],recent:[],waGroup:''};
 
 const dispNum=n=>S.numerals==='arabic'?toAr(n):String(n);
 const fmt=n=>{const v=Math.round(n*100)/100;const s=v.toLocaleString('en-US',{maximumFractionDigits:2});return S.numerals==='arabic'?toAr(s):s;};
@@ -590,7 +636,7 @@ $('aOk').onclick=()=>{closeM('ask');const f=askCb;askCb=null;f&&f();};
 let inpCb=null;
 function inputBox(title,msg,val,cb,type='text'){
   $('iT').textContent=title;$('iM').textContent=msg||'';
-  const v=$('iV');v.type=type;v.value=val||'';
+  const v=$('iV');v.type=type;v.value=val||'';v.dir = type==='url'?'ltr':'';
   inpCb=cb;openM('inp');
   setTimeout(()=>{v.focus();try{v.select();}catch(e){}},260);
 }
@@ -609,6 +655,7 @@ if(!Array.isArray(S.extraYears))S.extraYears=[];
 if(!Array.isArray(S.collapsed))S.collapsed=[];
 if(!Array.isArray(S.recent))S.recent=[];
 if(typeof S.hideData!=='boolean')S.hideData=false;
+if(typeof S.waGroup!=='string')S.waGroup='';
 const saveS=()=>{try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}};
 
 /* ============ THEME ============ */
@@ -638,6 +685,7 @@ $('numSeg').onclick=e=>{const b=e.target.closest('button');if(b){S.numerals=b.da
 $('sw').onclick=e=>{const b=e.target.closest('button');if(b){th.a=b.dataset.c;saveS();applyTheme();render();}};
 $('sw').addEventListener('input',e=>{if(e.target.id==='cc'){th.a=e.target.value;saveS();applyTheme();render();}});
 $('setGoal').addEventListener('input',e=>{S.goal=num(e.target.value);saveS();stats();});
+$('setWa').addEventListener('input',e=>{S.waGroup=e.target.value.trim();saveS();updateWaHint();});
 try{matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyTheme);}catch(e){}
 
 /* ============ PWA MANIFEST ============ */
@@ -1132,6 +1180,41 @@ $('bPv').onclick=()=>{
   toast(S.hideData?'تم إخفاء كل البيانات':'تم إظهار البيانات','i');
 };
 
+/* ============ WHATSAPP ============ */
+function updateWaHint(){
+  const hint = $('waHint');
+  if (S.waGroup) hint.textContent = 'اضغط للانضمام إلى المجموعة';
+  else hint.textContent = 'اضغط لإعداد رابط المجموعة';
+}
+function openWaGroup(){
+  if (S.waGroup){
+    hp(20);
+    try{
+      const a = document.createElement('a');
+      a.href = S.waGroup;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }catch(e){
+      window.open(S.waGroup, '_blank', 'noopener');
+    }
+    return;
+  }
+  inputBox('رابط مجموعة الواتساب','الصق رابط دعوة المجموعة العامة (يبدأ بـ https://chat.whatsapp.com/...)','',val=>{
+    const v = (val||'').trim();
+    if (!v){ toast('لم يتم الحفظ','i'); return; }
+    if (!/^https?:\/\//i.test(v)){ toast('الرابط يجب أن يبدأ بـ http','e'); return; }
+    S.waGroup = v; saveS();
+    $('setWa').value = v;
+    updateWaHint();
+    toast('تم حفظ رابط المجموعة');
+  },'url');
+}
+$('bWa').onclick = openWaGroup;
+$('waBanner').onclick = openWaGroup;
+
 /* ============ FOLD ============ */
 function toggleFold(i){
   const t=tx[i];if(!t)return;
@@ -1143,7 +1226,7 @@ function toggleFold(i){
 }
 
 /* ============================================================
-   AUTOCOMPLETE — تعبئة تلقائية من العملاء السابقين
+   AUTOCOMPLETE
    ============================================================ */
 let clientIndex = [];
 
@@ -1151,7 +1234,6 @@ function rebuildClientIndex(){
   const map = new Map();
   tx.forEach(t => {
     if (!t.name && !t.phone) return;
-    /* المفتاح: الهاتف إن وُجد، وإلا الاسم */
     const key = (t.phone || '').trim() || ('__n:' + (t.name || '').trim().toLowerCase());
     if (!key) return;
     const yNew = +t.year || 0;
@@ -1242,7 +1324,7 @@ function attachSuggestion(inputId, target){
   if (!inp || !box) return;
 
   inp.addEventListener('input', () => {
-    if (edit > -1) return; /* التعبئة التلقائية فقط عند إضافة معاملة جديدة */
+    if (edit > -1) return;
     clearTimeout(suggTimers[target]);
     suggTimers[target] = setTimeout(() => {
       const q = inp.value;
@@ -1268,7 +1350,6 @@ function attachSuggestion(inputId, target){
     if (e.key === 'Escape') closeSuggestions(target);
   });
 
-  /* استخدام pointerdown لتفادي فقدان التركيز قبل النقر */
   box.addEventListener('pointerdown', (e) => {
     const sg = e.target.closest('.sg');
     if (!sg) return;
@@ -1719,17 +1800,18 @@ $('bStat').onclick=()=>{
   const M = v => HP ? DOTS : fmt(v);
   const M2 = v => H ? DOTS : fmt(v);
   let html='';
-  let curP=0,curB=0,curN=0,curDone=0,curPend=0,curCanc=0;
+  let curP=0,curB=0,curN=0,curDone=0,curPend=0,curCanc=0,curP2=0;
   tx.forEach(t=>{
     if(+t.year!==Y)return;
     curN++;
     if(t.cancelled){curCanc++;return;}
     curP+=calc(t);curB+=num(t.buyPrice);
-    if(t.done)curDone++;else curPend++;
+    if(t.done){curDone++;curP2+=calc(t);}else curPend++;
   });
   html+=`<div class="s2">ملخص سنة ${dispNum(Y)}</div>
     <div class="g2">
-      <div class="ii"><small>صافي الأرباح</small><b style="color:${curP>=0?'var(--ok)':'var(--no)'}">${M(curP)}</b></div>
+      <div class="ii"><small>الربح بعد الشراء</small><b style="color:${curP>=0?'var(--ok)':'var(--no)'}">${M(curP)}</b></div>
+      <div class="ii"><small>صافي الربح</small><b style="color:${curP2>=0?'var(--ok)':'var(--no)'}">${M(curP2)}</b></div>
       <div class="ii"><small>إجمالي المشتريات</small><b>${M2(curB)}</b></div>
       <div class="ii"><small>المعاملات</small><b>${dispNum(curN)}</b></div>
       <div class="ii"><small>منفذة / جارية</small><b>${dispNum(curDone)} / ${dispNum(curPend)}</b></div>
@@ -1747,27 +1829,29 @@ $('bStat').onclick=()=>{
       return `<div class="hmc l${lvl}" title="${c} معاملة"></div>`;
     }).join('')}</div>
     <div class="hmLegend"><span>أقل</span><span class="sw"></span><span class="sw l1"></span><span class="sw l2"></span><span class="sw l3"></span><span class="sw l4"></span><span>أكثر</span></div>`;
-  let gP=0,gB=0,gN=0;
+  let gP=0,gB=0,gN=0,gP2=0;
   ys.forEach(y=>{
-    let n=0,P=0,B=0,dn=0,pe=0,cn=0;
+    let n=0,P=0,B=0,dn=0,pe=0,cn=0,P2=0;
     tx.forEach(t=>{
       if(+t.year!==y)return;
       n++;
       if(t.cancelled){cn++;return;}
       P+=calc(t);B+=num(t.buyPrice);
-      if(t.done)dn++;else pe++;
+      if(t.done){dn++;P2+=calc(t);}else pe++;
     });
-    gP+=P;gB+=B;gN+=n;
+    gP+=P;gB+=B;gN+=n;gP2+=P2;
     html+=`<div class="s2">سنة ${dispNum(y)} — ${dispNum(n)} معاملة (${dispNum(dn)} منفذة، ${dispNum(pe)} جارية، ${dispNum(cn)} ملغية)</div>
       <div class="g2">
-        <div class="ii"><small>صافي الأرباح</small><b style="color:${P>=0?'var(--ok)':'var(--no)'}">${M(P)}</b></div>
+        <div class="ii"><small>الربح بعد الشراء</small><b style="color:${P>=0?'var(--ok)':'var(--no)'}">${M(P)}</b></div>
+        <div class="ii"><small>صافي الربح</small><b style="color:${P2>=0?'var(--ok)':'var(--no)'}">${M(P2)}</b></div>
         <div class="ii"><small>إجمالي المشتريات</small><b>${M2(B)}</b></div>
       </div>`;
   });
   html+=`<div class="s2">الإجمالي العام</div>
     <div class="g2">
       <div class="ii"><small>عدد المعاملات</small><b>${dispNum(gN)}</b></div>
-      <div class="ii"><small>صافي الأرباح</small><b style="color:${gP>=0?'var(--ok)':'var(--no)'}">${M(gP)}</b></div>
+      <div class="ii"><small>الربح بعد الشراء</small><b style="color:${gP>=0?'var(--ok)':'var(--no)'}">${M(gP)}</b></div>
+      <div class="ii"><small>صافي الربح</small><b style="color:${gP2>=0?'var(--ok)':'var(--no)'}">${M(gP2)}</b></div>
       <div class="ii"><small>إجمالي المشتريات</small><b>${M2(gB)}</b></div>
       <div class="ii"><small>عدد السنوات</small><b>${dispNum(ys.length)}</b></div>
       <div class="ii"><small>النسخ المحفوظة</small><b>${dispNum(snaps.length)}</b></div>
@@ -1777,7 +1861,11 @@ $('bStat').onclick=()=>{
 };
 
 /* ============ HEADER / SETTINGS ============ */
-$('bSet').onclick=()=>{$('setGoal').value=S.goal||'';openM('set');};
+$('bSet').onclick=()=>{
+  $('setGoal').value=S.goal||'';
+  $('setWa').value=S.waGroup||'';
+  openM('set');
+};
 
 /* ============ SNAPSHOT BUTTONS ============ */
 $('bSnapNew').onclick=()=>{
@@ -1872,7 +1960,6 @@ document.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{
   const inField=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
   if(e.key==='Escape'){
-    /* إغلاق الاقتراحات أولاً */
     const anySugg = $('suggName').classList.contains('on') || $('suggPhone').classList.contains('on');
     if (anySugg){ closeSuggestions(); return; }
     const openForm=document.getElementById('form').classList.contains('on');
@@ -1885,6 +1972,7 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='/'){e.preventDefault();$('q').focus();}
   else if(e.key==='p'||e.key==='P'){$('pEye').click();}
   else if(e.key==='h'||e.key==='H'){$('bPv').click();}
+  else if(e.key==='w'||e.key==='W'){openWaGroup();}
   else if(e.key===','&&(e.ctrlKey||e.metaKey)){e.preventDefault();$('bSet').click();}
   else if(e.key==='d'&&(e.ctrlKey||e.metaKey)){e.preventDefault();th.m=th.m==='dark'?'light':'dark';applyTheme();}
   else if(e.key==='s'&&(e.ctrlKey||e.metaKey)){
@@ -1925,7 +2013,7 @@ function checkN(){
   applyHideUI();
   applyTheme();
   updateSnapCount();
-  /* تفعيل التعبئة التلقائية */
+  updateWaHint();
   attachSuggestion('f_name','name');
   attachSuggestion('f_phone','phone');
   $('list').innerHTML=skeleton();
