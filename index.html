@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>إدارة المعاملات</title>
 <meta name="theme-color" content="#f2f3f8">
 <meta name="mobile-web-app-capable" content="yes">
@@ -18,6 +18,7 @@
 [data-theme=dark]{--bg:#0a0b16;--cd:#14162a;--tx:#eef0ff;--sub:#9296b8;--bd:#25283f;--ok:#2fd39a;--no:#ff6b88;--wn:#ffb02e;color-scheme:dark}
 [data-theme=amoled]{--bg:#000;--cd:#0a0a0a;--tx:#f5f5ff;--sub:#8a8ab0;--bd:#1a1a1a;--ok:#2fd39a;--no:#ff6b88;--wn:#ffb02e;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{touch-action:manipulation;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;font:400 14px/1.55 'Readex Pro',system-ui,Tahoma,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:120px;overflow-x:hidden}
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none;padding:0}
 i{display:inline-flex;font-style:normal}small{color:var(--sub);font-size:12px}
@@ -49,7 +50,6 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .recent .av{width:26px;height:26px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:11px;flex:none}
 .recent button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-/* summary */
 .sm{position:relative;background:var(--cd);border:1px solid var(--bd);border-radius:24px;overflow:hidden;margin:2px 0 14px}
 .eye-mini{position:absolute;top:12px;inset-inline-start:12px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--sub);background:var(--bg);border:1px solid var(--bd);z-index:3;transition:transform .12s,color .15s,background .15s}
 .eye-mini:hover{color:var(--ac);background:var(--acs)}
@@ -231,7 +231,6 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .moveControls button:disabled{opacity:.35;pointer-events:none}
 .moveControls button svg{color:var(--ac)}
 
-/* ========== AUTOCOMPLETE ========== */
 .acwrap{position:relative}
 .sugg{position:absolute;top:calc(100% + 4px);inset-inline:0;background:var(--cd);border:1px solid var(--bd);border-radius:14px;box-shadow:0 14px 36px rgba(0,0,0,.18);max-height:236px;overflow:auto;z-index:70;display:none;padding:5px}
 .sugg.on{display:block;animation:suggIn .16s ease-out}
@@ -244,7 +243,6 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .sugg .sg .info b{display:block;font-weight:600;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
 .sugg .sg .info small{font-size:11px;color:var(--sub);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
 .sugg .sg .yr{font-size:10.5px;color:var(--sub);background:var(--bg);padding:2px 8px;border-radius:6px;flex:none;font-weight:600}
-.sugg .sugg-empty{padding:12px;text-align:center;color:var(--sub);font-size:12.5px}
 </style>
 </head>
 <body>
@@ -262,10 +260,10 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <button class="eye-mini" id="pEye" aria-label="إظهار/إخفاء الأرباح"><i data-ic="eyeoff" data-s="14"></i></button>
 <div class="pfw">
   <div class="pf">
-    <span class="pf-lbl">صافي الأرباح</span>
+    <span class="pf-lbl">الربح بعد الشراء</span>
     <strong id="sP">•••••</strong>
     <div class="pf-sub">
-      <span>الأرباح من المنفذة</span>
+      <span>صافي الربح</span>
       <b id="sP2">•••••</b>
     </div>
     <span id="hE" class="pf-note"></span>
@@ -337,8 +335,9 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="f"><label>قيمة شحن المعاملة</label><input type="number" step="any" inputmode="decimal" id="f_chargePrice"></div>
 <div class="f"><label>سعر بيع المعاملة</label><input type="number" step="any" inputmode="decimal" id="f_sellPrice"></div>
 <div class="f"><label>الخصم %</label><input type="number" step="any" inputmode="decimal" id="f_discount"></div>
-<div class="f w2"><label>ملاحظات</label><textarea id="f_notes" rows="2"></textarea></div>
+<div class="f"><label>سعر البيع بالدولار</label><input type="number" step="any" inputmode="decimal" id="f_sellPriceUSD"></div>
 <div class="f"><label>السنة</label><input type="number" inputmode="numeric" id="f_year"></div>
+<div class="f w2"><label>ملاحظات</label><textarea id="f_notes" rows="2"></textarea></div>
 </div>
 <label class="tg"><span>معاملة بالنصف</span><input type="checkbox" id="f_half"><i class="sw"></i></label>
 <div class="preview" id="fPreview">
@@ -362,6 +361,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="f"><label>قيمة الشحن</label><input type="number" step="any" inputmode="decimal" id="d_charge"></div>
 <div class="f"><label>سعر البيع</label><input type="number" step="any" inputmode="decimal" id="d_sell"></div>
 <div class="f"><label>الخصم %</label><input type="number" step="any" inputmode="decimal" id="d_disc"></div>
+<div class="f"><label>سعر البيع بالدولار</label><input type="number" step="any" inputmode="decimal" id="d_sellUSD"></div>
 </div>
 <label class="tg"><span>معاملة بالنصف</span><input type="checkbox" id="d_half"><i class="sw"></i></label>
 <div class="pc" id="dPc">صافي الربح<b id="dP">0.00</b></div>
@@ -511,6 +511,34 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 "use strict";
 const $ = i => document.getElementById(i);
 const KEY='app2026_pro_db',TK='app2026_theme',SK='app2026_settings_v2',SNAPK='app2026_snapshots_v1';
+
+/* ============ منع الزوم بالكامل ============ */
+(function(){
+  ['gesturestart','gesturechange','gestureend'].forEach(evt=>{
+    document.addEventListener(evt, e => e.preventDefault(), {passive:false});
+  });
+  document.addEventListener('touchstart', e => {
+    if (e.touches.length > 1) e.preventDefault();
+  }, {passive:false});
+  let lastTouch = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - lastTouch <= 320){
+      if (!e.target.closest('input,textarea,select,[contenteditable]')){
+        e.preventDefault();
+      }
+    }
+    lastTouch = now;
+  }, {passive:false});
+  document.addEventListener('wheel', e => {
+    if (e.ctrlKey) e.preventDefault();
+  }, {passive:false});
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && ['+','-','=','0'].includes(e.key)){
+      e.preventDefault();
+    }
+  });
+})();
 
 /* ============ ICONS ============ */
 const I = {
@@ -972,6 +1000,9 @@ function card(r,n){
   if(num(t.sellPrice)>0){
     m+=H?'<span class="tag">بيع •••••</span>':`<span class="tag">بيع ${fmt(num(t.sellPrice))}</span>`;
   }
+  if(num(t.sellPriceUSD)>0){
+    m+=H?'<span class="tag">$ ••••</span>':`<span class="tag" style="color:var(--ok);font-weight:600">$ ${fmt(num(t.sellPriceUSD))}</span>`;
+  }
   if(!t.isHalf&&num(t.buyPrice)>0){
     m+=H?'<span class="tag">شراء •••••</span>':`<span class="tag">شراء ${fmt(num(t.buyPrice))}</span>`;
   }
@@ -1151,7 +1182,6 @@ function rebuildClientIndex(){
   const map = new Map();
   tx.forEach(t => {
     if (!t.name && !t.phone) return;
-    /* المفتاح: الهاتف إن وُجد، وإلا الاسم */
     const key = (t.phone || '').trim() || ('__n:' + (t.name || '').trim().toLowerCase());
     if (!key) return;
     const yNew = +t.year || 0;
@@ -1242,7 +1272,7 @@ function attachSuggestion(inputId, target){
   if (!inp || !box) return;
 
   inp.addEventListener('input', () => {
-    if (edit > -1) return; /* التعبئة التلقائية فقط عند إضافة معاملة جديدة */
+    if (edit > -1) return;
     clearTimeout(suggTimers[target]);
     suggTimers[target] = setTimeout(() => {
       const q = inp.value;
@@ -1268,7 +1298,6 @@ function attachSuggestion(inputId, target){
     if (e.key === 'Escape') closeSuggestions(target);
   });
 
-  /* استخدام pointerdown لتفادي فقدان التركيز قبل النقر */
   box.addEventListener('pointerdown', (e) => {
     const sg = e.target.closest('.sg');
     if (!sg) return;
@@ -1282,7 +1311,7 @@ function attachSuggestion(inputId, target){
 }
 
 /* ============ FORM ============ */
-const F=['name','phone','account','nationalId','passport','iban','buyPrice','chargePrice','sellPrice','discount','notes'];
+const F=['name','phone','account','nationalId','passport','iban','buyPrice','chargePrice','sellPrice','sellPriceUSD','discount','notes'];
 const fh=()=>{const h=$('f_half').checked;$('f_buyPrice').disabled=h;if(h)$('f_buyPrice').value='';updatePreview();};
 let edit=-1;let formDirty=false;
 F.concat(['year']).forEach(k=>{$('f_'+k).addEventListener('input',()=>{formDirty=true;updatePreview();});});
@@ -1430,6 +1459,7 @@ function details(i){
   $('d_buy').value=t.buyPrice||'';
   $('d_charge').value=t.chargePrice||'';
   $('d_sell').value=t.sellPrice||'';
+  $('d_sellUSD').value=t.sellPriceUSD||'';
   $('d_disc').value=t.discount||'0';
   $('d_notes').value=t.notes||'';
   $('d_year').value=t.year||selYear();
@@ -1460,6 +1490,7 @@ $('dSave').onclick=()=>{
   t.chargePrice=$('d_charge').value;
   const spRaw=String($('d_sell').value).trim();
   t.sellPrice=spRaw;
+  t.sellPriceUSD=$('d_sellUSD').value;
   t.discount=$('d_disc').value;
   t.notes=$('d_notes').value;
   const y=parseInt($('d_year').value,10);
@@ -1719,17 +1750,18 @@ $('bStat').onclick=()=>{
   const M = v => HP ? DOTS : fmt(v);
   const M2 = v => H ? DOTS : fmt(v);
   let html='';
-  let curP=0,curB=0,curN=0,curDone=0,curPend=0,curCanc=0;
+  let curP=0,curB=0,curN=0,curDone=0,curPend=0,curCanc=0,curP2=0;
   tx.forEach(t=>{
     if(+t.year!==Y)return;
     curN++;
     if(t.cancelled){curCanc++;return;}
     curP+=calc(t);curB+=num(t.buyPrice);
-    if(t.done)curDone++;else curPend++;
+    if(t.done){curDone++;curP2+=calc(t);}else curPend++;
   });
   html+=`<div class="s2">ملخص سنة ${dispNum(Y)}</div>
     <div class="g2">
-      <div class="ii"><small>صافي الأرباح</small><b style="color:${curP>=0?'var(--ok)':'var(--no)'}">${M(curP)}</b></div>
+      <div class="ii"><small>الربح بعد الشراء</small><b style="color:${curP>=0?'var(--ok)':'var(--no)'}">${M(curP)}</b></div>
+      <div class="ii"><small>صافي الربح</small><b style="color:${curP2>=0?'var(--ok)':'var(--no)'}">${M(curP2)}</b></div>
       <div class="ii"><small>إجمالي المشتريات</small><b>${M2(curB)}</b></div>
       <div class="ii"><small>المعاملات</small><b>${dispNum(curN)}</b></div>
       <div class="ii"><small>منفذة / جارية</small><b>${dispNum(curDone)} / ${dispNum(curPend)}</b></div>
@@ -1747,27 +1779,29 @@ $('bStat').onclick=()=>{
       return `<div class="hmc l${lvl}" title="${c} معاملة"></div>`;
     }).join('')}</div>
     <div class="hmLegend"><span>أقل</span><span class="sw"></span><span class="sw l1"></span><span class="sw l2"></span><span class="sw l3"></span><span class="sw l4"></span><span>أكثر</span></div>`;
-  let gP=0,gB=0,gN=0;
+  let gP=0,gB=0,gN=0,gP2=0;
   ys.forEach(y=>{
-    let n=0,P=0,B=0,dn=0,pe=0,cn=0;
+    let n=0,P=0,B=0,dn=0,pe=0,cn=0,P2=0;
     tx.forEach(t=>{
       if(+t.year!==y)return;
       n++;
       if(t.cancelled){cn++;return;}
       P+=calc(t);B+=num(t.buyPrice);
-      if(t.done)dn++;else pe++;
+      if(t.done){dn++;P2+=calc(t);}else pe++;
     });
-    gP+=P;gB+=B;gN+=n;
+    gP+=P;gB+=B;gN+=n;gP2+=P2;
     html+=`<div class="s2">سنة ${dispNum(y)} — ${dispNum(n)} معاملة (${dispNum(dn)} منفذة، ${dispNum(pe)} جارية، ${dispNum(cn)} ملغية)</div>
       <div class="g2">
-        <div class="ii"><small>صافي الأرباح</small><b style="color:${P>=0?'var(--ok)':'var(--no)'}">${M(P)}</b></div>
+        <div class="ii"><small>الربح بعد الشراء</small><b style="color:${P>=0?'var(--ok)':'var(--no)'}">${M(P)}</b></div>
+        <div class="ii"><small>صافي الربح</small><b style="color:${P2>=0?'var(--ok)':'var(--no)'}">${M(P2)}</b></div>
         <div class="ii"><small>إجمالي المشتريات</small><b>${M2(B)}</b></div>
       </div>`;
   });
   html+=`<div class="s2">الإجمالي العام</div>
     <div class="g2">
       <div class="ii"><small>عدد المعاملات</small><b>${dispNum(gN)}</b></div>
-      <div class="ii"><small>صافي الأرباح</small><b style="color:${gP>=0?'var(--ok)':'var(--no)'}">${M(gP)}</b></div>
+      <div class="ii"><small>الربح بعد الشراء</small><b style="color:${gP>=0?'var(--ok)':'var(--no)'}">${M(gP)}</b></div>
+      <div class="ii"><small>صافي الربح</small><b style="color:${gP2>=0?'var(--ok)':'var(--no)'}">${M(gP2)}</b></div>
       <div class="ii"><small>إجمالي المشتريات</small><b>${M2(gB)}</b></div>
       <div class="ii"><small>عدد السنوات</small><b>${dispNum(ys.length)}</b></div>
       <div class="ii"><small>النسخ المحفوظة</small><b>${dispNum(snaps.length)}</b></div>
@@ -1818,6 +1852,7 @@ $('fi').onchange=e=>{
         id:uid(),name:o.name||'',phone:o.phone||'',account:o.account||'',
         nationalId:o.nationalId||'',passport:o.passport||'',iban:o.iban||'',
         buyPrice:o.buyPrice||'',chargePrice:o.chargePrice||'',sellPrice:o.sellPrice||'',
+        sellPriceUSD:o.sellPriceUSD||'',
         discount:o.discount||'0',notes:o.notes||'',
         year:parseInt(o.year,10)||curYear,
         date:o.date||new Date().toLocaleDateString('en-GB'),
@@ -1872,7 +1907,6 @@ document.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{
   const inField=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
   if(e.key==='Escape'){
-    /* إغلاق الاقتراحات أولاً */
     const anySugg = $('suggName').classList.contains('on') || $('suggPhone').classList.contains('on');
     if (anySugg){ closeSuggestions(); return; }
     const openForm=document.getElementById('form').classList.contains('on');
@@ -1925,7 +1959,6 @@ function checkN(){
   applyHideUI();
   applyTheme();
   updateSnapCount();
-  /* تفعيل التعبئة التلقائية */
   attachSuggestion('f_name','name');
   attachSuggestion('f_phone','phone');
   $('list').innerHTML=skeleton();
