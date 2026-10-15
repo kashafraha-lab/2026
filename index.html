@@ -13,11 +13,14 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237b6bff'/%3E%3Cstop offset='1' stop-color='%234a3aff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Cpath d='M17 42V32M27 42V20M37 42V27M47 42V15' stroke='white' stroke-width='4.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{--ac:#5b4bff;--acs:color-mix(in srgb,var(--ac) 14%,transparent);--bg:#f2f3f8;--cd:#fff;--tx:#12142b;--sub:#6c7090;--bd:#e4e6f0;--ok:#0f9d6e;--no:#e5395b;--wn:#e8960c;color-scheme:light}
 [data-theme=dark]{--bg:#0a0b16;--cd:#14162a;--tx:#eef0ff;--sub:#9296b8;--bd:#25283f;--ok:#2fd39a;--no:#ff6b88;--wn:#ffb02e;color-scheme:dark}
+[data-theme=amoled]{--bg:#000;--cd:#0a0a0a;--tx:#f5f5ff;--sub:#8a8ab0;--bd:#1a1a1a;--ok:#2fd39a;--no:#ff6b88;--wn:#ffb02e;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{margin:0;font:400 14px/1.55 'Readex Pro',system-ui,Tahoma,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:120px;overflow-x:hidden}
+body{margin:0;font:400 14px/1.55 'Readex Pro',system-ui,Tahoma,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:140px;overflow-x:hidden}
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none;padding:0}
 i{display:inline-flex;font-style:normal}small{color:var(--sub);font-size:12px}
 .w{max-width:720px;margin:auto;padding:0 14px}
@@ -26,26 +29,47 @@ i{display:inline-flex;font-style:normal}small{color:var(--sub);font-size:12px}
 .mk{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;color:#fff;font-weight:700;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 78%,#fff) 0%,var(--ac) 60%,color-mix(in srgb,var(--ac) 72%,#000) 100%);box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 32%,transparent)}
 h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .ib{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--cd);border:1px solid var(--bd);transition:transform .12s}
-.ib:active,.btn:active,.ab:active,.ia:active,.pey:active{transform:scale(.94)}
+.ib:active,.btn:active,.ab:active,.ia:active,.pey:active,.mini-fab:active{transform:scale(.94)}
 
 /* years bar */
-.ychips{display:flex;gap:8px;overflow-x:auto;padding:4px 1px 12px;scrollbar-width:none}
+.ychips{display:flex;gap:8px;overflow-x:auto;padding:4px 1px 10px;scrollbar-width:none}
 .ychips::-webkit-scrollbar{display:none}
-.ychips button{flex:0 0 auto;height:40px;padding:0 14px;border-radius:13px;background:var(--cd);border:1px solid var(--bd);color:var(--sub);font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:7px;transition:.2s}
+.ychips button{flex:0 0 auto;height:44px;padding:0 12px;border-radius:13px;background:var(--cd);border:1px solid var(--bd);color:var(--sub);font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:8px;transition:.2s}
 .ychips button.on{background:var(--ac);border-color:var(--ac);color:#fff;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 32%,transparent)}
-.ychips em{font-style:normal;font-size:11px;padding:1px 7px;border-radius:99px;background:var(--bg);color:var(--sub);font-weight:600}
+.ychips button em{font-style:normal;font-size:11px;padding:1px 7px;border-radius:99px;background:var(--bg);color:var(--sub);font-weight:600}
 .ychips button.on em{background:rgba(255,255,255,.24);color:#fff}
-.ychips .add{width:40px;padding:0;justify-content:center}
+.ychips .add{width:44px;padding:0;justify-content:center}
+.ychips button svg.spark{opacity:.7}
+.ychips button.on svg.spark{opacity:1}
+
+/* months bar */
+.mchips{display:flex;gap:6px;overflow-x:auto;padding:0 1px 10px;scrollbar-width:none}
+.mchips::-webkit-scrollbar{display:none}
+.mchips button{flex:0 0 auto;height:30px;padding:0 12px;border-radius:10px;background:var(--cd);border:1px solid var(--bd);color:var(--sub);font-size:12px;font-weight:500;transition:.15s}
+.mchips button.on{background:var(--tx);border-color:var(--tx);color:var(--bg)}
+
+/* recent */
+.recent{display:flex;gap:8px;overflow-x:auto;padding:0 1px 12px;scrollbar-width:none}
+.recent::-webkit-scrollbar{display:none}
+.recent button{flex:0 0 auto;display:flex;align-items:center;gap:7px;padding:4px 12px 4px 4px;border-radius:99px;background:var(--cd);border:1px solid var(--bd);color:var(--tx);font-size:12.5px;font-weight:500;transition:transform .12s;max-width:160px}
+.recent button:active{transform:scale(.95)}
+.recent .av{width:26px;height:26px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:11px;flex:none}
+.recent button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* summary */
 .sm{background:var(--cd);border:1px solid var(--bd);border-radius:24px;overflow:hidden;margin:2px 0 14px}
-.pfw{position:relative}
-.pf{width:100%;padding:20px 20px 16px;text-align:start;display:grid;gap:2px}
-.pf strong{font-size:40px;line-height:1.15;font-weight:700;letter-spacing:-1px;color:var(--ac);transition:.2s}
+.pfw{position:relative;display:flex;align-items:center;gap:14px;padding:18px 20px}
+.pf{flex:1;text-align:start;display:grid;gap:2px;min-width:0}
+.pf strong{font-size:36px;line-height:1.15;font-weight:700;letter-spacing:-1px;color:var(--ac);transition:.2s}
 .pf strong.neg{color:var(--no)}
-.pf strong.hid{color:var(--sub);letter-spacing:3px;font-size:32px}
+.pf strong.hid{color:var(--sub);letter-spacing:3px;font-size:30px}
 .pf span{color:var(--sub);font-size:12.5px}
 .pey{position:absolute;inset-inline-end:16px;top:16px;width:38px;height:38px;border-radius:13px;display:grid;place-items:center;color:var(--sub);background:var(--bg);border:1px solid var(--bd)}
+.rad{position:relative;width:78px;height:78px;flex:none}
+.rad svg{transform:rotate(-90deg)}
+.rad .rt{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.rad .rt b{display:block;font-size:15px;font-weight:700;color:var(--ac);line-height:1}
+.rad .rt small{font-size:9px;color:var(--sub)}
 .gr3{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--bd)}
 .gr3 button{padding:12px 2px;display:grid;justify-items:center;gap:1px}
 .gr3 button+button{border-inline-start:1px solid var(--bd)}
@@ -62,16 +86,32 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 
 /* list */
 #list{background:var(--cd);border:1px solid var(--bd);border-radius:24px;overflow:hidden}
+#list.timeline{background:transparent;border:0;border-radius:0}
 #list.pv{filter:blur(12px);pointer-events:none;user-select:none}
-.c{position:relative;padding:14px 22px 14px 14px;border-bottom:1px solid var(--bd)}
+
+/* card */
+.c{position:relative;overflow:hidden;border-bottom:1px solid var(--bd);touch-action:pan-y}
 .c:last-child{border-bottom:0}
-.c:before{content:"";position:absolute;inset-block:14px;inset-inline-start:7px;width:4px;border-radius:99px;background:var(--rc)}
+.c .inner{position:relative;padding:14px 22px 14px 14px;background:var(--cd);transition:transform .18s ease, max-height .3s;will-change:transform}
+.c:before{content:"";position:absolute;inset-block:14px;inset-inline-start:7px;width:4px;border-radius:99px;background:var(--rc);z-index:2}
 .c.x{opacity:.55}.c.x .nm b{text-decoration:line-through}
+.c .swipe-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;padding:0 22px;pointer-events:none;opacity:0;transition:opacity .15s;background:linear-gradient(90deg,color-mix(in srgb,var(--ok) 20%,var(--cd)) 0%,var(--cd) 30%,var(--cd) 70%,color-mix(in srgb,var(--no) 20%,var(--cd)) 100%)}
+.c.swiping .swipe-bg{opacity:1}
+.c .swipe-bg .r{color:var(--ok);font-weight:700;display:flex;align-items:center;gap:6px;font-size:13px}
+.c .swipe-bg .l{color:var(--no);font-weight:700;display:flex;align-items:center;gap:6px;font-size:13px}
 .ch{display:flex;align-items:center;gap:10px}
-.nb{width:34px;height:34px;border-radius:11px;flex:none;font-weight:600;background:color-mix(in srgb,var(--rc) 18%,transparent)}
+.nb{width:34px;height:34px;border-radius:11px;flex:none;font-weight:600;background:color-mix(in srgb,var(--rc) 18%,transparent);position:relative}
+.ring{width:34px;height:34px;flex:none;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .rt{position:absolute;inset:0;display:grid;place-items:center;font-size:9px;font-weight:700;color:var(--ac)}
 .nm{flex:1;min-width:0;cursor:pointer}.nm b{display:block;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nm small{display:flex;gap:10px}
+.nm small{display:flex;gap:10px;flex-wrap:wrap}
+.nm small i{color:var(--sub);display:inline-flex;align-items:center;gap:3px}
 .ia{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--sub);flex:none;transition:transform .12s}.ia.d{color:var(--no)}
+.chev{transition:transform .3s}
+.c.col .chev{transform:rotate(180deg)}
+.c .foldable{max-height:300px;overflow:hidden;transition:max-height .35s ease,opacity .25s,margin .3s,transform .3s;opacity:1}
+.c.col .foldable{max-height:0;opacity:0;margin-top:0!important;transform:scaleY(.9);transform-origin:top}
 .cm{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .pill,.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:500}
 .pill.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}.pill.wn{background:color-mix(in srgb,var(--wn) 16%,transparent);color:var(--wn)}.pill.gr{background:var(--bd);color:var(--sub)}
@@ -81,10 +121,59 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .ab{flex:1;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:500;background:var(--bg);color:var(--tx);transition:transform .12s}
 .ab.ac{background:var(--ac);color:#fff}
 .ab.ar{flex:0 0 44px;color:var(--sub)}
+/* stages */
+.stages{display:flex;align-items:center;gap:6px;margin-top:10px;padding:0 2px}
+.stage{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--sub);flex:none}
+.stage .dot{width:16px;height:16px;border-radius:50%;background:var(--bd);display:grid;place-items:center;flex:none;transition:.3s;font-size:9px;color:#fff}
+.stage.done .dot{background:var(--ok)}
+.stage.active .dot{background:var(--ac);box-shadow:0 0 0 3px var(--acs)}
+.stage.done{color:var(--ok)}
+.stage.active{color:var(--ac)}
+.stage .line{flex:1;height:2px;background:var(--bd);border-radius:99px;min-width:12px}
+.stage.done .line{background:var(--ok)}
+@keyframes soldPulse{0%{box-shadow:0 0 0 0 rgba(15,157,110,.7)}100%{box-shadow:0 0 0 24px rgba(15,157,110,0)}}
+.c.pulse .inner{animation:soldPulse .9s ease-out}
+@keyframes delPulse{0%{background:color-mix(in srgb,var(--no) 30%,var(--cd))}100%{background:var(--cd)}}
+.c.deleting .inner{animation:delPulse .35s}
+
+/* timeline */
+.tl{position:relative;padding-inline-start:36px;padding-top:6px;padding-bottom:6px}
+.tl:before{content:"";position:absolute;inset-inline-start:14px;top:8px;bottom:8px;width:2px;background:var(--bd);border-radius:99px}
+.tl .tlc{position:relative;margin-bottom:14px;padding:12px 14px;background:var(--cd);border:1px solid var(--bd);border-radius:16px;transition:transform .12s}
+.tl .tlc:active{transform:scale(.98)}
+.tl .tlc:before{content:"";position:absolute;inset-inline-start:-30px;top:16px;width:14px;height:14px;border-radius:50%;background:var(--cd);border:3px solid var(--rc,var(--ac))}
+.tl .tld{font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:600;display:flex;align-items:center;gap:6px}
+
 .dv{padding:8px 16px;background:var(--bg);color:var(--sub);font-size:12px;font-weight:500}
 .em{text-align:center;color:var(--sub);padding:40px 16px}.em p{margin:8px 0 0}
-.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:30;display:flex;align-items:center;gap:8px;height:54px;padding:0 26px;border-radius:99px;color:#fff;font-weight:600;background:var(--ac);box-shadow:0 10px 26px color-mix(in srgb,var(--ac) 42%,transparent);transition:transform .12s}
-.fab:active{transform:translateX(-50%) scale(.95)}
+.em h3{margin:12px 0 4px;color:var(--tx);font-size:16px;font-weight:600}
+.em .emActs{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+
+/* empty state illustration */
+.emptyArt{width:140px;height:140px;margin:0 auto;display:block;opacity:.85}
+
+/* skeleton */
+.skl{padding:14px 22px 14px 14px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.skl:last-child{border-bottom:0}
+.sk{background:linear-gradient(90deg,var(--bd) 25%,var(--bg) 50%,var(--bd) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:10px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk.av{width:34px;height:34px;border-radius:11px;flex:none}
+.sk.l1{height:14px;flex:1;max-width:60%}
+.sk.l2{height:11px;width:40%;margin-top:6px}
+
+/* speed dial */
+.sd{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:30;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none}
+.sd>.fab{position:static;transform:none;pointer-events:auto;position:relative}
+.sd>.fab .chevUp{position:absolute;inset-inline-end:6px;top:0;bottom:0;width:28px;display:grid;place-items:center;opacity:.6;border-inline-start:1px solid rgba(255,255,255,.2);margin:8px 0}
+.sd.open>.fab .chevUp{transform:rotate(180deg)}
+.sd>.fab .chevUp{transition:transform .25s}
+.fab{display:flex;align-items:center;gap:8px;height:54px;padding:0 26px;border-radius:99px;color:#fff;font-weight:600;background:var(--ac);box-shadow:0 10px 26px color-mix(in srgb,var(--ac) 42%,transparent);transition:transform .12s}
+.fab:active{transform:scale(.95)}
+.sd .mini-fabs{display:flex;gap:10px;align-items:center;opacity:0;transform:translateY(14px);transition:.25s;pointer-events:none}
+.sd.open .mini-fabs{opacity:1;transform:translateY(0);pointer-events:auto}
+.sd .mini-fab{width:48px;height:48px;border-radius:50%;background:var(--cd);border:1px solid var(--bd);display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.12);transition:transform .12s;color:var(--tx);position:relative}
+.sd .mini-fab small{position:absolute;top:-22px;background:var(--tx);color:var(--bg);font-size:10px;padding:2px 8px;border-radius:6px;white-space:nowrap;opacity:0;transition:.2s;pointer-events:none}
+.sd.open .mini-fab:hover small{opacity:1}
 
 /* modals */
 .bg{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background:rgba(8,8,24,.5);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}.bg.on{display:flex}
@@ -110,7 +199,11 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .lr{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--bd)}.lr b{flex:1;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ln{color:var(--sub);width:22px;flex:none}.g{color:var(--ok)}
 .mini{padding:6px 12px;border-radius:10px;background:var(--acs);color:var(--ac);font-weight:500;font-size:12.5px;white-space:nowrap}
 .s2{font-size:12px;color:var(--sub);margin:16px 0 8px;font-weight:500}
-.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:5px;background:var(--bg);border-radius:14px}.seg button{height:40px;border-radius:10px;color:var(--sub);font-weight:500}.seg button.on{background:var(--cd);color:var(--ac)}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:5px;background:var(--bg);border-radius:14px}.seg button{height:40px;border-radius:10px;color:var(--sub);font-weight:500;font-size:12.5px}.seg button.on{background:var(--cd);color:var(--ac)}
+.seasonGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.seasonGrid button{padding:12px;border-radius:12px;background:var(--bg);border:2px solid transparent;text-align:start;font-weight:500;font-size:13px;display:flex;align-items:center;gap:10px;transition:.15s}
+.seasonGrid button.on{border-color:var(--ac);background:var(--acs)}
+.seasonGrid .swatch{width:22px;height:22px;border-radius:50%;flex:none;border:2px solid var(--cd);box-shadow:0 0 0 1px var(--bd)}
 .sws{display:flex;gap:10px;flex-wrap:wrap}.sws button,.sws label{width:36px;height:36px;border-radius:50%;border:3px solid var(--cd);box-shadow:0 0 0 2px var(--bd);position:relative;overflow:hidden}
 .sws button.on{box-shadow:0 0 0 2px var(--tx)}
 .sws label{background:conic-gradient(red,yellow,lime,aqua,blue,magenta,red)}.sws input{opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
@@ -121,7 +214,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .tact{background:rgba(255,255,255,.18);color:#fff;padding:4px 13px;border-radius:99px;font-size:12px;font-weight:600;flex:none}
 .hint{font-size:11.5px;color:var(--sub);text-align:center;padding:0 0 10px}
 
-/* snapshot & year-manage rows */
+/* snapshot & year rows */
 .row{display:flex;align-items:flex-start;gap:10px;padding:12px 4px;border-bottom:1px solid var(--bd)}
 .row:last-child{border-bottom:0}
 .row .info{flex:1;min-width:0}
@@ -131,20 +224,93 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .row .acts{display:flex;gap:6px;flex:none;align-items:center}
 .row .acts .mini{padding:7px 12px;font-size:12px}
 .badge-count{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:22px;padding:0 8px;border-radius:99px;background:var(--acs);color:var(--ac);font-size:11.5px;font-weight:600}
+
+/* heatmap */
+.hm{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin:10px 0}
+.hm .hmc{aspect-ratio:1;border-radius:4px;background:var(--bd);min-height:16px;position:relative;cursor:pointer;transition:transform .12s}
+.hm .hmc:active{transform:scale(.9)}
+.hm .hmc.l1{background:color-mix(in srgb,var(--ac) 22%,var(--bg))}
+.hm .hmc.l2{background:color-mix(in srgb,var(--ac) 45%,var(--bg))}
+.hm .hmc.l3{background:color-mix(in srgb,var(--ac) 70%,var(--bg))}
+.hm .hmc.l4{background:var(--ac)}
+.hmLegend{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--sub);justify-content:flex-end;margin-top:-4px}
+.hmLegend .sw{width:12px;height:12px;border-radius:3px;box-shadow:none!important;background:var(--bd)}
+.hmLegend .sw.l1{background:color-mix(in srgb,var(--ac) 22%,var(--bg))}
+.hmLegend .sw.l2{background:color-mix(in srgb,var(--ac) 45%,var(--bg))}
+.hmLegend .sw.l3{background:color-mix(in srgb,var(--ac) 70%,var(--bg))}
+.hmLegend .sw.l4{background:var(--ac)}
+
+/* qr */
+.qr-wrap{display:grid;place-items:center;padding:18px;background:#fff;border-radius:18px;margin:12px 0}
+.qr-wrap img,.qr-wrap canvas{border-radius:8px;display:block}
+
+/* context menu */
+.ctx{position:fixed;z-index:110;background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:6px;box-shadow:0 8px 28px rgba(0,0,0,.18);display:none;min-width:180px;animation:up .18s}
+.ctx.on{display:block}
+.ctx button{width:100%;padding:10px 12px;text-align:start;border-radius:10px;font-size:13.5px;display:flex;align-items:center;gap:10px;color:var(--tx)}
+.ctx button:active{background:var(--bg)}
+.ctx button.dg{color:var(--no)}
+
+/* focus */
+.focus{position:fixed;inset:0;z-index:100;background:var(--bg);padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 16px);display:none;flex-direction:column;gap:16px}
+.focus.on{display:flex}
+.focus .fh{display:flex;justify-content:space-between;align-items:center}
+.focus .fb{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;text-align:center;overflow:auto}
+.focus h2{font-size:30px;margin:0;font-weight:700}
+.focus .fcid{font-size:12px;color:var(--sub);letter-spacing:.5px}
+.focus .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px}
+.focus .frow div{padding:12px;background:var(--cd);border:1px solid var(--bd);border-radius:14px;text-align:start}
+.focus .frow small{display:block;color:var(--sub);font-size:10.5px;margin-bottom:4px}
+.focus .frow b{font-size:14px;word-break:break-all;font-weight:600}
+.focus .fprofit{font-size:40px;font-weight:700;color:var(--ac);letter-spacing:-1px}
+.focus .fprofit.neg{color:var(--no)}
+.focus .facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto}
+.focus .fabtn{padding:16px;border-radius:16px;font-weight:600;font-size:15px;background:var(--cd);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center;gap:8px;color:var(--tx)}
+.focus .fabtn.pr{background:var(--ac);color:#fff;border-color:var(--ac)}
+.focus .fabtn:active{transform:scale(.97)}
+
+/* preview in form */
+.preview{margin-top:14px;padding:14px;border-radius:16px;background:var(--bg);border:1.5px dashed var(--bd);position:relative}
+.preview h4{margin:0 0 8px;font-size:11.5px;color:var(--sub);font-weight:600;letter-spacing:.3px;text-transform:uppercase}
+.preview .pvRow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;font-size:13px}
+.preview .pvRow span:first-child{color:var(--sub);font-size:12px}
+.preview .pvRow span:last-child{font-weight:600}
+.preview .pvTotal{padding-top:8px;margin-top:8px;border-top:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.preview .pvTotal b{font-size:22px;color:var(--ac);font-weight:700}
+.preview .pvTotal b.neg{color:var(--no)}
+
+/* kbd */
+.kbd{display:inline-block;padding:3px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--bd);border-bottom-width:2px;font-family:monospace;font-size:12px;font-weight:600;color:var(--tx)}
+.kbdRow{display:flex;justify-content:space-between;align-items:center;padding:10px 4px;border-bottom:1px solid var(--bd)}
+.kbdRow:last-child{border-bottom:0}
+.kbdRow small{font-size:12.5px}
 </style>
 </head>
 <body>
 <header class="hd"><div class="w hi">
 <div class="lg"><span class="mk" id="mkIcon"></span><div><h1>إدارة المعاملات</h1><small id="sub"></small></div></div>
-<div class="hb"><button class="ib" id="bPv" aria-label="إخفاء البيانات"><i data-ic="eye"></i></button><button class="ib" id="bSet" aria-label="الإعدادات"><i data-ic="set"></i></button></div>
+<div class="hb">
+<button class="ib" id="bView" aria-label="تبديل العرض"><i data-ic="list"></i></button>
+<button class="ib" id="bPv" aria-label="إخفاء البيانات"><i data-ic="eye"></i></button>
+<button class="ib" id="bSet" aria-label="الإعدادات"><i data-ic="set"></i></button>
+</div>
 </div></header>
 <div class="w">
 
 <div class="ychips" id="yr"></div>
+<div class="mchips" id="mo"></div>
+<div class="recent" id="recent"></div>
 
 <section class="sm">
 <div class="pfw">
-<button class="pf" data-l="profit"><span>صافي الأرباح</span><strong id="sP">•••••</strong><span id="hE"></span></button>
+<div class="pf"><span>صافي الأرباح</span><strong id="sP">•••••</strong><span id="hE"></span></div>
+<div class="rad" id="rad">
+<svg width="78" height="78" viewBox="0 0 78 78">
+<circle cx="39" cy="39" r="32" fill="none" stroke="var(--bd)" stroke-width="7"/>
+<circle id="radArc" cx="39" cy="39" r="32" fill="none" stroke="var(--ac)" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 999"/>
+</svg>
+<div class="rt"><div><b id="radPct">0%</b><small id="radLbl">الهدف</small></div></div>
+</div>
 <button class="pey" id="pEye" aria-label="إظهار أو إخفاء الأرباح"><i data-ic="eyeoff"></i></button>
 </div>
 <div class="gr3">
@@ -170,11 +336,19 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <option value="pendingFirst">الجارية أولاً</option>
 </select>
 </div>
-<div class="chips" id="fl"><button data-f="all" class="on">الكل</button><button data-f="pending">جارية</button><button data-f="done">منفذة</button><button data-f="booked">محجوزة</button><button data-f="cancelled">ملغية</button></div>
+<div class="chips" id="fl"><button data-f="all" class="on">الكل</button><button data-f="pending">جارية</button><button data-f="done">منفذة</button><button data-f="booked">محجوزة</button><button data-f="todayBook">حجوزات اليوم</button><button data-f="overdue">متأخرة</button><button data-f="cancelled">ملغية</button></div>
 <div class="hint" id="hint"></div>
 <main id="list"></main>
 </div>
-<button class="fab" id="bAdd"><i data-ic="plus" data-s="22"></i>معاملة جديدة</button>
+
+<div class="sd" id="sd">
+<div class="mini-fabs">
+<button class="mini-fab" id="sdStat" aria-label="إحصائيات"><i data-ic="chart" data-s="20"></i><small>إحصائيات</small></button>
+<button class="mini-fab" id="sdBook" aria-label="حجز سريع"><i data-ic="cal" data-s="20"></i><small>حجز سريع</small></button>
+<button class="mini-fab" id="sdView" aria-label="تبديل العرض"><i data-ic="activity" data-s="20"></i><small>الخط الزمني</small></button>
+</div>
+<button class="fab" id="bAdd"><i data-ic="plus" data-s="22"></i>معاملة جديدة<span class="chevUp" id="sdChev"><i data-ic="chevUp" data-s="16"></i></span></button>
+</div>
 
 <!-- ===== FORM ===== -->
 <div class="bg" id="form"><div class="sh">
@@ -186,27 +360,35 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="f"><label>الرقم الوطني</label><input id="f_nationalId"></div>
 <div class="f"><label>جواز السفر</label><input id="f_passport"></div>
 <div class="f w2"><label>IBAN</label><input id="f_iban"></div>
-<div class="f"><label>سعر شراء البطاقة</label><input type="number" inputmode="decimal" id="f_buyPrice"></div>
-<div class="f"><label>قيمة شحن المعاملة</label><input type="number" inputmode="decimal" id="f_chargePrice"></div>
-<div class="f"><label>سعر بيع المعاملة</label><input type="number" inputmode="decimal" id="f_sellPrice"></div>
-<div class="f"><label>الخصم %</label><input type="number" inputmode="decimal" id="f_discount"></div>
+<div class="f"><label>سعر شراء البطاقة</label><input type="number" step="any" inputmode="decimal" id="f_buyPrice"></div>
+<div class="f"><label>قيمة شحن المعاملة</label><input type="number" step="any" inputmode="decimal" id="f_chargePrice"></div>
+<div class="f"><label>سعر بيع المعاملة</label><input type="number" step="any" inputmode="decimal" id="f_sellPrice"></div>
+<div class="f"><label>الخصم %</label><input type="number" step="any" inputmode="decimal" id="f_discount"></div>
 <div class="f w2"><label>ملاحظات</label><textarea id="f_notes" rows="2"></textarea></div>
 <div class="f"><label>السنة</label><input type="number" inputmode="numeric" id="f_year"></div>
 </div>
 <label class="tg"><span>معاملة بالنصف</span><input type="checkbox" id="f_half"><i class="sw"></i></label>
+<div class="preview" id="fPreview">
+<h4>معاينة مباشرة</h4>
+<div class="pvRow"><span>الشراء</span><span id="pvBuy">—</span></div>
+<div class="pvRow"><span>الشحن</span><span id="pvCharge">—</span></div>
+<div class="pvRow"><span>البيع (بعد الخصم)</span><span id="pvSell">—</span></div>
+<div class="pvTotal"><span>صافي الربح المتوقع</span><b id="pvProfit">0.00</b></div>
+</div>
 <div class="ac2"><button class="btn pr" id="fSave"></button><button class="btn" id="fCan"></button></div>
 </div></div>
 
 <!-- ===== DETAILS ===== -->
 <div class="bg" id="det"><div class="sh">
 <div class="th"><h2 id="dN"></h2><button class="ib" data-x="det" aria-label="إغلاق"><i data-ic="x"></i></button></div>
+<div id="dId" style="font-size:11.5px;color:var(--sub);letter-spacing:.5px;margin-bottom:10px"></div>
 <div class="g2" id="dI"></div>
 <div class="s2">البيانات المالية</div>
 <div class="g2">
-<div class="f"><label>شراء البطاقة</label><input type="number" inputmode="decimal" id="d_buy"></div>
-<div class="f"><label>قيمة الشحن</label><input type="number" inputmode="decimal" id="d_charge"></div>
-<div class="f"><label>سعر البيع</label><input type="number" inputmode="decimal" id="d_sell"></div>
-<div class="f"><label>الخصم %</label><input type="number" inputmode="decimal" id="d_disc"></div>
+<div class="f"><label>شراء البطاقة</label><input type="number" step="any" inputmode="decimal" id="d_buy"></div>
+<div class="f"><label>قيمة الشحن</label><input type="number" step="any" inputmode="decimal" id="d_charge"></div>
+<div class="f"><label>سعر البيع</label><input type="number" step="any" inputmode="decimal" id="d_sell"></div>
+<div class="f"><label>الخصم %</label><input type="number" step="any" inputmode="decimal" id="d_disc"></div>
 </div>
 <label class="tg"><span>معاملة بالنصف</span><input type="checkbox" id="d_half"><i class="sw"></i></label>
 <div class="pc" id="dPc">صافي الربح<b id="dP">0.00</b></div>
@@ -216,13 +398,34 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="f"><label>السنة</label><input type="number" inputmode="numeric" id="d_year"></div>
 </div>
 <div class="ac2"><button class="btn pr" id="dSave"><i data-ic="check"></i>حفظ التعديلات</button></div>
-<div class="ac2"><button class="btn" id="dDup"><i data-ic="copy"></i>نسخ المعاملة</button></div>
+<div class="ac2"><button class="btn" id="dFocus"><i data-ic="focus"></i>وضع التركيز</button><button class="btn" id="dQr"><i data-ic="qr"></i>عرض QR</button></div>
+<div class="ac2"><button class="btn" id="dShareImg"><i data-ic="image"></i>مشاركة كصورة</button><button class="btn" id="dDup"><i data-ic="copy"></i>نسخ المعاملة</button></div>
+</div></div>
+
+<!-- ===== QR ===== -->
+<div class="bg" id="qrm"><div class="sh">
+<div class="th"><h2>رمز QR للعميل</h2><button class="ib" data-x="qrm" aria-label="إغلاق"><i data-ic="x"></i></button></div>
+<div class="qr-wrap" id="qrBox"></div>
+<p style="text-align:center;font-size:12px;color:var(--sub)">امسح الرمز لإضافة بيانات العميل على جهاز آخر</p>
+</div></div>
+
+<!-- ===== KEYBOARD HELP ===== -->
+<div class="bg" id="kbdm"><div class="sh">
+<div class="th"><h2>اختصارات لوحة المفاتيح</h2><button class="ib" data-x="kbdm" aria-label="إغلاق"><i data-ic="x"></i></button></div>
+<div class="kbdRow"><small>معاملة جديدة</small><span class="kbd">N</span></div>
+<div class="kbdRow"><small>بحث</small><span class="kbd">/</span></div>
+<div class="kbdRow"><small>إغلاق النافذة</small><span class="kbd">Esc</span></div>
+<div class="kbdRow"><small>حفظ</small><span class="kbd">Ctrl + S</span></div>
+<div class="kbdRow"><small>تبديل العرض</small><span class="kbd">V</span></div>
+<div class="kbdRow"><small>تبديل المظهر</small><span class="kbd">Ctrl + D</span></div>
+<div class="kbdRow"><small>إظهار/إخفاء الأرباح</small><span class="kbd">P</span></div>
+<div class="kbdRow"><small>الإعدادات</small><span class="kbd">Ctrl + ,</span></div>
 </div></div>
 
 <!-- ===== QUICK ENTRY ===== -->
 <div class="bg" id="qe"><div class="sh">
 <div class="th"><h2 id="qe_t"></h2><button class="ib" data-x="qe" aria-label="إغلاق"><i data-ic="x"></i></button></div>
-<div class="f" id="qe_g"><input type="number" inputmode="decimal" id="qe_in"></div>
+<div class="f" id="qe_g"><input type="number" step="any" inputmode="decimal" id="qe_in"></div>
 <label class="tg" id="qe_hf"><span>معاملة بالنصف</span><input type="checkbox" id="qe_half"><i class="sw"></i></label>
 <div class="ac2"><button class="btn pr" id="qe_ok">حفظ ومتابعة</button></div>
 </div></div>
@@ -244,8 +447,14 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <!-- ===== SETTINGS ===== -->
 <div class="bg" id="set"><div class="sh">
 <div class="th"><h2>الإعدادات</h2><button class="ib" data-x="set" aria-label="إغلاق"><i data-ic="x"></i></button></div>
-<div class="s2">المظهر</div><div class="seg" id="seg"><button data-m="auto">تلقائي</button><button data-m="light">فاتح</button><button data-m="dark">داكن</button></div>
+<div class="s2">المظهر</div><div class="seg" id="seg"><button data-m="auto">تلقائي</button><button data-m="light">فاتح</button><button data-m="dark">داكن</button><button data-m="amoled">AMOLED</button></div>
+<div class="s2">الموسم</div><div class="seasonGrid" id="seasons"></div>
 <div class="s2">لون التطبيق</div><div class="sws" id="sw"></div>
+
+<div class="s2">الأرقام</div><div class="seg" id="numSeg"><button data-n="western">1 2 3</button><button data-n="arabic">١ ٢ ٣</button></div>
+
+<div class="s2">الهدف السنوي لصافي الربح</div>
+<div class="f"><input type="number" step="any" inputmode="decimal" id="setGoal" placeholder="مثال: 50000"></div>
 
 <div class="s2">حفظ واستعادة البيانات</div>
 <div class="ac2" style="margin-top:0">
@@ -264,6 +473,8 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="ac2" style="margin-top:0"><button class="btn" id="bEx"><i data-ic="down"></i>تصدير Excel</button><button class="btn" id="bIm"><i data-ic="up"></i>استيراد Excel</button></div>
 <div class="s2">إحصائيات</div>
 <div class="ac2" style="margin-top:0"><button class="btn" id="bStat"><i data-ic="chart"></i>إحصائيات شاملة</button></div>
+<div class="s2">مساعدة</div>
+<div class="ac2" style="margin-top:0"><button class="btn" id="bKbd"><i data-ic="keyboard"></i>اختصارات لوحة المفاتيح</button></div>
 <div class="s2">منطقة الخطر</div>
 <div class="ac2" style="margin-top:0"><button class="btn dg" id="bWipe"><i data-ic="trash"></i>حذف كل البيانات</button></div>
 </div></div>
@@ -289,6 +500,25 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div id="stB"></div>
 </div></div>
 
+<!-- ===== FOCUS MODE ===== -->
+<div class="focus" id="focus">
+<div class="fh">
+<div style="display:flex;gap:8px;align-items:center">
+<button class="ib" id="focusPrev" aria-label="السابق"><i data-ic="chevUp"></i></button>
+<button class="ib" id="focusNext" aria-label="التالي"><i data-ic="chevDown"></i></button>
+</div>
+<button class="ib" id="focusClose" aria-label="إغلاق"><i data-ic="x"></i></button>
+</div>
+<div class="fb" id="focusBody"></div>
+<div class="facts" id="focusActs"></div>
+</div>
+
+<!-- ===== CONTEXT MENU ===== -->
+<div class="ctx" id="ctx"></div>
+
+<!-- ===== SHARE IMAGE (hidden) ===== -->
+<div id="shareStage" style="position:fixed;left:-9999px;top:0;width:420px;background:var(--cd);padding:32px;border-radius:24px;font-family:'Readex Pro',sans-serif;color:var(--tx)"></div>
+
 <!-- ===== ASK ===== -->
 <div class="bg mid" id="ask"><div class="sh"><h2 id="aT"></h2><p id="aM"></p>
 <div class="ac2"><button class="btn" data-x="ask">تراجع</button><button class="btn dg" id="aOk"></button></div></div></div>
@@ -306,7 +536,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <script>
 "use strict";
 const $ = i => document.getElementById(i);
-const KEY = 'app2026_pro_db', TK = 'app2026_theme', SK = 'app2026_settings_v2', SNAPK = 'app2026_snapshots_v1';
+const KEY='app2026_pro_db',TK='app2026_theme',SK='app2026_settings_v2',SNAPK='app2026_snapshots_v1';
 
 /* ============ ICONS ============ */
 const I = {
@@ -335,1011 +565,1481 @@ const I = {
   note:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z|M14 2v6h6',
   save:'M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z|M17 21v-8H7v8|M7 3v5h8',
   history:'M3 12a9 9 0 1 0 3-6.7L3 8|M3 3v5h5|M12 7v5l3 2',
-  rotate:'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8|M3 3v5h5'
+  rotate:'M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8|M3 3v5h5',
+  list:'M8 6h13|M8 12h13|M8 18h13|M3 6h.01|M3 12h.01|M3 18h.01',
+  activity:'M22 12h-4l-3 9L9 3l-3 9H2',
+  focus:'M3 7V5a2 2 0 0 1 2-2h2|M17 3h2a2 2 0 0 1 2 2v2|M21 17v2a2 2 0 0 1-2 2h-2|M7 21H5a2 2 0 0 1-2-2v-2',
+  qr:'M3 3h7v7H3z|M14 3h7v7h-7z|M3 14h7v7H3z|M14 14h3v3h-3z|M20 14h1|M14 20h1|M17 20h4|M20 17v.01',
+  image:'M3 3h18v18H3z|M3 15l5-5 4 4 3-3 6 6|M8.5 8.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0',
+  keyboard:'M2 6h20v12H2z|M6 10h.01|M10 10h.01|M14 10h.01|M18 10h.01|M7 14h10',
+  phone:'M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.4-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z',
+  wa:'M21 11.5a8.4 8.4 0 0 1-9 8.4 9 9 0 0 1-3.5-.7L3 21l1.9-5.4A8.4 8.4 0 0 1 4 11.5a8.5 8.5 0 1 1 17 0z|M9 10c0 3 2 5 5 5l1-1.5-2-.7-.7.7c-1-.4-2-1.4-2.3-2.3l.7-.7L10 9 9 10z',
+  pin:'M12 17v5|M9 2h6l-1 8 3 3H7l3-3z'
 };
-const ic = (n, s = 19) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${(I[n]||'').split('|').map(d => `<path d="${d}"/>`).join('')}</svg>`;
-document.querySelectorAll('[data-ic]').forEach(e => e.innerHTML = ic(e.dataset.ic, +e.dataset.s || 19));
+const ic=(n,s=19)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${(I[n]||'').split('|').map(d=>`<path d="${d}"/>`).join('')}</svg>`;
+document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic,+e.dataset.s||19));
 $('mkIcon').innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M5 19v-5M11 19V7M17 19v-8"/></svg>`;
 
 /* ============ HELPERS ============ */
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const num = v => { const n = parseFloat(v); return isFinite(n) ? n : 0; };
-const fmt = n => (Math.round(n * 100) / 100).toLocaleString('en-US', { maximumFractionDigits: 2 });
-const curYear = new Date().getFullYear();
-const hp = (m = 15) => { try { navigator.vibrate && navigator.vibrate(m); } catch(e){} };
-const openM = id => $(id).classList.add('on');
-const closeM = id => $(id).classList.remove('on');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0;};
+const curYear=new Date().getFullYear();
+const hp=m=>{try{navigator.vibrate&&navigator.vibrate(m);}catch(e){}};
+const openM=id=>$(id).classList.add('on');
+const closeM=id=>$(id).classList.remove('on');
+const uid=()=> 'tx_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
+const toAr=s=>String(s).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+const dispNum=n=> S.numerals==='arabic' ? toAr(n) : String(n);
+const fmt=n=>{const v=Math.round(n*100)/100;const s=v.toLocaleString('en-US',{maximumFractionDigits:2});return S.numerals==='arabic'?toAr(s):s;};
 
-function toast(m, t = 's') {
-  const e = document.createElement('div');
-  e.className = 'toast ' + t;
-  e.innerHTML = ic(t === 'e' ? 'x' : 'check', 16) + '<span></span>';
-  e.lastChild.textContent = m;
+function toast(m,t='s'){
+  const e=document.createElement('div');e.className='toast '+t;
+  e.innerHTML=ic(t==='e'?'x':'check',16)+'<span></span>';e.lastChild.textContent=m;
   $('ts').appendChild(e);
-  setTimeout(() => { e.style.opacity = 0; setTimeout(() => e.remove(), 400); }, 2400);
+  setTimeout(()=>{e.style.opacity=0;setTimeout(()=>e.remove(),400);},2400);
 }
-function toastAct(m, label, cb) {
-  const el = document.createElement('div');
-  el.className = 'toast i';
-  el.innerHTML = `<span></span><button class="tact">${esc(label)}</button>`;
-  el.firstChild.textContent = m;
-  $('ts').appendChild(el);
-  const btn = el.querySelector('.tact');
-  let done = false;
-  const kill = () => { if (done) return; done = true; el.style.opacity = 0; setTimeout(() => el.remove(), 400); };
-  btn.onclick = () => { if (done) return; const f = cb; kill(); f && f(); };
-  setTimeout(kill, 6000);
+function toastAct(m,label,cb){
+  const el=document.createElement('div');el.className='toast i';
+  el.innerHTML=`<span></span><button class="tact">${esc(label)}</button>`;
+  el.firstChild.textContent=m;$('ts').appendChild(el);
+  const btn=el.querySelector('.tact');let done=false;
+  const kill=()=>{if(done)return;done=true;el.style.opacity=0;setTimeout(()=>el.remove(),400);};
+  btn.onclick=()=>{if(done)return;const f=cb;kill();f&&f();};
+  setTimeout(kill,6000);
 }
-let askCb = null;
-function ask(t, m, ok, cb, danger = 1) {
-  $('aT').textContent = t; $('aM').textContent = m;
-  const b = $('aOk'); b.textContent = ok; b.className = 'btn ' + (danger ? 'dg' : 'pr');
-  askCb = cb; openM('ask');
+let askCb=null;
+function ask(t,m,ok,cb,danger=1){
+  $('aT').textContent=t;$('aM').textContent=m;
+  const b=$('aOk');b.textContent=ok;b.className='btn '+(danger?'dg':'pr');
+  askCb=cb;openM('ask');
 }
-$('aOk').onclick = () => { closeM('ask'); const f = askCb; askCb = null; f && f(); };
+$('aOk').onclick=()=>{closeM('ask');const f=askCb;askCb=null;f&&f();};
 
-let inpCb = null;
-function inputBox(title, msg, val, cb, type = 'text') {
-  $('iT').textContent = title; $('iM').textContent = msg || '';
-  const v = $('iV'); v.type = type; v.value = val || '';
-  inpCb = cb; openM('inp');
-  setTimeout(() => { v.focus(); try { v.select(); } catch(e){} }, 260);
+let inpCb=null;
+function inputBox(title,msg,val,cb,type='text'){
+  $('iT').textContent=title;$('iM').textContent=msg||'';
+  const v=$('iV');v.type=type;v.value=val||'';
+  inpCb=cb;openM('inp');
+  setTimeout(()=>{v.focus();try{v.select();}catch(e){}},260);
 }
-$('iOk').onclick = () => { const v = $('iV').value; closeM('inp'); const f = inpCb; inpCb = null; f && f(v); };
-$('iV').addEventListener('keydown', e => { if (e.key === 'Enter') $('iOk').click(); });
+$('iOk').onclick=()=>{const v=$('iV').value;closeM('inp');const f=inpCb;inpCb=null;f&&f(v);};
+$('iV').addEventListener('keydown',e=>{if(e.key==='Enter')$('iOk').click();});
 
-const share = (text, title) => navigator.share ? navigator.share({ title, text }).catch(() => {}) : navigator.clipboard.writeText(text).then(() => toast('تم النسخ للحافظة', 'i')).catch(() => toast('تعذر النسخ', 'e'));
-const copy = v => { if (!v || v === '-') return; navigator.clipboard.writeText(v).then(() => toast('تم النسخ: ' + v, 'i')).catch(() => toast('تعذر النسخ', 'e')); };
+const share=(text,title)=>{
+  if(navigator.share)return navigator.share({title,text}).catch(()=>copy(text));
+  return navigator.clipboard.writeText(text).then(()=>toast('تم النسخ للحافظة','i')).catch(()=>toast('تعذر النسخ','e'));
+};
+const copy=v=>{if(!v||v==='-')return;navigator.clipboard.writeText(v).then(()=>toast('تم النسخ: '+v,'i')).catch(()=>toast('تعذر النسخ','e'));};
 
 /* ============ SETTINGS ============ */
-let S = { year: null, hideProfit: true, extraYears: [], sortBy: 'none', flt: 'all' };
-try { const o = JSON.parse(localStorage.getItem(SK)); if (o && typeof o === 'object') S = Object.assign(S, o); } catch(e){}
-if (!Array.isArray(S.extraYears)) S.extraYears = [];
-const saveS = () => { try { localStorage.setItem(SK, JSON.stringify(S)); } catch(e){} };
+let S={
+  year:null,hideProfit:true,extraYears:[],sortBy:'none',flt:'all',month:'all',
+  view:'list',numerals:'western',
+  season:'default',
+  goal:0,
+  collapsed:[],recent:[]
+};
+try{const o=JSON.parse(localStorage.getItem(SK));if(o&&typeof o==='object')S=Object.assign(S,o);}catch(e){}
+if(!Array.isArray(S.extraYears))S.extraYears=[];
+if(!Array.isArray(S.collapsed))S.collapsed=[];
+if(!Array.isArray(S.recent))S.recent=[];
+const saveS=()=>{try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}};
 
 /* ============ THEME ============ */
-const SW = ['#5b4bff', '#0f9d6e', '#0ea5e9', '#e5395b', '#e8960c', '#d946ef', '#14b8a6'];
-let th; try { th = JSON.parse(localStorage.getItem(TK)); } catch(e){}
-const oldT = localStorage.getItem('theme');
-th = th || { m: (oldT === 'dark' || oldT === 'light') ? oldT : 'auto', a: SW[0] };
-$('sw').innerHTML = SW.map(c => `<button data-c="${c}" style="background:${c}" aria-label="${c}"></button>`).join('') + '<label><input type="color" id="cc"></label>';
-function applyTheme() {
-  const dark = th.m === 'dark' || (th.m === 'auto' && matchMedia('(prefers-color-scheme:dark)').matches);
-  document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-  document.documentElement.style.setProperty('--ac', th.a);
-  const mt = document.querySelector('meta[name=theme-color]'); if (mt) mt.content = dark ? '#0a0b16' : '#f2f3f8';
-  document.querySelectorAll('#seg button').forEach(b => b.classList.toggle('on', b.dataset.m === th.m));
-  $('sw').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.c === th.a));
-  const cc = $('cc'); if (cc) cc.value = th.a;
-  try { localStorage.setItem(TK, JSON.stringify(th)); } catch(e){}
-}
-$('seg').onclick = e => { const b = e.target.closest('button'); if (b) { th.m = b.dataset.m; applyTheme(); } };
-$('sw').onclick = e => { const b = e.target.closest('button'); if (b) { th.a = b.dataset.c; applyTheme(); } };
-$('sw').addEventListener('input', e => { if (e.target.id === 'cc') { th.a = e.target.value; applyTheme(); } });
-try { matchMedia('(prefers-color-scheme:dark)').addEventListener('change', applyTheme); } catch(e){}
+const SW=['#5b4bff','#0f9d6e','#0ea5e9','#e5395b','#e8960c','#d946ef','#14b8a6'];
+const SEASONS={
+  default:{name:'افتراضي',ac:'#5b4bff'},
+  ramadan:{name:'رمضان',ac:'#c9a227'},
+  eid:{name:'العيد',ac:'#0f9d6e'},
+  formal:{name:'رسمي',ac:'#1e3a8a'},
+  cairo:{name:'القاهرة',ac:'#b45309'},
+  dubai:{name:'دبي',ac:'#0ea5e9'},
+  rabat:{name:'الرباط',ac:'#0369a1'},
+  tunis:{name:'تونس',ac:'#1e40af'}
+};
+let th;try{th=JSON.parse(localStorage.getItem(TK));}catch(e){}
+const oldT=localStorage.getItem('theme');
+th=th||{m:(oldT==='dark'||oldT==='light')?oldT:'auto',a:SW[0]};
+if(!th.m)th.m='auto';
+if(!th.a)th.a=SW[0];
 
-/* ============ PWA MANIFEST (runtime) ============ */
-(function attachManifest(){
-  try {
-    const icon = document.querySelector('link[rel="apple-touch-icon"]').href;
-    const mf = {
-      name: 'إدارة المعاملات', short_name: 'المعاملات', start_url: '.',
-      display: 'standalone', orientation: 'portrait',
-      background_color: '#f2f3f8', theme_color: '#5b4bff',
-      dir: 'rtl', lang: 'ar',
-      icons: [{ src: icon, sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' }]
-    };
-    const link = document.createElement('link');
-    link.rel = 'manifest';
-    link.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(mf));
+$('sw').innerHTML=SW.map(c=>`<button data-c="${c}" style="background:${c}" aria-label="${c}"></button>`).join('')+'<label><input type="color" id="cc"></label>';
+$('seasons').innerHTML=Object.entries(SEASONS).map(([k,v])=>`<button data-s="${k}" class="${S.season===k?'on':''}"><span class="swatch" style="background:${v.ac}"></span>${v.name}</button>`).join('');
+
+function applyTheme(){
+  const dark=th.m==='dark'||th.m==='amoled'||(th.m==='auto'&&matchMedia('(prefers-color-scheme:dark)').matches);
+  document.documentElement.dataset.theme=th.m==='amoled'?'amoled':(dark?'dark':'light');
+  const season=SEASONS[S.season]||SEASONS.default;
+  const accent=season.ac||th.a;
+  document.documentElement.style.setProperty('--ac',accent);
+  const mt=document.querySelector('meta[name=theme-color]');if(mt)mt.content=th.m==='amoled'?'#000':(dark?'#0a0b16':'#f2f3f8');
+  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.m===th.m));
+  $('sw').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.c===th.a));
+  const cc=$('cc');if(cc)cc.value=th.a;
+  document.querySelectorAll('#numSeg button').forEach(b=>b.classList.toggle('on',b.dataset.n===S.numerals));
+  try{localStorage.setItem(TK,JSON.stringify(th));}catch(e){}
+}
+$('seg').onclick=e=>{const b=e.target.closest('button');if(b){th.m=b.dataset.m;applyTheme();}};
+$('numSeg').onclick=e=>{const b=e.target.closest('button');if(b){S.numerals=b.dataset.n;saveS();applyTheme();render();}};
+$('sw').onclick=e=>{const b=e.target.closest('button');if(b){th.a=b.dataset.c;S.season='default';saveS();applyTheme();render();}};
+$('sw').addEventListener('input',e=>{if(e.target.id==='cc'){th.a=e.target.value;S.season='default';saveS();applyTheme();render();}});
+$('seasons').onclick=e=>{const b=e.target.closest('button');if(b){S.season=b.dataset.s;saveS();applyTheme();render();renderSeasons();}};
+function renderSeasons(){$('seasons').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.s===S.season));}
+$('setGoal').addEventListener('input',e=>{S.goal=num(e.target.value);saveS();stats();});
+
+try{matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyTheme);}catch(e){}
+
+/* ============ PWA MANIFEST ============ */
+(function(){
+  try{
+    const icon=document.querySelector('link[rel="apple-touch-icon"]').href;
+    const mf={name:'إدارة المعاملات',short_name:'المعاملات',start_url:'.',display:'standalone',orientation:'portrait',background_color:'#f2f3f8',theme_color:'#5b4bff',dir:'rtl',lang:'ar',icons:[{src:icon,sizes:'any',type:'image/svg+xml',purpose:'any maskable'}]};
+    const link=document.createElement('link');link.rel='manifest';
+    link.href='data:application/manifest+json;charset=utf-8,'+encodeURIComponent(JSON.stringify(mf));
     document.head.appendChild(link);
-  } catch(e){}
+  }catch(e){}
 })();
 
 /* ============ DATA ============ */
-let tx = [];
-try { const raw = JSON.parse(localStorage.getItem(KEY) || '[]'); if (Array.isArray(raw)) tx = raw; } catch(e){}
-tx = tx.filter(t => t && typeof t === 'object');
-tx.forEach(t => {
-  if (!t.year) {
-    let y = curYear;
-    const m = String(t.date || '').match(/(\d{4})/);
-    if (m) y = +m[1];
-    t.year = y;
-  }
-  if (typeof t.notes !== 'string') t.notes = '';
-  if (typeof t.rowColor !== 'string') t.rowColor = '#ffffff';
+let tx=[];
+try{const raw=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(raw))tx=raw;}catch(e){}
+tx=tx.filter(t=>t&&typeof t==='object');
+tx.forEach(t=>{
+  if(!t.id)t.id=uid();
+  if(!t.year){let y=curYear;const m=String(t.date||'').match(/(\d{4})/);if(m)y=+m[1];t.year=y;}
+  if(typeof t.notes!=='string')t.notes='';
+  if(typeof t.rowColor!=='string')t.rowColor='#ffffff';
+  if(!t.clientId)t.clientId=nextClientId(t.year);
+  if(!Array.isArray(t.payments))t.payments=[];
 });
+function nextClientId(y){
+  const nums=tx.map(t=>t.clientId).filter(Boolean).map(id=>{const m=String(id).match(/^C-(\d+)-(\d+)$/);return m&&+m[1]===y?+m[2]:0;});
+  const max=nums.length?Math.max(...nums):0;
+  return `C-${y}-${String(max+1).padStart(3,'0')}`;
+}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(tx));return true;}catch(e){toast('تعذر حفظ البيانات، الذاكرة ممتلئة','e');return false;}};
 
-const save = () => {
-  try { localStorage.setItem(KEY, JSON.stringify(tx)); return true; }
-  catch(e) { toast('تعذر حفظ البيانات، الذاكرة ممتلئة', 'e'); return false; }
+const calc=t=>{
+  const b=num(t.buyPrice),c=num(t.chargePrice),s=num(t.sellPrice),d=num(t.discount);
+  const f=s-s*d/100;
+  return t.isHalf?(f-c)/2:f-c-b;
 };
-
-const calc = t => {
-  const b = num(t.buyPrice), c = num(t.chargePrice), s = num(t.sellPrice), d = num(t.discount);
-  const f = s - s * d / 100;
-  return t.isHalf ? (f - c) / 2 : f - c - b;
+const isOverdue=s=>{
+  if(!s)return false;
+  const d=new Date(s+'T00:00:00');if(isNaN(d.getTime()))return false;
+  const t=new Date();t.setHours(0,0,0,0);
+  return d.getTime()<t.getTime();
 };
-
-const isOverdue = s => {
-  if (!s) return false;
-  const d = new Date(s + 'T00:00:00');
-  if (isNaN(d.getTime())) return false;
-  const t = new Date(); t.setHours(0,0,0,0);
-  return d.getTime() < t.getTime();
+const isToday=s=>{
+  if(!s)return false;
+  const d=new Date(s+'T00:00:00');if(isNaN(d.getTime()))return false;
+  const t=new Date();t.setHours(0,0,0,0);
+  return d.getTime()===t.getTime();
+};
+const smartColor=t=>{
+  if(/^#[0-9a-f]{6}$/i.test(t.rowColor||'')&&t.rowColor.toLowerCase()!=='#ffffff')return t.rowColor;
+  if(t.cancelled)return 'var(--sub)';
+  if(!t.done&&!num(t.sellPrice))return 'var(--ac)';
+  const p=calc(t);
+  const b=num(t.buyPrice)||1;
+  const margin=p/b;
+  if(p<0)return 'var(--no)';
+  if(t.done){
+    if(margin>=0.1)return 'var(--ok)';
+    return 'var(--wn)';
+  }
+  return 'var(--wn)';
 };
 
 /* ============ SNAPSHOTS ============ */
-let snaps = [];
-try { const raw = JSON.parse(localStorage.getItem(SNAPK) || '[]'); if (Array.isArray(raw)) snaps = raw; } catch(e){}
-snaps = snaps.filter(s => s && typeof s === 'object' && Array.isArray(s.tx));
-
-function saveSnaps() {
-  try { localStorage.setItem(SNAPK, JSON.stringify(snaps)); return true; }
-  catch(e) { return false; }
-}
-function trimSnaps() {
-  const MAX = 15;
-  while (snaps.length > MAX) {
-    let removed = false;
-    for (let i = snaps.length - 1; i >= 0; i--) {
-      if (snaps[i].auto) { snaps.splice(i, 1); removed = true; break; }
-    }
-    if (!removed) snaps.pop();
+let snaps=[];
+try{const raw=JSON.parse(localStorage.getItem(SNAPK)||'[]');if(Array.isArray(raw))snaps=raw;}catch(e){}
+snaps=snaps.filter(s=>s&&typeof s==='object'&&Array.isArray(s.tx));
+function saveSnaps(){try{localStorage.setItem(SNAPK,JSON.stringify(snaps));return true;}catch(e){return false;}}
+function trimSnaps(){
+  const MAX=15;
+  while(snaps.length>MAX){
+    let r=false;
+    for(let i=snaps.length-1;i>=0;i--){if(snaps[i].auto){snaps.splice(i,1);r=true;break;}}
+    if(!r)snaps.pop();
   }
 }
-function createSnapshot(name, auto) {
-  const s = {
-    id: 'snap_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
-    name: name || ('نسخة ' + new Date().toLocaleString('en-GB')),
-    ts: Date.now(),
-    auto: !!auto,
-    tx: JSON.parse(JSON.stringify(tx)),
-    extraYears: S.extraYears.slice(),
-    year: S.year
-  };
-  snaps.unshift(s);
-  trimSnaps();
-  if (saveSnaps()) { updateSnapCount(); return s; }
-  // rollback one step
-  snaps.shift();
-  trimSnaps();
-  if (saveSnaps()) { updateSnapCount(); return s; }
-  // aggressive: keep only 3 latest (memory + storage stay in sync)
-  while (snaps.length > 3) snaps.pop();
-  if (saveSnaps()) { updateSnapCount(); return s; }
-  // last resort: clear all snapshots and report
-  snaps = [];
-  try { localStorage.removeItem(SNAPK); } catch(e){}
-  updateSnapCount();
-  toast('تعذر إنشاء نسخة، الذاكرة ممتلئة', 'e');
+function createSnapshot(name,auto){
+  const s={id:'snap_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),name:name||('نسخة '+new Date().toLocaleString('en-GB')),ts:Date.now(),auto:!!auto,tx:JSON.parse(JSON.stringify(tx)),extraYears:S.extraYears.slice(),year:S.year};
+  snaps.unshift(s);trimSnaps();
+  if(saveSnaps()){updateSnapCount();return s;}
+  snaps.shift();trimSnaps();
+  if(saveSnaps()){updateSnapCount();return null;}
+  while(snaps.length>3)snaps.pop();
+  if(saveSnaps()){updateSnapCount();return s;}
+  snaps=[];try{localStorage.removeItem(SNAPK);}catch(e){}
+  updateSnapCount();toast('تعذر إنشاء نسخة، الذاكرة ممتلئة','e');
   return null;
 }
-function updateSnapCount() { $('snapCount').textContent = snaps.length; }
-
-function restoreSnapshot(id) {
-  const s = snaps.find(x => x.id === id);
-  if (!s) { toast('النسخة غير موجودة', 'e'); return; }
-  const curCount = tx.length;
-  ask('استعادة النسخة',
-    `سيتم استبدال البيانات الحالية (${curCount} معاملة) ببيانات هذه النسخة (${s.tx.length} معاملة). سيتم حفظ نسخة تلقائية من الحالة الحالية قبل الاستعادة.`,
-    'استعادة', () => {
-      createSnapshot('قبل استعادة: ' + s.name, true);
-      tx = JSON.parse(JSON.stringify(s.tx));
-      S.extraYears = Array.isArray(s.extraYears) ? s.extraYears.slice() : [];
-      S.year = null;
-      saveS(); save();
-      closeM('snaps');
-      render();
-      toast('تم استعادة النسخة بنجاح');
-    }, 0);
+function updateSnapCount(){$('snapCount').textContent=snaps.length;}
+function restoreSnapshot(id){
+  const s=snaps.find(x=>x.id===id);
+  if(!s){toast('النسخة غير موجودة','e');return;}
+  ask('استعادة النسخة',`سيتم استبدال البيانات الحالية (${tx.length} معاملة) ببيانات هذه النسخة (${s.tx.length} معاملة). سيتم حفظ نسخة تلقائية أولاً.`,'استعادة',()=>{
+    createSnapshot('قبل استعادة: '+s.name,true);
+    tx=JSON.parse(JSON.stringify(s.tx));
+    tx.forEach(t=>{if(!t.id)t.id=uid();if(!t.clientId)t.clientId=nextClientId(t.year);});
+    S.extraYears=Array.isArray(s.extraYears)?s.extraYears.slice():[];
+    S.year=null;saveS();save();closeM('snaps');render();
+    toast('تم استعادة النسخة بنجاح');
+  },0);
 }
-function deleteSnapshot(id) {
-  const i = snaps.findIndex(x => x.id === id);
-  if (i < 0) return;
-  const s = snaps[i];
-  ask('حذف النسخة', 'هل تريد حذف نسخة «' + s.name + '» نهائياً؟', 'حذف', () => {
-    snaps.splice(i, 1);
-    saveSnaps();
-    renderSnaps();
-    updateSnapCount();
-    toast('تم حذف النسخة', 'e');
+function deleteSnapshot(id){
+  const i=snaps.findIndex(x=>x.id===id);if(i<0)return;
+  const s=snaps[i];
+  ask('حذف النسخة','هل تريد حذف نسخة «'+s.name+'» نهائياً؟','حذف',()=>{
+    snaps.splice(i,1);saveSnaps();renderSnaps();updateSnapCount();toast('تم حذف النسخة','e');
   });
 }
-function renderSnaps() {
-  if (!snaps.length) {
-    $('snB').innerHTML = '<div class="em">' + ic('history', 40) + '<p>لا توجد نسخ محفوظة بعد</p></div>';
-    return;
-  }
-  $('snB').innerHTML = snaps.map(s => {
-    const d = new Date(s.ts);
-    const dt = d.toLocaleDateString('en-GB') + ' — ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-    const badge = s.auto ? '<span class="tag" style="background:var(--bg);color:var(--sub)">تلقائي</span>' : '';
-    return `<div class="row">
-      <div class="info">
-        <b>${esc(s.name)}${badge}</b>
-        <small>${dt} • ${s.tx.length} معاملة${s.extraYears && s.extraYears.length ? ' • ' + s.extraYears.join('،') : ''}</small>
-      </div>
-      <div class="acts">
-        <button class="mini" data-snres="${s.id}">${ic('rotate',14)} استعادة</button>
-        <button class="ia d" data-sndel="${s.id}" aria-label="حذف" style="width:34px;height:34px">${ic('trash',17)}</button>
-      </div>
-    </div>`;
+function renderSnaps(){
+  if(!snaps.length){$('snB').innerHTML='<div class="em">'+ic('history',40)+'<p>لا توجد نسخ محفوظة بعد</p></div>';return;}
+  $('snB').innerHTML=snaps.map(s=>{
+    const d=new Date(s.ts);
+    const dt=d.toLocaleDateString('en-GB')+' — '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const badge=s.auto?'<span class="tag" style="background:var(--bg);color:var(--sub)">تلقائي</span>':'';
+    return `<div class="row"><div class="info"><b>${esc(s.name)}${badge}</b><small>${dt} • ${s.tx.length} معاملة${s.extraYears&&s.extraYears.length?' • '+s.extraYears.join('،'):''}</small></div>
+    <div class="acts"><button class="mini" data-snres="${s.id}">${ic('rotate',14)} استعادة</button><button class="ia d" data-sndel="${s.id}" aria-label="حذف" style="width:34px;height:34px">${ic('trash',17)}</button></div></div>`;
   }).join('');
 }
-$('snB').onclick = e => {
-  const r = e.target.closest('[data-snres]');
-  if (r) { restoreSnapshot(r.dataset.snres); return; }
-  const d = e.target.closest('[data-sndel]');
-  if (d) { deleteSnapshot(d.dataset.sndel); }
-};
-$('snClean').onclick = () => {
-  const n = snaps.filter(s => s.auto).length;
-  if (!n) { toast('لا توجد نسخ تلقائية', 'i'); return; }
-  ask('حذف النسخ التلقائية', `سيتم حذف ${n} نسخة تلقائية. النسخ اليدوية لن تتأثر.`, 'حذف', () => {
-    snaps = snaps.filter(s => !s.auto);
-    saveSnaps();
-    renderSnaps();
-    updateSnapCount();
-    toast('تم حذف النسخ التلقائية', 'e');
+$('snB').onclick=e=>{const r=e.target.closest('[data-snres]');if(r){restoreSnapshot(r.dataset.snres);return;}const d=e.target.closest('[data-sndel]');if(d)deleteSnapshot(d.dataset.sndel);};
+$('snClean').onclick=()=>{
+  const n=snaps.filter(s=>s.auto).length;
+  if(!n){toast('لا توجد نسخ تلقائية','i');return;}
+  ask('حذف النسخ التلقائية',`سيتم حذف ${n} نسخة تلقائية. النسخ اليدوية لن تتأثر.`,'حذف',()=>{
+    snaps=snaps.filter(s=>!s.auto);saveSnaps();renderSnaps();updateSnapCount();toast('تم حذف النسخ التلقائية','e');
   });
 };
 
 /* ============ YEARS ============ */
-function years() {
-  const s = new Set();
-  tx.forEach(t => { const y = +t.year; if (y) s.add(y); });
-  S.extraYears.forEach(y => { const n = +y; if (n) s.add(n); });
-  if (!s.size) s.add(curYear);
-  return [...s].sort((a, b) => a - b);
+function years(){
+  const s=new Set();
+  tx.forEach(t=>{const y=+t.year;if(y)s.add(y);});
+  S.extraYears.forEach(y=>{const n=+y;if(n)s.add(n);});
+  if(!s.size)s.add(curYear);
+  return [...s].sort((a,b)=>a-b);
 }
-function selYear() {
-  const ys = years();
-  if (S.year && ys.indexOf(+S.year) > -1) return +S.year;
-  S.year = ys[ys.length - 1];
-  saveS();
+function selYear(){
+  const ys=years();
+  if(S.year&&ys.indexOf(+S.year)>-1)return +S.year;
+  S.year=ys[ys.length-1];saveS();
   return S.year;
 }
-function deleteYear(y) {
-  const count = tx.filter(t => +t.year === y).length;
-  const inExtra = S.extraYears.indexOf(+y) > -1;
-  if (!count && !inExtra) { toast('السنة غير موجودة', 'e'); return; }
-  const msg = count > 0
-    ? `سيتم حذف ${count} معاملة من سنة ${y}. يمكن التراجع مباشرة بعد الحذف.`
-    : `سيتم حذف سنة ${y} الفارغة من القائمة.`;
-  ask('حذف سنة ' + y, msg, 'حذف', () => {
-    const snap = createSnapshot('قبل حذف سنة ' + y, true);
-    tx = tx.filter(t => +t.year !== y);
-    S.extraYears = S.extraYears.filter(x => +x !== y);
-    if (+S.year === +y) S.year = null;
-    save(); saveS();
-    closeM('yrMg'); closeM('snaps');
-    render();
-    toastAct('تم حذف سنة ' + y, 'تراجع', () => {
-      if (!snap) return;
-      tx = JSON.parse(JSON.stringify(snap.tx));
-      S.extraYears = snap.extraYears.slice();
-      if (snap.year) S.year = snap.year;
-      save(); saveS(); render();
-      toast('تم استرجاع السنة');
-    });
+function deleteYear(y){
+  const count=tx.filter(t=>+t.year===y).length;
+  const inExtra=S.extraYears.indexOf(+y)>-1;
+  if(!count&&!inExtra){toast('السنة غير موجودة','e');return;}
+  const msg=count>0?`سيتم حذف ${count} معاملة من سنة ${y}. يمكن التراجع مباشرة بعد الحذف.`:`سيتم حذف سنة ${y} الفارغة من القائمة.`;
+  ask('حذف سنة '+y,msg,'حذف',()=>{
+    const snap=createSnapshot('قبل حذف سنة '+y,true);
+    if(!snap){ask('تحذير','تعذّر إنشاء نسخة احتياطية قبل الحذف. هل تريد المتابعة؟','متابعة',()=>{doDeleteYear(y);},1);return;}
+    doDeleteYear(y,snap);
   });
 }
-function renderYrMg() {
-  const ys = years();
-  $('yrB').innerHTML = ys.length ? ys.map(y => {
-    const count = tx.filter(t => +t.year === y).length;
-    const done = tx.filter(t => +t.year === y && t.done && !t.cancelled).length;
-    const pend = tx.filter(t => +t.year === y && !t.done && !t.cancelled).length;
-    const canc = tx.filter(t => +t.year === y && t.cancelled).length;
-    return `<div class="row">
-      <div class="info">
-        <b>سنة ${y}</b>
-        <small>${count} معاملة • ${done} منفذة • ${pend} جارية${canc ? ' • ' + canc + ' ملغية' : ''}</small>
-      </div>
-      <div class="acts">
-        <span class="badge-count">${count}</span>
-        <button class="ia d" data-yrdel="${y}" aria-label="حذف السنة">${ic('trash',17)}</button>
-      </div>
-    </div>`;
-  }).join('') : '<div class="em">لا توجد سنوات</div>';
+function doDeleteYear(y,snap){
+  tx=tx.filter(t=>+t.year!==y);
+  S.extraYears=S.extraYears.filter(x=>+x!==y);
+  if(+S.year===+y)S.year=null;
+  save();saveS();closeM('yrMg');closeM('snaps');render();
+  toastAct('تم حذف سنة '+y,'تراجع',()=>{
+    if(!snap)return;
+    tx=JSON.parse(JSON.stringify(snap.tx));
+    S.extraYears=snap.extraYears.slice();
+    if(snap.year)S.year=snap.year;
+    save();saveS();render();toast('تم استرجاع السنة');
+  });
 }
-$('yrB').onclick = e => {
-  const b = e.target.closest('[data-yrdel]');
-  if (!b) return;
-  deleteYear(+b.dataset.yrdel);
-};
-$('yrAdd').onclick = () => {
+function renderYrMg(){
+  const ys=years();
+  $('yrB').innerHTML=ys.length?ys.map(y=>{
+    const count=tx.filter(t=>+t.year===y).length;
+    const done=tx.filter(t=>+t.year===y&&t.done&&!t.cancelled).length;
+    const pend=tx.filter(t=>+t.year===y&&!t.done&&!t.cancelled).length;
+    const canc=tx.filter(t=>+t.year===y&&t.cancelled).length;
+    return `<div class="row"><div class="info"><b>سنة ${dispNum(y)}</b><small>${dispNum(count)} معاملة • ${dispNum(done)} منفذة • ${dispNum(pend)} جارية${canc?' • '+dispNum(canc)+' ملغية':''}</small></div>
+    <div class="acts"><span class="badge-count">${dispNum(count)}</span><button class="ia d" data-yrdel="${y}" aria-label="حذف السنة">${ic('trash',17)}</button></div></div>`;
+  }).join(''):'<div class="em">لا توجد سنوات</div>';
+}
+$('yrB').onclick=e=>{const b=e.target.closest('[data-yrdel]');if(!b)return;deleteYear(+b.dataset.yrdel);};
+$('yrAdd').onclick=()=>{
   closeM('yrMg');
-  inputBox('إضافة سنة', 'أدخل السنة الجديدة (مثال: 2028)', '', val => {
-    const y = parseInt(val, 10);
-    if (!y || y < 2000 || y > 2100) { toast('سنة غير صالحة', 'e'); return; }
-    if (years().indexOf(y) === -1) S.extraYears.push(y);
-    S.year = y; saveS(); render();
-    toast('تمت إضافة سنة ' + y);
-  }, 'number');
+  inputBox('إضافة سنة','أدخل السنة الجديدة (مثال: 2028)','',val=>{
+    const y=parseInt(val,10);
+    if(!y||y<2000||y>2100){toast('سنة غير صالحة','e');return;}
+    if(years().indexOf(y)===-1)S.extraYears.push(y);
+    S.year=y;saveS();render();toast('تمت إضافة سنة '+y);
+  },'number');
 };
+
+/* ============ SPARKLINE ============ */
+function sparkline(y){
+  const months=Array.from({length:12},()=>0);
+  tx.forEach(t=>{
+    if(+t.year!==y||t.cancelled)return;
+    const m=String(t.date||'').match(/^\d{1,2}\/(\d{1,2})\//);
+    if(m){const i=+m[1]-1;if(i>=0&&i<12)months[i]+=calc(t);}
+  });
+  const max=Math.max(...months.map(Math.abs),1);
+  const w=24,h=14;
+  const pts=months.map((v,i)=>{
+    const x=(i/11)*w;
+    const y=h/2-(v/max)*(h/2-1);
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return `<svg class="spark" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
 
 /* ============ SEARCH / SORT ============ */
-const pd = s => { if (!s) return 0; const p = String(s).split('/'); return p.length === 3 ? new Date(+p[2], +p[1] - 1, +p[0]).getTime() : (new Date(s).getTime() || 0); };
-const SO = {
-  asc: (a, b) => String(a.t.name || '').localeCompare(String(b.t.name || ''), 'ar'),
-  desc: (a, b) => SO.asc(b, a),
-  buyHigh: (a, b) => num(b.t.buyPrice) - num(a.t.buyPrice),
-  buyLow: (a, b) => num(a.t.buyPrice) - num(b.t.buyPrice),
-  profitHigh: (a, b) => calc(b.t) - calc(a.t),
-  doneFirst: (a, b) => (!!b.t.done) - (!!a.t.done),
-  pendingFirst: (a, b) => (!!a.t.done) - (!!b.t.done),
-  dateNew: (a, b) => pd(b.t.date) - pd(a.t.date),
-  dateOld: (a, b) => pd(a.t.date) - pd(b.t.date)
+const pd=s=>{if(!s)return 0;const p=String(s).split('/');return p.length===3?new Date(+p[2],+p[1]-1,+p[0]).getTime():(new Date(s).getTime()||0);};
+const SO={
+  asc:(a,b)=>String(a.t.name||'').localeCompare(String(b.t.name||''),'ar'),
+  desc:(a,b)=>SO.asc(b,a),
+  buyHigh:(a,b)=>num(b.t.buyPrice)-num(a.t.buyPrice),
+  buyLow:(a,b)=>num(a.t.buyPrice)-num(b.t.buyPrice),
+  profitHigh:(a,b)=>calc(b.t)-calc(a.t),
+  doneFirst:(a,b)=>(!!b.t.done)-(!!a.t.done),
+  pendingFirst:(a,b)=>(!!a.t.done)-(!!b.t.done),
+  dateNew:(a,b)=>pd(b.t.date)-pd(a.t.date),
+  dateOld:(a,b)=>pd(a.t.date)-pd(b.t.date)
 };
-const FL = { all: () => true, pending: r => !r.t.done, done: r => !!r.t.done, booked: r => r.t.bookingDate && !r.t.done };
-
-function computeRows() {
-  const Y = selYear();
-  const q = $('q').value.trim().toLowerCase();
-  const match = ({ t }) => {
-    if (+t.year !== Y) return false;
-    if (!q) return true;
-    const hay = [t.name, t.phone, t.account, t.iban, t.nationalId, t.passport, t.notes]
-      .map(v => String(v || '').toLowerCase()).join(' ');
-    return hay.indexOf(q) > -1;
+const FL={
+  all:()=>true,
+  pending:r=>!r.t.done,
+  done:r=>!!r.t.done,
+  booked:r=>r.t.bookingDate&&!r.t.done,
+  todayBook:r=>r.t.bookingDate&&!r.t.done&&isToday(r.t.bookingDate),
+  overdue:r=>r.t.bookingDate&&!r.t.done&&isOverdue(r.t.bookingDate)
+};
+function computeRows(){
+  const Y=selYear();
+  const q=$('q').value.trim().toLowerCase();
+  const match=({t})=>{
+    if(+t.year!==Y)return false;
+    if(S.month!=='all'){
+      const m=String(t.date||'').match(/^\d{1,2}\/(\d{1,2})\//);
+      if(!m||+m[1]!==+S.month)return false;
+    }
+    if(!q)return true;
+    const hay=[t.name,t.phone,t.account,t.iban,t.nationalId,t.passport,t.notes,t.clientId].map(v=>String(v||'').toLowerCase()).join(' ');
+    return hay.indexOf(q)>-1;
   };
-  const rows = tx.map((t, i) => ({ t, i })).filter(match);
-  let a = rows.filter(r => !r.t.cancelled);
-  let c = rows.filter(r => r.t.cancelled);
-  if (S.flt === 'cancelled') { a = []; }
-  else if (S.flt !== 'all') { a = a.filter(FL[S.flt]); c = []; }
-  const fn = SO[S.sortBy];
-  if (fn) { a.sort(fn); c.sort(fn); }
-  return { a, c };
+  const rows=tx.map((t,i)=>({t,i})).filter(match);
+  let a=rows.filter(r=>!r.t.cancelled);
+  let c=rows.filter(r=>r.t.cancelled);
+  if(S.flt==='cancelled'){a=[];}
+  else if(S.flt!=='all'){a=a.filter(FL[S.flt]);c=[];}
+  const fn=SO[S.sortBy];
+  if(fn){a.sort(fn);c.sort(fn);}
+  return {a,c};
 }
 
 /* ============ STATS ============ */
-function stats() {
-  const Y = selYear();
-  let P = 0, B = 0, pe = 0, dn = 0, cn = 0, bk = 0, n = 0;
-  tx.forEach(t => {
-    if (+t.year !== Y) return;
+function stats(){
+  const Y=selYear();
+  let P=0,B=0,pe=0,dn=0,cn=0,bk=0,n=0;
+  tx.forEach(t=>{
+    if(+t.year!==Y)return;
     n++;
-    if (t.cancelled) { cn++; return; }
-    P += calc(t); B += num(t.buyPrice);
-    if (t.done) dn++; else { pe++; if (t.bookingDate) bk++; }
+    if(t.cancelled){cn++;return;}
+    P+=calc(t);B+=num(t.buyPrice);
+    if(t.done)dn++;else{pe++;if(t.bookingDate)bk++;}
   });
-  const el = $('sP');
-  el.textContent = S.hideProfit ? '•••••' : fmt(P);
-  el.classList.toggle('neg', !S.hideProfit && P < 0);
-  el.classList.toggle('hid', !!S.hideProfit);
-  $('hE').textContent = 'من ' + dn + ' معاملة منفذة';
-  $('sB').textContent = fmt(B);
-  $('sN').textContent = pe;
-  $('sD').textContent = dn;
-  $('sC').textContent = cn;
-  $('sK').textContent = bk;
-  $('sub').textContent = Y + ' • ' + n + ' معاملة، ' + pe + ' جارية';
+  const el=$('sP');
+  el.textContent=S.hideProfit?'•••••':fmt(P);
+  el.classList.toggle('neg',!S.hideProfit&&P<0);
+  el.classList.toggle('hid',!!S.hideProfit);
+  $('hE').textContent='من '+dispNum(dn)+' معاملة منفذة';
+  $('sB').textContent=fmt(B);
+  $('sN').textContent=dispNum(pe);
+  $('sD').textContent=dispNum(dn);
+  $('sC').textContent=dispNum(cn);
+  $('sK').textContent=dispNum(bk);
+  $('sub').textContent=dispNum(Y)+' • '+dispNum(n)+' معاملة، '+dispNum(pe)+' جارية';
+  // radial
+  const goal=num(S.goal);
+  const pct=goal>0?Math.max(0,Math.min(1,P/goal)):0;
+  const arc=$('radArc');
+  const C=2*Math.PI*32;
+  arc.setAttribute('stroke-dasharray',`${(pct*C).toFixed(1)} ${C.toFixed(1)}`);
+  $('radPct').textContent=goal>0?Math.round(pct*100)+'%':'—';
+  $('radLbl').textContent=goal>0?'من الهدف':'حدد هدف';
+}
+
+/* ============ STAGES ============ */
+function stages(t){
+  const hasBuy=t.isHalf||num(t.buyPrice)>0;
+  const hasCharge=num(t.chargePrice)>0;
+  const hasSell=num(t.sellPrice)>0||t.done;
+  const s1=hasBuy?'done':'active';
+  const s2=hasBuy?(hasCharge?'done':'active'):'';
+  const s3=(hasBuy&&hasCharge)?(hasSell?'done':'active'):'';
+  const icon1=hasBuy?ic('check',10):'1';
+  const icon2=hasCharge?ic('check',10):'2';
+  const icon3=hasSell?ic('check',10):'3';
+  return `<div class="stages foldable">
+    <div class="stage ${s1}"><span class="dot">${icon1}</span>شراء</div>
+    <span class="line ${hasBuy?'done':''}"></span>
+    <div class="stage ${s2}"><span class="dot">${icon2}</span>شحن</div>
+    <span class="line ${hasCharge?'done':''}"></span>
+    <div class="stage ${s3}"><span class="dot">${icon3}</span>بيع</div>
+  </div>`;
+}
+
+/* ============ RING ============ */
+function ring(t){
+  if(t.cancelled)return `<span class="nb">${dispNum(0)}</span>`;
+  const yearTotal=tx.filter(x=>+x.year===+t.year&&!x.cancelled).reduce((s,x)=>s+Math.max(0,calc(x)),0);
+  const own=Math.max(0,calc(t));
+  const pct=yearTotal>0?own/yearTotal:0;
+  const C=2*Math.PI*14;
+  const dash=(pct*C).toFixed(1);
+  return `<div class="ring">
+    <svg width="34" height="34" viewBox="0 0 34 34">
+      <circle cx="17" cy="17" r="14" fill="none" stroke="var(--bd)" stroke-width="3"/>
+      <circle cx="17" cy="17" r="14" fill="none" stroke="var(--rc)" stroke-width="3" stroke-linecap="round" stroke-dasharray="${dash} ${C.toFixed(1)}"/>
+    </svg>
+    <div class="rt">${Math.round(pct*100)}</div>
+  </div>`;
 }
 
 /* ============ CARD ============ */
-function card(r, n, manual) {
-  const t = r.t, i = r.i;
-  const c = !!t.cancelled;
-  const col = /^#[0-9a-f]{6}$/i.test(t.rowColor || '') && t.rowColor.toLowerCase() !== '#ffffff' ? t.rowColor : '';
-  const rc = col || (c ? 'var(--sub)' : t.done ? 'var(--ok)' : 'var(--wn)');
-  const k = `data-k="${i}"`;
-  const pill = c ? '<span class="pill gr">ملغية</span>'
-    : t.done ? `<span class="pill ok">${ic('check',13)}تم البيع</span>`
-    : `<span class="pill wn">${ic('clock',13)}جاري البيع</span>`;
-  let m = '';
-  if (t.done || num(t.sellPrice) > 0) { const p = calc(t); m += `<span class="tag ${p >= 0 ? 'g' : 'r'}">ربح ${fmt(p)}</span>`; }
-  if (!t.isHalf && num(t.buyPrice) > 0) m += `<span class="tag">شراء ${fmt(num(t.buyPrice))}</span>`;
-  if (num(t.chargePrice) > 0) m += `<span class="tag">شحن ${fmt(num(t.chargePrice))}</span>`;
-  if (t.isHalf) m += '<span class="tag">بالنصف</span>';
-  if (t.bookingDate && !t.done) {
-    const over = isOverdue(t.bookingDate);
-    m += `<span class="tag ${over ? 'r' : ''}">${ic('cal',12)}${esc(t.bookingDate)}${over ? ' متأخر' : ''}</span>`;
+function card(r,n,manual){
+  const t=r.t,i=r.i;
+  const c=!!t.cancelled;
+  const rc=smartColor(t);
+  const k=`data-k="${i}"`;
+  const idAttr=`data-id="${t.id}"`;
+  const collapsed=S.collapsed.indexOf(t.id)>-1;
+  const pill=c?'<span class="pill gr">ملغية</span>':t.done?`<span class="pill ok">${ic('check',13)}تم البيع</span>`:`<span class="pill wn">${ic('clock',13)}جاري البيع</span>`;
+  let m='';
+  if(t.done||num(t.sellPrice)>0){
+    const p=calc(t);
+    m+=S.hideProfit?'<span class="tag">ربح •••••</span>':`<span class="tag ${p>=0?'g':'r'}">ربح ${fmt(p)}</span>`;
   }
-  if (t.notes) m += `<span class="tag">${ic('note',12)}${esc(String(t.notes).slice(0, 24))}</span>`;
-  const del = `<button class="ia d" data-a="del" ${k} aria-label="حذف">${ic('trash',18)}</button>`;
-  const tools = c ? del : `<button class="ia" data-a="edit" ${k} aria-label="تعديل">${ic('edit',18)}</button><button class="ia" data-a="share" ${k} aria-label="مشاركة">${ic('share',18)}</button>${del}`;
-  const acts = c
-    ? `<button class="ab ac" data-a="rest" ${k}>${ic('undo',17)}تفعيل المعاملة</button>`
-    : `<button class="ab${t.done ? '' : ' ac'}" data-a="sale" ${k}>${t.done ? ic('undo',17) + 'تراجع عن البيع' : ic('check',17) + 'إتمام البيع'}</button><button class="ab" data-a="book" ${k}>${ic('cal',17)}${t.done ? 'منتهي' : t.bookingDate ? 'تم الحجز' : 'حجز موعد'}</button>`;
-  const arrows = manual
-    ? `<button class="ab ar" data-a="up" ${k} aria-label="أعلى">${ic('chevUp',18)}</button><button class="ab ar" data-a="down" ${k} aria-label="أسفل">${ic('chevDown',18)}</button>`
-    : '';
-  return `<div class="c${c ? ' x' : ''}" style="--rc:${rc}"><div class="ch"><button class="nb" data-a="color" ${k}>${n}</button><div class="nm" data-a="det" ${k}><b>${esc(t.name) || '-'}</b><small>${[t.phone, t.date].filter(Boolean).map(esc).map(s => `<span>${s}</span>`).join('')}</small></div>${tools}</div><div class="cm">${pill}${m}</div><div class="ca">${arrows}${acts}</div></div>`;
+  if(!t.isHalf&&num(t.buyPrice)>0)m+=`<span class="tag">شراء ${fmt(num(t.buyPrice))}</span>`;
+  if(num(t.chargePrice)>0)m+=`<span class="tag">شحن ${fmt(num(t.chargePrice))}</span>`;
+  if(t.isHalf)m+='<span class="tag">بالنصف</span>';
+  if(t.bookingDate&&!t.done){
+    const over=isOverdue(t.bookingDate);
+    m+=`<span class="tag ${over?'r':''}">${ic('cal',12)}${esc(t.bookingDate)}${over?' متأخر':''}</span>`;
+  }
+  if(t.notes)m+=`<span class="tag">${ic('note',12)}${esc(String(t.notes).slice(0,24))}</span>`;
+  if(t.clientId)m+=`<span class="tag" style="font-family:monospace;font-size:11px">${esc(t.clientId)}</span>`;
+  const del=`<button class="ia d" data-a="del" ${k} aria-label="حذف">${ic('trash',18)}</button>`;
+  const tools=c?del:`<button class="ia" data-a="edit" ${k} aria-label="تعديل">${ic('edit',18)}</button><button class="ia" data-a="share" ${k} aria-label="مشاركة">${ic('share',18)}</button>${del}`;
+  const acts=c?`<button class="ab ac" data-a="rest" ${k}>${ic('undo',17)}تفعيل المعاملة</button>`
+    :`<button class="ab${t.done?'':' ac'}" data-a="sale" ${k}>${t.done?ic('undo',17)+'تراجع عن البيع':ic('check',17)+'إتمام البيع'}</button><button class="ab" data-a="book" ${k}>${ic('cal',17)}${t.done?'منتهي':t.bookingDate?'تم الحجز':'حجز موعد'}</button>`;
+  const arrows=manual?`<button class="ab ar" data-a="up" ${k} aria-label="أعلى">${ic('chevUp',18)}</button><button class="ab ar" data-a="down" ${k} aria-label="أسفل">${ic('chevDown',18)}</button>`:'';
+  const nmSmall=[t.phone,t.date].filter(Boolean).map(esc).map(s=>`<span>${s}</span>`).join('')+(t.clientId?`<i>${ic('copy',11)}${esc(t.clientId)}</i>`:'');
+  return `<div class="c${c?' x':''}${collapsed?' col':''}" style="--rc:${rc}" ${idAttr}>
+    <div class="swipe-bg"><span class="r">${ic('check',18)} إتمام البيع</span><span class="l">خيارات ${ic('chevDown',14)}</span></div>
+    <div class="inner">
+      <div class="ch">
+        ${ring(t)}
+        <div class="nm" data-a="det" ${k}><b>${esc(t.name)||'-'}</b><small>${nmSmall}</small></div>
+        ${tools}
+        <button class="ia" data-a="fold" ${k} aria-label="طي">${ic('chevUp',18)}</button>
+      </div>
+      ${stages(t)}
+      <div class="cm foldable">${pill}${m}</div>
+      <div class="ca foldable">${arrows}${acts}</div>
+    </div>
+  </div>`;
+}
+
+/* ============ TIMELINE CARD ============ */
+function tlCard(r){
+  const t=r.t,i=r.i;
+  const rc=smartColor(t);
+  const p=calc(t);
+  const k=`data-k="${i}"`;
+  return `<div class="tlc" style="--rc:${rc}" data-a="det" ${k}>
+    <div class="tld">${ic('cal',12)} ${esc(t.date||'—')}${t.clientId?' • '+esc(t.clientId):''}</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="flex:1;min-width:0">
+        <b style="font-weight:600;font-size:14.5px;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.name)||'-'}</b>
+        <small style="display:block;color:var(--sub);margin-top:2px">${t.done?'<span style="color:var(--ok)">✓ تم البيع</span>':t.cancelled?'<span style="color:var(--sub)">ملغية</span>':'<span style="color:var(--wn)">⏳ جارية</span>'}</small>
+      </div>
+      ${S.hideProfit?'<span style="color:var(--sub);font-size:13px">•••••</span>':`<span style="font-weight:700;color:${p>=0?'var(--ok)':'var(--no)'};font-size:14px">${fmt(p)}</span>`}
+    </div>
+  </div>`;
 }
 
 /* ============ RENDER ============ */
-function renderYears() {
-  const ys = years(), Y = selYear();
-  $('yr').innerHTML = ys.map(y => {
-    const n = tx.filter(t => +t.year === y && !t.cancelled).length;
-    return `<button data-y="${y}" class="${y === Y ? 'on' : ''}">${y}<em>${n}</em></button>`;
-  }).join('') + `<button class="add" data-y="__add" aria-label="إضافة سنة">${ic('plus',18)}</button>`;
+function renderYears(){
+  const ys=years(),Y=selYear();
+  $('yr').innerHTML=ys.map(y=>{
+    const n=tx.filter(t=>+t.year===y&&!t.cancelled).length;
+    return `<button data-y="${y}" class="${y===Y?'on':''}">${sparkline(y)}<span>${dispNum(y)}</span><em>${dispNum(n)}</em></button>`;
+  }).join('')+`<button class="add" data-y="__add" aria-label="إضافة سنة">${ic('plus',18)}</button>`;
 }
-function render() {
+function renderMonths(){
+  const Y=selYear();
+  const has=tx.some(t=>+t.year===Y);
+  if(!has){$('mo').innerHTML='';return;}
+  const months=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const counts=Array(12).fill(0);
+  tx.forEach(t=>{
+    if(+t.year!==Y)return;
+    const m=String(t.date||'').match(/^\d{1,2}\/(\d{1,2})\//);
+    if(m){const i=+m[1]-1;if(i>=0&&i<12)counts[i]++;}
+  });
+  $('mo').innerHTML=`<button data-m="all" class="${S.month==='all'?'on':''}">الكل</button>`+
+    months.map((nm,i)=>counts[i]||S.month===String(i+1)?`<button data-m="${i+1}" class="${String(i+1)===String(S.month)?'on':''}">${nm} ${dispNum(counts[i])}</button>`:'').join('');
+}
+function renderRecent(){
+  const ids=S.recent.slice(0,6);
+  const items=ids.map(id=>tx.find(t=>t.id===id)).filter(Boolean);
+  if(!items.length){$('recent').innerHTML='';return;}
+  $('recent').innerHTML=items.map(t=>{
+    const initial=(t.name||'?').trim().charAt(0);
+    return `<button data-recent="${t.id}"><span class="av">${esc(initial)}</span><span>${esc(t.name||'-')}</span></button>`;
+  }).join('');
+}
+function skeleton(){
+  let h='';
+  for(let i=0;i<5;i++)h+=`<div class="skl"><div class="sk av"></div><div style="flex:1"><div class="sk l1"></div><div class="sk l2"></div></div></div>`;
+  return h;
+}
+function render(){
   renderYears();
-  const { a, c } = computeRows();
-  const manual = !SO[S.sortBy];
-  let n = 0, h = a.map(r => card(r, ++n, manual)).join('');
-  if (c.length) h += (a.length ? '<div class="dv">المعاملات الملغية</div>' : '') + c.map(r => card(r, ++n, manual)).join('');
-  $('list').innerHTML = h || `<div class="em">${ic('inbox',44)}<p>${tx.length ? 'لا توجد نتائج مطابقة' : 'لا توجد معاملات بعد.<br>اضغط «معاملة جديدة» للبدء'}</p></div>`;
-  const total = a.length + c.length;
-  $('hint').textContent = manual && total > 1 ? 'وضع الترتيب اليدوي — استخدم الأسهم لتحريك العميل' : '';
+  renderMonths();
+  renderRecent();
+  const {a,c}=computeRows();
+  const manual=!SO[S.sortBy];
+  let h='';
+  if(S.view==='timeline'){
+    const all=a.concat(c);
+    all.sort((x,y)=>pd(y.t.date)-pd(x.t.date));
+    h=all.length?`<div class="tl">${all.map(tlCard).join('')}</div>`:'';
+    $('list').classList.add('timeline');
+  }else{
+    let n=0;
+    h=a.map(r=>card(r,++n,manual)).join('');
+    if(c.length)h+=(a.length?'<div class="dv">المعاملات الملغية</div>':'')+c.map(r=>card(r,++n,manual)).join('');
+    $('list').classList.remove('timeline');
+  }
+  if(!h){
+    const hasAny=tx.length;
+    h=`<div class="em">
+      <svg class="emptyArt" viewBox="0 0 200 200" fill="none">
+        <rect x="40" y="60" width="120" height="100" rx="14" stroke="currentColor" stroke-width="3" opacity=".3"/>
+        <path d="M40 80h120" stroke="currentColor" stroke-width="3" opacity=".3"/>
+        <circle cx="55" cy="72" r="3" fill="currentColor" opacity=".3"/>
+        <circle cx="67" cy="72" r="3" fill="currentColor" opacity=".3"/>
+        <circle cx="79" cy="72" r="3" fill="currentColor" opacity=".3"/>
+        <path d="M70 120h60M70 135h40" stroke="currentColor" stroke-width="3" stroke-linecap="round" opacity=".35"/>
+        <circle cx="150" cy="150" r="28" fill="var(--ac)" opacity=".15"/>
+        <path d="M150 138v24M138 150h24" stroke="var(--ac)" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <h3>${hasAny?'لا توجد نتائج مطابقة':'ابدأ بإضافة معاملتك الأولى'}</h3>
+      <p>${hasAny?'جرّب تعديل البحث أو الفلاتر':'سيظهر هنا كل عملائك، مع تتبع الأرباح والحجوزات'}</p>
+      ${!hasAny?'<div class="emActs"><button class="btn pr" id="emAdd" style="max-width:220px"><i data-ic="plus"></i>إضافة معاملة</button></div>':''}
+    </div>`;
+  }
+  $('list').innerHTML=h;
+  const total=a.length+c.length;
+  const filtered=!!$('q').value.trim()||S.flt!=='all'||S.month!=='all';
+  $('hint').textContent=manual&&total>1?(filtered?'الترتيب اليدوي مع فلتر/بحث قد لا يظهر فرقاً واضحاً':'وضع الترتيب اليدوي — استخدم الأسهم لتحريك العميل'):'';
   stats();
+  const em=$('emAdd');
+  if(em)em.onclick=()=>form();
 }
 
 /* ============ YEAR BAR ============ */
-$('yr').onclick = e => {
-  const b = e.target.closest('button'); if (!b) return;
-  const v = b.dataset.y;
-  if (v === '__add') {
-    inputBox('إضافة سنة', 'أدخل السنة الجديدة (مثال: 2028)', '', val => {
-      const y = parseInt(val, 10);
-      if (!y || y < 2000 || y > 2100) { toast('سنة غير صالحة', 'e'); return; }
-      if (years().indexOf(y) === -1) S.extraYears.push(y);
-      S.year = y; saveS(); render(); toast('تمت إضافة سنة ' + y);
-    }, 'number');
+$('yr').onclick=e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const v=b.dataset.y;
+  if(v==='__add'){
+    inputBox('إضافة سنة','أدخل السنة الجديدة (مثال: 2028)','',val=>{
+      const y=parseInt(val,10);
+      if(!y||y<2000||y>2100){toast('سنة غير صالحة','e');return;}
+      if(years().indexOf(y)===-1)S.extraYears.push(y);
+      S.year=y;saveS();render();toast('تمت إضافة سنة '+y);
+    },'number');
     return;
   }
-  S.year = +v; saveS(); hp(); render();
+  S.year=+v;S.month='all';saveS();hp();render();
 };
+$('mo').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.month=b.dataset.m;saveS();render();};
+$('recent').onclick=e=>{const b=e.target.closest('[data-recent]');if(!b)return;const i=tx.findIndex(t=>t.id===b.dataset.recent);if(i>=0)details(i);};
 
 /* ============ SEARCH / FILTER / SORT ============ */
 let qTimer;
-$('q').oninput = () => { clearTimeout(qTimer); qTimer = setTimeout(render, 120); };
-$('so').onchange = e => { S.sortBy = e.target.value; saveS(); render(); };
-$('fl').onclick = e => {
-  const b = e.target.closest('button'); if (!b) return;
-  S.flt = b.dataset.f;
-  [...$('fl').children].forEach(x => x.classList.toggle('on', x === b));
-  saveS(); render();
+$('q').oninput=()=>{clearTimeout(qTimer);qTimer=setTimeout(render,120);};
+$('so').onchange=e=>{S.sortBy=e.target.value;saveS();render();};
+$('fl').onclick=e=>{
+  const b=e.target.closest('button');if(!b)return;
+  S.flt=b.dataset.f;
+  [...$('fl').children].forEach(x=>x.classList.toggle('on',x===b));
+  saveS();render();
 };
 
 /* ============ PROFIT PRIVACY ============ */
-function applyProfitUI() { $('pEye').innerHTML = ic(S.hideProfit ? 'eyeoff' : 'eye'); }
-$('pEye').onclick = e => {
+function applyProfitUI(){$('pEye').innerHTML=ic(S.hideProfit?'eyeoff':'eye');}
+$('pEye').onclick=e=>{
   e.stopPropagation();
-  S.hideProfit = !S.hideProfit; saveS(); applyProfitUI(); stats(); hp();
-  toast(S.hideProfit ? 'تم إخفاء صافي الأرباح' : 'تم إظهار صافي الأرباح', 'i');
+  S.hideProfit=!S.hideProfit;saveS();applyProfitUI();stats();render();hp(10);
+  toast(S.hideProfit?'تم إخفاء صافي الأرباح':'تم إظهار صافي الأرباح','i');
 };
+
+/* ============ FOLD ============ */
+function toggleFold(i){
+  const t=tx[i];if(!t)return;
+  const pos=S.collapsed.indexOf(t.id);
+  if(pos>-1)S.collapsed.splice(pos,1);else S.collapsed.push(t.id);
+  saveS();
+  const el=document.querySelector(`.c[data-id="${t.id}"]`);
+  if(el)el.classList.toggle('col',S.collapsed.indexOf(t.id)>-1);
+}
 
 /* ============ FORM ============ */
-const F = ['name','phone','account','nationalId','passport','iban','buyPrice','chargePrice','sellPrice','discount','notes'];
-const fh = () => {
-  const h = $('f_half').checked;
-  $('f_buyPrice').disabled = h;
-  if (h) $('f_buyPrice').value = '';
-};
-let edit = -1;
-let formDirty = false;
+const F=['name','phone','account','nationalId','passport','iban','buyPrice','chargePrice','sellPrice','discount','notes'];
+const fh=()=>{const h=$('f_half').checked;$('f_buyPrice').disabled=h;if(h)$('f_buyPrice').value='';updatePreview();};
+let edit=-1;let formDirty=false;
+F.concat(['year']).forEach(k=>{$('f_'+k).addEventListener('input',()=>{formDirty=true;updatePreview();});});
+$('f_half').addEventListener('change',()=>{formDirty=true;updatePreview();});
 
-// Track dirty state for the form
-F.concat(['year']).forEach(k => {
-  $('f_' + k).addEventListener('input', () => { formDirty = true; });
-});
-$('f_half').addEventListener('change', () => { formDirty = true; });
-
-function form(i = -1) {
-  edit = i;
-  const t = i > -1 ? tx[i] : {};
-  F.forEach(k => { $('f_' + k).value = k === 'discount' ? (t.discount || '0') : (t[k] ?? ''); });
-  $('f_year').value = t.year || selYear();
-  $('f_half').checked = !!t.isHalf;
+function updatePreview(){
+  const b=num($('f_buyPrice').value),c=num($('f_chargePrice').value),s=num($('f_sellPrice').value),d=num($('f_discount').value);
+  const half=$('f_half').checked;
+  const f=s-s*d/100;
+  const p=half?(f-c)/2:f-c-b;
+  $('pvBuy').textContent=(!half&&b>0)?fmt(b):'—';
+  $('pvCharge').textContent=c>0?fmt(c):'—';
+  $('pvSell').textContent=s>0?fmt(f):'—';
+  const el=$('pvProfit');
+  el.textContent=S.hideProfit?'•••••':fmt(p);
+  el.classList.toggle('neg',!S.hideProfit&&p<0);
+}
+function form(i=-1){
+  edit=i;
+  const t=i>-1?tx[i]:{};
+  F.forEach(k=>{$('f_'+k).value=k==='discount'?(t.discount||'0'):(t[k]??'');});
+  $('f_year').value=t.year||selYear();
+  $('f_half').checked=!!t.isHalf;
   fh();
-  formDirty = false;
-  $('fT').textContent = i > -1 ? 'تعديل المعاملة' : 'معاملة جديدة';
-  $('fSave').innerHTML = ic('check') + (i > -1 ? 'تحديث المعاملة' : 'حفظ المعاملة');
-  $('fCan').style.display = i > -1 ? '' : 'none';
-  if (i > -1) $('fCan').innerHTML = ic(t.cancelled ? 'undo' : 'ban') + (t.cancelled ? 'تفعيل المعاملة' : 'إلغاء المعاملة');
+  formDirty=false;updatePreview();
+  $('fT').textContent=i>-1?'تعديل المعاملة':'معاملة جديدة';
+  $('fSave').innerHTML=ic('check')+(i>-1?'تحديث المعاملة':'حفظ المعاملة');
+  $('fCan').style.display=i>-1?'':'none';
+  if(i>-1)$('fCan').innerHTML=ic(t.cancelled?'undo':'ban')+(t.cancelled?'تفعيل المعاملة':'إلغاء المعاملة');
   openM('form');
 }
-function closeFormSafe(force) {
-  if (!force && formDirty) {
-    ask('إغلاق بدون حفظ؟', 'لديك تغييرات غير محفوظة في النموذج. هل تريد إغلاق النموذج بدون حفظ؟', 'إغلاق بدون حفظ', () => {
-      formDirty = false;
-      closeM('form');
-    });
+function closeFormSafe(force){
+  if(!force&&formDirty){
+    ask('إغلاق بدون حفظ؟','لديك تغييرات غير محفوظة في النموذج. هل تريد إغلاقه بدون حفظ؟','إغلاق بدون حفظ',()=>{formDirty=false;closeM('form');});
     return;
   }
-  formDirty = false;
-  closeM('form');
+  formDirty=false;closeM('form');
 }
-$('bAdd').onclick = () => { hp(); form(); };
-$('f_half').onchange = () => { fh(); };
-
-$('fSave').onclick = () => {
+$('bAdd').onclick=()=>{hp();form();};
+$('fSave').onclick=()=>{
   hp(30);
-  const v = k => $('f_' + k).value;
-  if (!v('name').trim()) { toast('الاسم مطلوب!', 'e'); $('f_name').focus(); return; }
-  const o = edit > -1 ? tx[edit] : null;
-  const spRaw = String(v('sellPrice')).trim();
-  const sp = parseFloat(spRaw) || 0;
-  let done = !!(o && o.done);
-  if (sp > 0) done = true;
-  else if (!spRaw) done = false;   // cleared sell price → back to "pending"
-  const y = parseInt(v('year'), 10) || selYear();
-  const d = Object.assign({}, o || {}, Object.fromEntries(F.map(k => [k, k === 'name' ? v(k).trim() : v(k)])), {
-    year: y,
-    isHalf: $('f_half').checked,
-    date: o ? o.date : new Date().toLocaleDateString('en-GB'),
-    rowColor: o ? (o.rowColor || '#ffffff') : '#ffffff',
-    done: done,
-    cancelled: o ? !!o.cancelled : false,
-    bookingDate: o ? (o.bookingDate || '') : ''
+  const v=k=>$('f_'+k).value;
+  if(!v('name').trim()){toast('الاسم مطلوب!','e');$('f_name').focus();return;}
+  const o=edit>-1?tx[edit]:null;
+  const spRaw=String(v('sellPrice')).trim();
+  const sp=parseFloat(spRaw)||0;
+  let done=!!(o&&o.done);
+  if(sp>0)done=true;else if(!spRaw)done=false;
+  const y=parseInt(v('year'),10)||selYear();
+  const d=Object.assign({},o||{},Object.fromEntries(F.map(k=>[k,k==='name'?v(k).trim():v(k)])),{
+    id:o?o.id:uid(),
+    clientId:o?(o.clientId||nextClientId(y)):nextClientId(y),
+    year:y,isHalf:$('f_half').checked,
+    date:o?o.date:new Date().toLocaleDateString('en-GB'),
+    rowColor:o?(o.rowColor||'#ffffff'):'#ffffff',
+    done:done,
+    cancelled:o?!!o.cancelled:false,
+    bookingDate:o?(o.bookingDate||''):'',
+    payments:o?(o.payments||[]):[]
   });
-  if (d.isHalf) d.buyPrice = '';
-  if (o) tx[edit] = d; else tx.push(d);
-  if (!o) { S.year = y; saveS(); }
-  save(); formDirty = false; closeM('form'); render();
-  toast(o ? 'تم تحديث البيانات' : 'تم الحفظ بنجاح');
+  if(d.isHalf)d.buyPrice='';
+  if(o)tx[edit]=d;else tx.push(d);
+  if(!o){S.year=y;saveS();}
+  save();formDirty=false;closeM('form');render();
+  toast(o?'تم تحديث البيانات':'تم الحفظ بنجاح');
+  if(!o)setTimeout(()=>pulseCard(d.id),50);
 };
-$('fCan').onclick = () => {
-  const t = tx[edit]; if (!t) return;
-  ask(t.cancelled ? 'تفعيل المعاملة' : 'إلغاء المعاملة', 'هل أنت متأكد من تغيير حالة المعاملة؟', 'نعم، متأكد', () => {
-    t.cancelled = !t.cancelled; save(); formDirty = false; closeM('form'); render();
-    toast(t.cancelled ? 'تم إلغاء المعاملة' : 'تم تفعيل المعاملة');
-  }, !t.cancelled ? 1 : 0);
+$('fCan').onclick=()=>{
+  const t=tx[edit];if(!t)return;
+  ask(t.cancelled?'تفعيل المعاملة':'إلغاء المعاملة','هل أنت متأكد من تغيير حالة المعاملة؟','نعم، متأكد',()=>{
+    t.cancelled=!t.cancelled;save();formDirty=false;closeM('form');render();
+    toast(t.cancelled?'تم إلغاء المعاملة':'تم تفعيل المعاملة');
+  },!t.cancelled?1:0);
 };
+
+function pulseCard(id){
+  const el=document.querySelector(`.c[data-id="${id}"]`);
+  if(!el)return;
+  el.classList.add('pulse');
+  setTimeout(()=>el.classList.remove('pulse'),1000);
+}
 
 /* ============ QUICK SALE ============ */
-let cur = -1, step = '';
-function sale(i) {
-  cur = i;
-  const t = tx[i]; if (!t) return;
-  const q = $('qe_in');
-  q.disabled = false; q.value = '';
-  $('qe_g').style.opacity = 1;
-  $('qe_half').checked = false;
-  if (!t.isHalf && !num(t.buyPrice)) {
-    step = 'buy'; $('qe_t').textContent = 'شراء البطاقة';
-    q.placeholder = 'سعر الشراء (أو اتركه فارغاً)';
-    $('qe_hf').style.display = 'flex';
-  } else if (!num(t.chargePrice)) {
-    step = 'charge'; $('qe_t').textContent = 'قيمة الشحن';
-    q.placeholder = 'قيمة الشحن (أو اتركه فارغاً)';
-    $('qe_hf').style.display = 'none';
-  } else {
-    step = 'sell'; $('qe_t').textContent = 'إتمام البيع';
-    q.placeholder = 'أدخل سعر البيع';
-    $('qe_hf').style.display = 'none';
+let cur=-1,step='';
+function sale(i){
+  cur=i;
+  const t=tx[i];if(!t)return;
+  const q=$('qe_in');
+  q.disabled=false;q.value='';
+  $('qe_g').style.opacity=1;
+  $('qe_half').checked=false;
+  if(!t.isHalf&&!num(t.buyPrice)){
+    step='buy';$('qe_t').textContent='شراء البطاقة';
+    q.placeholder='سعر الشراء (أو اتركه فارغاً)';
+    $('qe_hf').style.display='flex';
+  }else if(!num(t.chargePrice)){
+    step='charge';$('qe_t').textContent='قيمة الشحن';
+    q.placeholder='قيمة الشحن (أو اتركه فارغاً)';
+    $('qe_hf').style.display='none';
+  }else{
+    step='sell';$('qe_t').textContent='إتمام البيع';
+    q.placeholder='أدخل سعر البيع';
+    $('qe_hf').style.display='none';
   }
   openM('qe');
-  setTimeout(() => q.focus(), 300);
+  setTimeout(()=>q.focus(),300);
 }
-$('qe_half').onchange = () => {
-  const h = $('qe_half').checked;
-  $('qe_in').disabled = h;
-  $('qe_g').style.opacity = h ? .3 : 1;
+$('qe_half').onchange=()=>{
+  const h=$('qe_half').checked;
+  $('qe_in').disabled=h;
+  $('qe_g').style.opacity=h?.3:1;
 };
-$('qe_ok').onclick = () => {
-  const v = $('qe_in').value, h = $('qe_half').checked;
-  const idx = cur;                 // capture index (avoids race with other modals)
-  const t = tx[idx];
-  if (!t) return;
-  if (step === 'buy' && h) {
-    t.isHalf = true; t.buyPrice = '';
-    save(); closeM('qe'); setTimeout(() => sale(idx), 250); return;
+$('qe_ok').onclick=()=>{
+  const v=$('qe_in').value,h=$('qe_half').checked;
+  const idx=cur;const t=tx[idx];
+  if(!t)return;
+  if(step==='buy'&&h){
+    t.isHalf=true;t.buyPrice='';
+    save();closeM('qe');setTimeout(()=>sale(idx),250);return;
   }
-  if (step === 'buy') { t.buyPrice = v || '0'; t.isHalf = false; }
-  else if (step === 'charge') t.chargePrice = v || '0';
-  else {
-    if (!(parseFloat(v) > 0)) { toast('أدخل رقماً صحيحاً لإتمام البيع', 'e'); return; }
-    t.sellPrice = v; t.done = true;
+  if(step==='buy'){t.buyPrice=v||'0';t.isHalf=false;}
+  else if(step==='charge')t.chargePrice=v||'0';
+  else{
+    if(!(parseFloat(v)>0)){toast('أدخل رقماً صحيحاً لإتمام البيع','e');return;}
+    t.sellPrice=v;t.done=true;
   }
-  save(); closeM('qe');
-  if (step !== 'sell') setTimeout(() => sale(idx), 250);
-  else { toast('تم إتمام البيع وتحديث البيانات'); render(); }
+  save();closeM('qe');
+  if(step!=='sell')setTimeout(()=>sale(idx),250);
+  else{toast('تم إتمام البيع وتحديث البيانات');render();pulseCard(t.id);}
 };
 
 /* ============ DETAILS ============ */
-function details(i) {
-  cur = i;
-  const t = tx[i]; if (!t) return;
-  $('dN').textContent = t.name || 'تفاصيل المعاملة';
-  $('dI').innerHTML = [
-    ['رقم الهاتف', t.phone], ['الحساب', t.account], ['الرقم الوطني', t.nationalId],
-    ['جواز السفر', t.passport], ['IBAN', t.iban], ['تاريخ الإضافة', t.date]
-  ].map(([l, v]) => {
-    const val = v || '-';
+function details(i){
+  cur=i;
+  const t=tx[i];if(!t)return;
+  // add to recent
+  S.recent=S.recent.filter(x=>x!==t.id);
+  S.recent.unshift(t.id);
+  S.recent=S.recent.slice(0,10);
+  saveS();
+  $('dN').textContent=t.name||'تفاصيل المعاملة';
+  $('dId').textContent=t.clientId?'رمز العميل: '+t.clientId:'';
+  $('dI').innerHTML=[
+    ['رقم الهاتف',t.phone],['الحساب',t.account],['الرقم الوطني',t.nationalId],
+    ['جواز السفر',t.passport],['IBAN',t.iban],['تاريخ الإضافة',t.date]
+  ].map(([l,v])=>{
+    const val=v||'-';
     return `<button class="ii" data-cp="${esc(val)}"><small>${l}</small><b>${esc(val)}</b></button>`;
   }).join('');
-  $('d_buy').value = t.buyPrice || '';
-  $('d_charge').value = t.chargePrice || '';
-  $('d_sell').value = t.sellPrice || '';
-  $('d_disc').value = t.discount || '0';
-  $('d_notes').value = t.notes || '';
-  $('d_year').value = t.year || selYear();
-  $('d_half').checked = !!t.isHalf;
+  $('d_buy').value=t.buyPrice||'';
+  $('d_charge').value=t.chargePrice||'';
+  $('d_sell').value=t.sellPrice||'';
+  $('d_disc').value=t.discount||'0';
+  $('d_notes').value=t.notes||'';
+  $('d_year').value=t.year||selYear();
+  $('d_half').checked=!!t.isHalf;
   dh();
   openM('det');
+  renderRecent();
 }
-function dp() {
-  if (cur < 0) return;
-  const b = num($('d_buy').value), c = num($('d_charge').value), s = num($('d_sell').value), d = num($('d_disc').value);
-  const f = s - s * d / 100;
-  const p = $('d_half').checked ? (f - c) / 2 : f - c - b;
-  $('dP').textContent = p.toFixed(2);
-  $('dPc').style.background = p >= 0 ? 'var(--ok)' : 'var(--no)';
+function dp(){
+  if(cur<0)return;
+  const b=num($('d_buy').value),c=num($('d_charge').value),s=num($('d_sell').value),d=num($('d_disc').value);
+  const f=s-s*d/100;
+  const p=$('d_half').checked?(f-c)/2:f-c-b;
+  $('dP').textContent=S.hideProfit?'•••••':p.toFixed(2);
+  $('dPc').style.background=p>=0?'var(--ok)':'var(--no)';
 }
-function dh() {
-  const h = $('d_half').checked;
-  $('d_buy').disabled = h;
-  if (h) $('d_buy').value = '';
+function dh(){
+  const h=$('d_half').checked;
+  $('d_buy').disabled=h;
+  if(h)$('d_buy').value='';
   dp();
 }
-['d_buy','d_charge','d_sell','d_disc'].forEach(k => $(k).oninput = dp);
-$('d_half').onchange = dh;
-$('dSave').onclick = () => {
-  const t = tx[cur]; if (!t) return;
-  t.buyPrice = $('d_buy').value;
-  t.chargePrice = $('d_charge').value;
-  const spRaw = String($('d_sell').value).trim();
-  t.sellPrice = spRaw;
-  t.discount = $('d_disc').value;
-  t.notes = $('d_notes').value;
-  const y = parseInt($('d_year').value, 10);
-  if (y >= 2000 && y <= 2100) t.year = y;
-  t.isHalf = $('d_half').checked;
-  if (t.isHalf) t.buyPrice = '';
-  const sp = parseFloat(spRaw) || 0;
-  if (sp > 0) t.done = true;
-  else if (!spRaw) t.done = false;   // cleared sell price → back to "pending"
-  save(); render(); toast('تم حفظ التعديلات بنجاح'); closeM('det');
+['d_buy','d_charge','d_sell','d_disc'].forEach(k=>$(k).oninput=dp);
+$('d_half').onchange=dh;
+$('dSave').onclick=()=>{
+  const t=tx[cur];if(!t)return;
+  t.buyPrice=$('d_buy').value;
+  t.chargePrice=$('d_charge').value;
+  const spRaw=String($('d_sell').value).trim();
+  t.sellPrice=spRaw;
+  t.discount=$('d_disc').value;
+  t.notes=$('d_notes').value;
+  const y=parseInt($('d_year').value,10);
+  if(y>=2000&&y<=2100)t.year=y;
+  t.isHalf=$('d_half').checked;
+  if(t.isHalf)t.buyPrice='';
+  const sp=parseFloat(spRaw)||0;
+  if(sp>0)t.done=true;else if(!spRaw)t.done=false;
+  save();render();toast('تم حفظ التعديلات بنجاح');closeM('det');
 };
-$('dDup').onclick = () => {
-  const t = tx[cur]; if (!t) return;
-  const c = Object.assign({}, t, {
-    date: new Date().toLocaleDateString('en-GB'),
-    done: false, cancelled: false, bookingDate: '', sellPrice: '', notes: '', rowColor: '#ffffff'
+$('dDup').onclick=()=>{
+  const t=tx[cur];if(!t)return;
+  const c=Object.assign({},t,{
+    id:uid(),clientId:nextClientId(t.year),
+    date:new Date().toLocaleDateString('en-GB'),
+    done:false,cancelled:false,bookingDate:'',sellPrice:'',notes:'',rowColor:'#ffffff',payments:[]
   });
-  tx.push(c); save(); closeM('det'); render(); toast('تم نسخ المعاملة');
+  tx.push(c);save();closeM('det');render();toast('تم نسخ المعاملة');
+};
+$('dQr').onclick=()=>{
+  const t=tx[cur];if(!t)return;
+  const data=JSON.stringify({n:t.name,p:t.phone,a:t.account,iban:t.iban,id:t.clientId,y:t.year});
+  const box=$('qrBox');
+  box.innerHTML='';
+  try{
+    new QRCode(box,{text:data,width:180,height:180,colorDark:'#12142b',colorLight:'#ffffff'});
+  }catch(e){box.textContent='تعذر توليد QR';}
+  openM('qrm');
+};
+$('dFocus').onclick=()=>{closeM('det');openFocus(cur);};
+$('dShareImg').onclick=async()=>{
+  const t=tx[cur];if(!t)return;
+  if(typeof html2canvas==='undefined'){toast('المكتبة غير متاحة','e');return;}
+  const stage=$('shareStage');
+  const p=calc(t);
+  stage.innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+      <div style="width:48px;height:48px;border-radius:14px;background:${'var(--ac)'};display:grid;place-items:center;color:#fff;font-weight:700;font-size:22px">${esc((t.name||'?').charAt(0))}</div>
+      <div>
+        <div style="font-size:20px;font-weight:700">${esc(t.name||'-')}</div>
+        <div style="font-size:12px;color:var(--sub);letter-spacing:.5px">${esc(t.clientId||'')}</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px;margin-bottom:16px">
+      <div style="padding:10px;background:var(--bg);border-radius:12px"><small style="color:var(--sub);display:block;margin-bottom:3px">التليفون</small><b>${esc(t.phone||'-')}</b></div>
+      <div style="padding:10px;background:var(--bg);border-radius:12px"><small style="color:var(--sub);display:block;margin-bottom:3px">الحساب</small><b>${esc(t.account||'-')}</b></div>
+    </div>
+    <div style="padding:16px;border-radius:14px;background:var(--ac);color:#fff;text-align:center">
+      <div style="font-size:12px;opacity:.85;margin-bottom:4px">صافي الربح</div>
+      <div style="font-size:32px;font-weight:700">${S.hideProfit?'•••••':fmt(p)}</div>
+    </div>
+    <div style="margin-top:14px;display:flex;justify-content:space-between;font-size:12px;color:var(--sub)">
+      <span>${t.done?'✓ تم البيع':t.cancelled?'ملغية':'⏳ جارية'}</span>
+      <span>${esc(t.date||'')}</span>
+    </div>`;
+  try{
+    const canvas=await html2canvas(stage,{backgroundColor:getComputedStyle(document.body).getPropertyValue('--cd')||'#fff',scale:2,logging:false});
+    canvas.toBlob(async blob=>{
+      if(!blob){toast('تعذر التوليد','e');return;}
+      const file=new File([blob],'client_'+t.id+'.png',{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file],title:t.name});toast('تم إنشاء الصورة');return;}catch(e){}
+      }
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download=file.name;a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1500);
+      toast('تم تنزيل الصورة');
+    });
+  }catch(e){toast('تعذر التوليد','e');}
+};
+
+/* ============ FOCUS MODE ============ */
+let focusIdx=-1;
+function openFocus(i){
+  const t=tx[i];if(!t)return;
+  focusIdx=i;
+  const p=calc(t);
+  $('focusBody').innerHTML=`
+    <div>
+      <div class="fcid">${esc(t.clientId||'')}</div>
+      <h2>${esc(t.name||'-')}</h2>
+      <div style="color:var(--sub);font-size:13px;margin-top:6px">${t.done?'✓ تم البيع':t.cancelled?'ملغية':'⏳ جارية البيع'}</div>
+    </div>
+    <div class="fprofit${p<0?' neg':''}">${S.hideProfit?'•••••':fmt(p)}</div>
+    <div class="frow">
+      <div><small>التليفون</small><b>${esc(t.phone||'-')}</b></div>
+      <div><small>الحساب</small><b>${esc(t.account||'-')}</b></div>
+      <div><small>IBAN</small><b>${esc(t.iban||'-')}</b></div>
+      <div><small>السنة</small><b>${dispNum(t.year)}</b></div>
+    </div>`;
+  $('focusActs').innerHTML=`
+    <button class="fabtn" id="fcClose">إغلاق</button>
+    ${t.done?`<button class="fabtn pr" id="fcSale">تراجع عن البيع</button>`:`<button class="fabtn pr" id="fcSale">إتمام البيع</button>`}`;
+  openM('focus');
+  document.documentElement.style.overflow='hidden';
+  $('fcClose').onclick=closeFocus;
+  $('fcSale').onclick=()=>{
+    const tt=tx[focusIdx];
+    if(!tt)return;
+    if(tt.done){tt.done=false;save();openFocus(focusIdx);render();toast('تم التراجع عن البيع','i');}
+    else{save();closeFocus();sale(focusIdx);}
+  };
+}
+function closeFocus(){
+  closeM('focus');
+  document.documentElement.style.overflow='';
+  focusIdx=-1;
+  render();
+}
+$('focusClose').onclick=closeFocus;
+$('focusPrev').onclick=()=>{
+  if(focusIdx>0){focusIdx--;openFocus(focusIdx);}
+  else toast('في الأول بالفعل','i');
+};
+$('focusNext').onclick=()=>{
+  if(focusIdx<tx.length-1){focusIdx++;openFocus(focusIdx);}
+  else toast('في الأخير بالفعل','i');
 };
 
 /* ============ BOOKING ============ */
-function book(i) {
-  cur = i;
-  $('bk_d').value = tx[i].bookingDate || '';
-  $('bk_c').style.display = tx[i].bookingDate ? '' : 'none';
+function book(i){
+  cur=i;
+  $('bk_d').value=tx[i].bookingDate||'';
+  $('bk_c').style.display=tx[i].bookingDate?'':'none';
   openM('bk');
 }
-$('bk_s').onclick = () => {
-  if (cur > -1 && tx[cur]) {
-    tx[cur].bookingDate = $('bk_d').value;
-    save(); toast('تم حفظ التاريخ بنجاح'); closeM('bk'); render();
+$('bk_s').onclick=()=>{
+  if(cur>-1&&tx[cur]){
+    tx[cur].bookingDate=$('bk_d').value;
+    save();toast('تم حفظ التاريخ بنجاح');closeM('bk');render();
   }
 };
-$('bk_c').onclick = () => {
-  if (cur > -1 && tx[cur]) {
-    tx[cur].bookingDate = '';
-    save(); toast('تم إلغاء الحجز بنجاح', 'i'); closeM('bk'); render();
+$('bk_c').onclick=()=>{
+  if(cur>-1&&tx[cur]){
+    tx[cur].bookingDate='';
+    save();toast('تم إلغاء الحجز بنجاح','i');closeM('bk');render();
   }
 };
 
 /* ============ DELETE / RESTORE / MOVE ============ */
-function del(i) {
-  const t = tx[i]; if (!t) return;
-  ask('تأكيد الحذف', 'هل تريد حذف «' + (t.name || '') + '» نهائياً؟', 'حذف', () => {
-    const removed = tx.splice(i, 1)[0];
-    save(); render();
-    toastAct('تم حذف المعاملة', 'تراجع', () => {
-      // reference-based undo (safe against concurrent edits)
-      if (tx.indexOf(removed) > -1) return;
-      const pos = Math.min(i, tx.length);
-      tx.splice(pos, 0, removed);
-      save(); render(); toast('تم استرجاع المعاملة');
-    });
+function del(i){
+  const t=tx[i];if(!t)return;
+  ask('تأكيد الحذف','هل تريد حذف «'+(t.name||'')+'» نهائياً؟','حذف',()=>{
+    const el=document.querySelector(`.c[data-id="${t.id}"]`);
+    if(el)el.classList.add('deleting');
+    setTimeout(()=>{
+      const removed=tx.splice(i,1)[0];
+      save();render();
+      toastAct('تم حذف المعاملة','تراجع',()=>{
+        if(tx.indexOf(removed)>-1)return;
+        const pos=Math.min(i,tx.length);
+        tx.splice(pos,0,removed);
+        save();render();toast('تم استرجاع المعاملة');
+      });
+    },200);
   });
 }
-function restore(i) {
-  ask('تفعيل المعاملة', 'هل أنت متأكد من تفعيل هذه المعاملة؟', 'نعم، تفعيل', () => {
-    tx[i].cancelled = false; save(); closeM('ls'); render(); toast('تم تفعيل المعاملة بنجاح');
-  }, 0);
+function restore(i){
+  ask('تفعيل المعاملة','هل أنت متأكد من تفعيل هذه المعاملة؟','نعم، تفعيل',()=>{
+    tx[i].cancelled=false;save();closeM('ls');render();toast('تم تفعيل المعاملة بنجاح');
+  },0);
 }
-function move(i, dir) {
-  if (SO[S.sortBy]) { toast('الترتيب اليدوي غير مفعّل', 'i'); return; }
-  const { a, c } = computeRows();
-  const vis = a.concat(c).map(r => r.i);
-  const p = vis.indexOf(i);
-  if (p < 0) return;
-  const np = p + dir;
-  if (np < 0 || np >= vis.length) { toast(dir < 0 ? 'في الأعلى بالفعل' : 'في الأسفل بالفعل', 'i'); return; }
-  const j = vis[np];
-  const tmp = tx[i]; tx[i] = tx[j]; tx[j] = tmp;
-  save(); hp(10); render();
+function move(i,dir){
+  if(SO[S.sortBy]){toast('الترتيب اليدوي غير مفعّل','i');return;}
+  const {a,c}=computeRows();
+  const vis=a.concat(c).map(r=>r.i);
+  const p=vis.indexOf(i);
+  if(p<0)return;
+  const np=p+dir;
+  if(np<0||np>=vis.length){toast(dir<0?'في الأعلى بالفعل':'في الأسفل بالفعل','i');return;}
+  const j=vis[np];
+  const tmp=tx[i];tx[i]=tx[j];tx[j]=tmp;
+  save();hp(10);render();
 }
-function shareTx(i) {
-  const t = tx[i];
-  const lines = [
-    'الاسم: ' + (t.name || '-'),
-    'تليفون: ' + (t.phone || '-'),
-    'حساب: ' + (t.account || '-'),
-    'IBAN: ' + (t.iban || '-'),
-    'رقم وطني: ' + (t.nationalId || '-'),
-    'جواز السفر: ' + (t.passport || '-'),
-    'السنة: ' + (t.year || '-'),
-    'الحالة: ' + (t.cancelled ? 'ملغية' : t.done ? 'تم البيع' : 'جاري البيع')
+function shareTx(i){
+  const t=tx[i];
+  const lines=[
+    'الاسم: '+(t.name||'-'),
+    'تليفون: '+(t.phone||'-'),
+    'حساب: '+(t.account||'-'),
+    'IBAN: '+(t.iban||'-'),
+    'رقم وطني: '+(t.nationalId||'-'),
+    'جواز السفر: '+(t.passport||'-'),
+    'السنة: '+(t.year||'-'),
+    'الحالة: '+(t.cancelled?'ملغية':t.done?'تم البيع':'جاري البيع')
   ];
-  share(lines.join('\n'), 'بيانات العميل');
+  share(lines.join('\n'),'بيانات العميل');
 }
-function pick(i) {
-  cur = i;
-  const c = tx[i].rowColor;
-  $('pk').value = /^#[0-9a-f]{6}$/i.test(c || '') ? c : th.a;
-  try { $('pk').click(); } catch(e){}
+function pick(i){
+  cur=i;
+  const c=tx[i].rowColor;
+  $('pk').value=/^#[0-9a-f]{6}$/i.test(c||'')?c:th.a;
+  try{$('pk').click();}catch(e){}
 }
-$('pk').onchange = e => { if (cur > -1 && tx[cur]) { tx[cur].rowColor = e.target.value; save(); render(); } };
+$('pk').onchange=e=>{if(cur>-1&&tx[cur]){tx[cur].rowColor=e.target.value;save();render();}};
+
+/* ============ CONTEXT MENU ============ */
+let ctxIdx=-1;
+function openCtx(i,x,y){
+  ctxIdx=i;
+  const t=tx[i];if(!t)return;
+  const waPhone=(t.phone||'').replace(/[^0-9]/g,'');
+  const items=[
+    ['view','eye','عرض التفاصيل'],
+    ['edit','edit','تعديل'],
+    ['focus','focus','وضع التركيز'],
+    t.phone?['call','phone','اتصال']:null,
+    waPhone?['wa','wa','واتساب']:null,
+    ['copyName','copy','نسخ الاسم'],
+    ['copyId','copy','نسخ رمز العميل'],
+    ['delete','trash','حذف','dg']
+  ].filter(Boolean);
+  const menu=$('ctx');
+  menu.innerHTML=items.map(([a,icn,label,cls])=>`<button data-ctx="${a}" class="${cls||''}">${ic(icn,17)}${label}</button>`).join('');
+  menu.classList.add('on');
+  const r=menu.getBoundingClientRect();
+  const vw=window.innerWidth,vh=window.innerHeight;
+  let px=Math.min(x,vw-r.width-8),py=Math.min(y,vh-r.height-8);
+  menu.style.left=px+'px';menu.style.top=py+'px';
+}
+function closeCtx(){$('ctx').classList.remove('on');ctxIdx=-1;}
+$('ctx').onclick=e=>{
+  const b=e.target.closest('[data-ctx]');if(!b)return;
+  const a=b.dataset.ctx;
+  const i=ctxIdx;closeCtx();
+  if(i<0)return;
+  const t=tx[i];if(!t)return;
+  if(a==='view')details(i);
+  else if(a==='edit')form(i);
+  else if(a==='focus')openFocus(i);
+  else if(a==='call'){const p=(t.phone||'').replace(/[^0-9+]/g,'');if(p)window.location.href='tel:'+p;}
+  else if(a==='wa'){const p=(t.phone||'').replace(/[^0-9]/g,'');if(p)window.open('https://wa.me/'+p,'_blank');}
+  else if(a==='copyName')copy(t.name||'');
+  else if(a==='copyId')copy(t.clientId||'');
+  else if(a==='delete')del(i);
+};
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#ctx')&&!e.target.closest('.c'))closeCtx();
+});
+
+/* ============ SWIPE & LONG PRESS ============ */
+let sw={id:null,x0:0,y0:0,dx:0,el:null,active:false};
+let lp={el:null,x:0,y:0,timer:null,moved:false};
+$('list').addEventListener('pointerdown',e=>{
+  const card=e.target.closest('.c, .tlc');
+  if(!card||e.target.closest('button'))return;
+  if(e.pointerType==='mouse')return;
+  sw.id=e.pointerId;sw.x0=e.clientX;sw.y0=e.clientY;sw.dx=0;sw.el=card;sw.active=false;
+});
+$('list').addEventListener('pointermove',e=>{
+  if(e.pointerId!==sw.id||!sw.el)return;
+  const dx=e.clientX-sw.x0,dy=e.clientY-sw.y0;
+  if(!sw.active){
+    if(Math.abs(dx)<12)return;
+    if(Math.abs(dy)>Math.abs(dx)){sw.el=null;return;}
+    sw.active=true;
+    sw.el.classList.add('swiping');
+  }
+  sw.dx=dx;
+  const inner=sw.el.querySelector('.inner')||sw.el;
+  if(inner)inner.style.transform=`translateX(${dx*0.45}px)`;
+});
+function endSwipe(e){
+  if(e.pointerId!==sw.id||!sw.el)return;
+  const el=sw.el,dx=sw.dx,active=sw.active;
+  el.classList.remove('swiping');
+  const inner=el.querySelector('.inner')||el;
+  if(inner)inner.style.transform='';
+  sw.el=null;sw.id=null;sw.active=false;
+  if(!active)return;
+  const id=el.dataset.id;
+  const i=tx.findIndex(t=>t.id===id);
+  if(i<0)return;
+  if(dx>80){
+    const t=tx[i];
+    if(!t.done&&!t.cancelled){
+      hp([12,25,12]);
+      t.done=true;save();render();pulseCard(t.id);
+      toast('تم إتمام البيع');
+    }
+  }else if(dx<-80){
+    hp(15);
+    openCtx(i,e.clientX,e.clientY);
+  }
+}
+$('list').addEventListener('pointerup',endSwipe);
+$('list').addEventListener('pointercancel',endSwipe);
+
+$('list').addEventListener('touchstart',e=>{
+  const card=e.target.closest('.c, .tlc');
+  if(!card||e.target.closest('button'))return;
+  const touch=e.touches[0];
+  lp.el=card;lp.x=touch.clientX;lp.y=touch.clientY;lp.moved=false;
+  clearTimeout(lp.timer);
+  lp.timer=setTimeout(()=>{
+    if(lp.moved||!lp.el)return;
+    hp(35);
+    const i=tx.findIndex(t=>t.id===lp.el.dataset.id);
+    if(i>=0)openCtx(i,lp.x,lp.y);
+    lp.el=null;
+  },550);
+},{passive:true});
+$('list').addEventListener('touchmove',()=>{
+  lp.moved=true;clearTimeout(lp.timer);lp.timer=null;
+},{passive:true});
+$('list').addEventListener('touchend',()=>{clearTimeout(lp.timer);lp.timer=null;});
 
 /* ============ LIST CLICK ============ */
-$('list').onclick = e => {
-  const b = e.target.closest('[data-a]'); if (!b) return;
-  const i = +b.dataset.k;
+$('list').onclick=e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;
+  const i=+b.dataset.k;
+  const act=b.dataset.a;
   hp(12);
-  const act = b.dataset.a;
-  if (act === 'det') details(i);
-  else if (act === 'edit') form(i);
-  else if (act === 'share') shareTx(i);
-  else if (act === 'del') del(i);
-  else if (act === 'rest') restore(i);
-  else if (act === 'book') book(i);
-  else if (act === 'color') pick(i);
-  else if (act === 'up') move(i, -1);
-  else if (act === 'down') move(i, 1);
-  else if (act === 'sale') {
-    if (tx[i].done) { tx[i].done = false; save(); render(); toast('تم التراجع عن البيع', 'i'); }
-    else sale(i);
+  if(act==='det')details(i);
+  else if(act==='edit')form(i);
+  else if(act==='share')shareTx(i);
+  else if(act==='del')del(i);
+  else if(act==='rest')restore(i);
+  else if(act==='book')book(i);
+  else if(act==='color')pick(i);
+  else if(act==='up')move(i,-1);
+  else if(act==='down')move(i,1);
+  else if(act==='fold')toggleFold(i);
+  else if(act==='sale'){
+    if(tx[i].done){
+      tx[i].done=false;save();render();toast('تم التراجع عن البيع','i');
+    }else sale(i);
   }
 };
 
 /* ============ SUMMARY LISTS ============ */
-const LT = { profit: 'قائمة الأرباح', purchases: 'قائمة المشتريات', pending: 'المعاملات الجارية', done: 'المعاملات المنفذة', cancelled: 'المعاملات الملغية', booked: 'قائمة الحجوزات' };
-let shareTxt = '';
-function showList(type) {
+const LT={profit:'قائمة الأرباح',purchases:'قائمة المشتريات',pending:'المعاملات الجارية',done:'المعاملات المنفذة',cancelled:'المعاملات الملغية',booked:'قائمة الحجوزات'};
+let shareTxt='';
+function showList(type){
   hp(15);
-  const Y = selYear();
-  const rows = tx.map((t, i) => ({ t, i })).filter(({ t }) => {
-    if (+t.year !== Y) return false;
-    switch (type) {
-      case 'profit': return !t.cancelled && calc(t) > 0;
-      case 'purchases': return !t.cancelled && num(t.buyPrice) > 0;
-      case 'pending': return !t.cancelled && !t.done;
-      case 'done': return !t.cancelled && !!t.done;
-      case 'cancelled': return !!t.cancelled;
-      case 'booked': return !t.cancelled && t.bookingDate && !t.done;
+  const Y=selYear();
+  const rows=tx.map((t,i)=>({t,i})).filter(({t})=>{
+    if(+t.year!==Y)return false;
+    switch(type){
+      case 'profit':return !t.cancelled&&calc(t)>0;
+      case 'purchases':return !t.cancelled&&num(t.buyPrice)>0;
+      case 'pending':return !t.cancelled&&!t.done;
+      case 'done':return !t.cancelled&&!!t.done;
+      case 'cancelled':return !!t.cancelled;
+      case 'booked':return !t.cancelled&&t.bookingDate&&!t.done;
     }
     return false;
   });
-  const title = LT[type] + ' — ' + Y;
-  $('lT').textContent = title;
-  let txt = title + '\n\n';
-  let sum = 0;
-  $('lB').innerHTML = rows.length ? rows.map(({ t, i }, k) => {
-    let inf = '', pl = '';
-    if (type === 'profit') { const p = calc(t); sum += p; inf = `<b class="g">+${fmt(p)}</b>`; pl = 'الربح: ' + fmt(p); }
-    else if (type === 'purchases') { sum += num(t.buyPrice); pl = 'شراء: ' + fmt(num(t.buyPrice)); inf = pl; }
-    else if (type === 'booked') { pl = 'موعد: ' + t.bookingDate; inf = esc(t.bookingDate); }
-    else if (type === 'cancelled') { pl = 'ملغية'; inf = `<button class="mini" data-r="${i}">استرجاع</button>`; }
-    txt += (k + 1) + '- ' + (t.name || '-') + (pl ? ' (' + pl + ')' : '') + '\n';
-    return `<div class="lr"><span class="ln">${k + 1}</span><b>${esc(t.name || '-')}</b><span>${inf}</span></div>`;
-  }).join('') : '<div class="em">لا توجد بيانات مطابقة</div>';
-  if (rows.length && (type === 'profit' || type === 'purchases')) txt += '\nالإجمالي: ' + fmt(sum);
-  if (!rows.length) txt += 'لا توجد بيانات مطابقة';
-  shareTxt = txt;
+  const title=LT[type]+' — '+Y;
+  $('lT').textContent=title;
+  let txt=title+'\n\n';
+  let sum=0;
+  $('lB').innerHTML=rows.length?rows.map(({t,i},k)=>{
+    let inf='',pl='';
+    if(type==='profit'){const p=calc(t);sum+=p;inf=`<b class="g">+${fmt(p)}</b>`;pl='الربح: '+fmt(p);}
+    else if(type==='purchases'){sum+=num(t.buyPrice);pl='شراء: '+fmt(num(t.buyPrice));inf=pl;}
+    else if(type==='booked'){pl='موعد: '+t.bookingDate;inf=esc(t.bookingDate);}
+    else if(type==='cancelled'){pl='ملغية';inf=`<button class="mini" data-r="${i}">استرجاع</button>`;}
+    txt+=(k+1)+'- '+(t.name||'-')+(pl?' ('+pl+')':'')+'\n';
+    return `<div class="lr"><span class="ln">${k+1}</span><b>${esc(t.name||'-')}</b><span>${inf}</span></div>`;
+  }).join(''):'<div class="em">لا توجد بيانات مطابقة</div>';
+  if(rows.length&&(type==='profit'||type==='purchases'))txt+='\nالإجمالي: '+fmt(sum);
+  if(!rows.length)txt+='لا توجد بيانات مطابقة';
+  shareTxt=txt;
   openM('ls');
 }
-$('lB').onclick = e => { const b = e.target.closest('[data-r]'); if (b) restore(+b.dataset.r); };
-$('lS').onclick = () => { hp(30); share(shareTxt, $('lT').textContent); };
+$('lB').onclick=e=>{const b=e.target.closest('[data-r]');if(b)restore(+b.dataset.r);};
+$('lS').onclick=()=>{hp(30);share(shareTxt,$('lT').textContent);};
 
 /* ============ STATS MODAL ============ */
-$('bStat').onclick = () => {
+$('bStat').onclick=()=>{
   closeM('set');
-  const ys = years();
-  let html = '';
-  let gP = 0, gB = 0, gN = 0;
-  ys.forEach(y => {
-    let n = 0, P = 0, B = 0, dn = 0, pe = 0, cn = 0;
-    tx.forEach(t => {
-      if (+t.year !== y) return;
+  const Y=selYear();
+  const ys=years();
+  let html='';
+  // radial for current year
+  let curP=0,curB=0,curN=0,curDone=0,curPend=0,curCanc=0;
+  tx.forEach(t=>{
+    if(+t.year!==Y)return;
+    curN++;
+    if(t.cancelled){curCanc++;return;}
+    curP+=calc(t);curB+=num(t.buyPrice);
+    if(t.done)curDone++;else curPend++;
+  });
+  html+=`<div class="s2">ملخص سنة ${dispNum(Y)}</div>
+    <div class="g2">
+      <div class="ii"><small>صافي الأرباح</small><b style="color:${curP>=0?'var(--ok)':'var(--no)'}">${fmt(curP)}</b></div>
+      <div class="ii"><small>إجمالي المشتريات</small><b>${fmt(curB)}</b></div>
+      <div class="ii"><small>المعاملات</small><b>${dispNum(curN)}</b></div>
+      <div class="ii"><small>منفذة / جارية</small><b>${dispNum(curDone)} / ${dispNum(curPend)}</b></div>
+    </div>`;
+  // heatmap
+  html+=`<div class="s2">خريطة النشاط الشهرية</div>`;
+  const months=Array(12).fill(0);
+  tx.forEach(t=>{
+    if(+t.year!==Y||t.cancelled)return;
+    const m=String(t.date||'').match(/^\d{1,2}\/(\d{1,2})\//);
+    if(m){const i=+m[1]-1;if(i>=0&&i<12)months[i]++;}
+  });
+  const maxM=Math.max(...months,1);
+  html+=`<div class="hm">${months.map(c=>{
+    const lvl=c===0?0:c/maxM<.25?1:c/maxM<.5?2:c/maxM<.75?3:4;
+    return `<div class="hmc l${lvl}" title="${c} معاملة"></div>`;
+  }).join('')}</div>
+  <div class="hmLegend"><span>أقل</span><span class="sw"></span><span class="sw l1"></span><span class="sw l2"></span><span class="sw l3"></span><span class="sw l4"></span><span>أكثر</span></div>`;
+  // per-year
+  let gP=0,gB=0,gN=0;
+  ys.forEach(y=>{
+    let n=0,P=0,B=0,dn=0,pe=0,cn=0;
+    tx.forEach(t=>{
+      if(+t.year!==y)return;
       n++;
-      if (t.cancelled) { cn++; return; }
-      P += calc(t); B += num(t.buyPrice);
-      if (t.done) dn++; else pe++;
+      if(t.cancelled){cn++;return;}
+      P+=calc(t);B+=num(t.buyPrice);
+      if(t.done)dn++;else pe++;
     });
-    gP += P; gB += B; gN += n;
-    html += `<div class="s2">سنة ${y} — ${n} معاملة (${dn} منفذة، ${pe} جارية، ${cn} ملغية)</div>
+    gP+=P;gB+=B;gN+=n;
+    html+=`<div class="s2">سنة ${dispNum(y)} — ${dispNum(n)} معاملة (${dispNum(dn)} منفذة، ${dispNum(pe)} جارية، ${dispNum(cn)} ملغية)</div>
       <div class="g2">
-        <div class="ii"><small>صافي الأرباح</small><b style="color:${P >= 0 ? 'var(--ok)' : 'var(--no)'}">${fmt(P)}</b></div>
+        <div class="ii"><small>صافي الأرباح</small><b style="color:${P>=0?'var(--ok)':'var(--no)'}">${fmt(P)}</b></div>
         <div class="ii"><small>إجمالي المشتريات</small><b>${fmt(B)}</b></div>
       </div>`;
   });
-  html += `<div class="s2">الإجمالي العام</div>
+  html+=`<div class="s2">الإجمالي العام</div>
     <div class="g2">
-      <div class="ii"><small>عدد المعاملات</small><b>${gN}</b></div>
-      <div class="ii"><small>صافي الأرباح</small><b style="color:${gP >= 0 ? 'var(--ok)' : 'var(--no)'}">${fmt(gP)}</b></div>
+      <div class="ii"><small>عدد المعاملات</small><b>${dispNum(gN)}</b></div>
+      <div class="ii"><small>صافي الأرباح</small><b style="color:${gP>=0?'var(--ok)':'var(--no)'}">${fmt(gP)}</b></div>
       <div class="ii"><small>إجمالي المشتريات</small><b>${fmt(gB)}</b></div>
-      <div class="ii"><small>عدد السنوات</small><b>${ys.length}</b></div>
-      <div class="ii"><small>النسخ المحفوظة</small><b>${snaps.length}</b></div>
+      <div class="ii"><small>عدد السنوات</small><b>${dispNum(ys.length)}</b></div>
+      <div class="ii"><small>النسخ المحفوظة</small><b>${dispNum(snaps.length)}</b></div>
     </div>`;
-  $('stB').innerHTML = html;
+  $('stB').innerHTML=html;
   openM('stt');
 };
 
-/* ============ HEADER BUTTONS ============ */
-$('bPv').onclick = () => {
-  const on = $('list').classList.toggle('pv');
-  $('bPv').innerHTML = ic(on ? 'eyeoff' : 'eye');
-  toast(on ? 'تم إخفاء البيانات' : 'تم إظهار البيانات', 'i');
+/* ============ HEADER / SPEED DIAL ============ */
+$('bPv').onclick=()=>{
+  const on=$('list').classList.toggle('pv');
+  $('bPv').innerHTML=ic(on?'eyeoff':'eye');
+  toast(on?'تم إخفاء البيانات':'تم إظهار البيانات','i');
 };
-$('bSet').onclick = () => openM('set');
+$('bSet').onclick=()=>{$('setGoal').value=S.goal||'';openM('set');};
+$('bView').onclick=toggleView;
+function toggleView(){
+  S.view=S.view==='list'?'timeline':'list';
+  saveS();
+  $('bView').innerHTML=ic(S.view==='list'?'list':'activity');
+  render();
+  toast(S.view==='timeline'?'عرض الخط الزمني':'عرض القائمة','i');
+}
+$('sdChev').onclick=e=>{
+  e.stopPropagation();
+  $('sd').classList.toggle('open');
+};
+$('sdView').onclick=()=>{$('sd').classList.remove('open');toggleView();};
+$('sdStat').onclick=()=>{$('sd').classList.remove('open');$('bStat').click();};
+$('sdBook').onclick=()=>{$('sd').classList.remove('open');toast('اختر معاملة لحجز موعد','i');};
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#sd'))$('sd').classList.remove('open');
+});
 
 /* ============ SNAPSHOT BUTTONS ============ */
-$('bSnapNew').onclick = () => {
-  inputBox('حفظ نسخة', 'أدخل اسماً للنسخة (اختياري)', 'نسخة ' + new Date().toLocaleString('en-GB'), val => {
-    const name = (val || '').trim() || ('نسخة ' + new Date().toLocaleString('en-GB'));
-    const s = createSnapshot(name, false);
-    if (s) toast('تم حفظ النسخة (' + s.tx.length + ' معاملة)');
+$('bSnapNew').onclick=()=>{
+  inputBox('حفظ نسخة','أدخل اسماً للنسخة (اختياري)','نسخة '+new Date().toLocaleString('en-GB'),val=>{
+    const name=(val||'').trim()||('نسخة '+new Date().toLocaleString('en-GB'));
+    const s=createSnapshot(name,false);
+    if(s)toast('تم حفظ النسخة ('+s.tx.length+' معاملة)');
+    else toast('تعذر حفظ النسخة، الذاكرة ممتلئة','e');
   });
 };
-$('bSnapView').onclick = () => { renderSnaps(); openM('snaps'); };
-$('bYrMg').onclick = () => { renderYrMg(); openM('yrMg'); };
+$('bSnapView').onclick=()=>{renderSnaps();openM('snaps');};
+$('bYrMg').onclick=()=>{renderYrMg();openM('yrMg');};
+$('bKbd').onclick=()=>{closeM('set');openM('kbdm');};
 
 /* ============ EXPORT / IMPORT ============ */
-$('bEx').onclick = () => {
-  if (typeof XLSX === 'undefined') { toast('مكتبة Excel غير متاحة', 'e'); return; }
-  try {
-    const wb = XLSX.utils.book_new();
-    const data = tx.map(t => Object.assign({}, t, { year: t.year || '' }));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'Transactions');
-    XLSX.writeFile(wb, 'Transactions_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+$('bEx').onclick=()=>{
+  if(typeof XLSX==='undefined'){toast('مكتبة Excel غير متاحة','e');return;}
+  try{
+    const wb=XLSX.utils.book_new();
+    const data=tx.map(t=>Object.assign({},t,{year:t.year||''}));
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(data),'Transactions');
+    XLSX.writeFile(wb,'Transactions_'+new Date().toISOString().slice(0,10)+'.xlsx');
     toast('تم تصدير الملف');
-  } catch(e) { toast('تعذر التصدير', 'e'); }
+  }catch(e){toast('تعذر التصدير','e');}
 };
-$('bIm').onclick = () => $('fi').click();
-$('fi').onchange = e => {
-  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  if (typeof XLSX === 'undefined') { toast('مكتبة Excel غير متاحة', 'e'); return; }
-  const r = new FileReader();
-  r.onload = ev => {
-    try {
-      const wb = XLSX.read(new Uint8Array(ev.target.result), { type: 'array' });
-      const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-      if (!rows.length) throw 0;
-      const bo = v => v === true || v === 1 || /^(true|1)$/i.test(String(v));
-      const data = rows.map(o => ({
-        name: o.name || '', phone: o.phone || '', account: o.account || '',
-        nationalId: o.nationalId || '', passport: o.passport || '', iban: o.iban || '',
-        buyPrice: o.buyPrice || '', chargePrice: o.chargePrice || '', sellPrice: o.sellPrice || '',
-        discount: o.discount || '0', notes: o.notes || '',
-        year: parseInt(o.year, 10) || curYear,
-        date: o.date || new Date().toLocaleDateString('en-GB'),
-        done: bo(o.done), cancelled: bo(o.cancelled), isHalf: bo(o.isHalf),
-        bookingDate: o.bookingDate || '', rowColor: o.rowColor || '#ffffff'
+$('bIm').onclick=()=>$('fi').click();
+$('fi').onchange=e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  if(typeof XLSX==='undefined'){toast('مكتبة Excel غير متاحة','e');return;}
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+      if(!rows.length)throw 0;
+      const bo=v=>v===true||v===1||/^(true|1)$/i.test(String(v));
+      const data=rows.map(o=>({
+        id:uid(),name:o.name||'',phone:o.phone||'',account:o.account||'',
+        nationalId:o.nationalId||'',passport:o.passport||'',iban:o.iban||'',
+        buyPrice:o.buyPrice||'',chargePrice:o.chargePrice||'',sellPrice:o.sellPrice||'',
+        discount:o.discount||'0',notes:o.notes||'',
+        year:parseInt(o.year,10)||curYear,
+        date:o.date||new Date().toLocaleDateString('en-GB'),
+        done:bo(o.done),cancelled:bo(o.cancelled),isHalf:bo(o.isHalf),
+        bookingDate:o.bookingDate||'',rowColor:o.rowColor||'#ffffff',payments:[]
       }));
+      data.forEach(t=>t.clientId=nextClientId(t.year));
       closeM('set');
-      ask('استيراد نسخة', 'سيتم استبدال البيانات الحالية بـ ' + data.length + ' معاملة من الملف. سيتم حفظ نسخة تلقائية من الحالة الحالية.', 'استيراد', () => {
-        createSnapshot('قبل استيراد Excel', true);
-        tx = data; save(); render(); toast('تم استيراد البيانات');
-      }, 0);
-    } catch(x) { toast('الملف غير صالح', 'e'); }
+      ask('استيراد نسخة','سيتم استبدال البيانات الحالية بـ '+data.length+' معاملة من الملف. سيتم حفظ نسخة تلقائية أولاً.','استيراد',()=>{
+        createSnapshot('قبل استيراد Excel',true);
+        tx=data;S.year=null;saveS();save();render();toast('تم استيراد البيانات');
+      },0);
+    }catch(x){toast('الملف غير صالح','e');}
   };
   r.readAsArrayBuffer(f);
 };
 
-$('bExJ').onclick = () => {
-  try {
-    const payload = { v: 2, exported: new Date().toISOString(), extraYears: S.extraYears, tx: tx, snaps: snaps.slice(0, 20) };
-    const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'backup_' + new Date().toISOString().slice(0, 10) + '.json';
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+$('bExJ').onclick=()=>{
+  try{
+    const payload={v:2,exported:new Date().toISOString(),extraYears:S.extraYears,tx:tx,snaps:snaps.slice(0,20)};
+    const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='backup_'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1500);
     toast('تم تصدير النسخة الاحتياطية');
-  } catch(e) { toast('تعذر التصدير', 'e'); }
+  }catch(e){toast('تعذر التصدير','e');}
 };
-$('bImJ').onclick = () => $('fj').click();
-$('fj').onchange = e => {
-  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-  const r = new FileReader();
-  r.onload = ev => {
-    try {
-      const o = JSON.parse(ev.target.result);
-      const data = Array.isArray(o) ? o : o.tx;
-      if (!Array.isArray(data) || !data.length) throw 0;
-      const extra = Array.isArray(o.extraYears) ? o.extraYears : [];
-      const importedSnaps = Array.isArray(o.snaps) ? o.snaps.filter(s => s && Array.isArray(s.tx)) : [];
-      data.forEach(t => {
-        if (!t.year) { const m = String(t.date || '').match(/(\d{4})/); t.year = m ? +m[1] : curYear; }
-        if (typeof t.notes !== 'string') t.notes = '';
-        if (typeof t.rowColor !== 'string') t.rowColor = '#ffffff';
+$('bImJ').onclick=()=>$('fj').click();
+$('fj').onchange=e=>{
+  const f=e.target.files[0];e.target.value='';if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const o=JSON.parse(ev.target.result);
+      const data=Array.isArray(o)?o:o.tx;
+      if(!Array.isArray(data)||!data.length)throw 0;
+      const extra=Array.isArray(o.extraYears)?o.extraYears:[];
+      const importedSnaps=Array.isArray(o.snaps)?o.snaps.filter(s=>s&&Array.isArray(s.tx)):[];
+      data.forEach(t=>{
+        if(!t.id)t.id=uid();
+        if(!t.year){const m=String(t.date||'').match(/(\d{4})/);t.year=m?+m[1]:curYear;}
+        if(typeof t.notes!=='string')t.notes='';
+        if(typeof t.rowColor!=='string')t.rowColor='#ffffff';
+        if(!t.clientId)t.clientId=nextClientId(t.year);
+        if(!Array.isArray(t.payments))t.payments=[];
       });
       closeM('set');
-      ask('استيراد نسخة احتياطية', 'سيتم استبدال البيانات الحالية بـ ' + data.length + ' معاملة' + (importedSnaps.length ? ' و' + importedSnaps.length + ' نسخة محفوظة.' : '.'), 'استيراد', () => {
-        createSnapshot('قبل استيراد JSON', true);
-        tx = data;
-        S.extraYears = extra;
-        S.year = null;
-        if (importedSnaps.length) {
-          snaps = importedSnaps.concat(snaps).slice(0, 15);
-          saveSnaps();
-        }
-        saveS(); save(); render(); updateSnapCount();
-        toast('تم استيراد النسخة الاحتياطية');
-      }, 0);
-    } catch(x) { toast('الملف غير صالح', 'e'); }
+      ask('استيراد نسخة احتياطية','سيتم استبدال البيانات الحالية بـ '+data.length+' معاملة'+(importedSnaps.length?' و'+importedSnaps.length+' نسخة محفوظة.':'.'),'استيراد',()=>{
+        createSnapshot('قبل استيراد JSON',true);
+        tx=data;S.extraYears=extra;S.year=null;
+        if(importedSnaps.length){snaps=importedSnaps.concat(snaps).slice(0,15);saveSnaps();}
+        saveS();save();render();updateSnapCount();toast('تم استيراد النسخة الاحتياطية');
+      },0);
+    }catch(x){toast('الملف غير صالح','e');}
   };
   r.readAsText(f);
 };
 
-$('bWipe').onclick = () => {
-  ask('حذف كل البيانات', 'سيتم حذف جميع المعاملات والسنوات نهائياً. سيتم حفظ نسخة تلقائية قبل الحذف.', 'نعم، احذف الكل', () => {
-    const snap = createSnapshot('قبل حذف كل البيانات', true);
-    tx = [];
-    S.extraYears = [];
-    S.year = null;
-    save(); saveS(); closeM('set'); render();
-    toastAct('تم حذف كل البيانات', 'تراجع', () => {
-      if (!snap) return;
-      tx = JSON.parse(JSON.stringify(snap.tx));
-      S.extraYears = snap.extraYears.slice();
-      if (snap.year) S.year = snap.year;
-      save(); saveS(); render();
-      toast('تم استرجاع البيانات');
-    });
+$('bWipe').onclick=()=>{
+  ask('حذف كل البيانات','سيتم حذف جميع المعاملات والسنوات نهائياً. سيتم حفظ نسخة تلقائية قبل الحذف.','نعم، احذف الكل',()=>{
+    const snap=createSnapshot('قبل حذف كل البيانات',true);
+    if(!snap){ask('تحذير','تعذّر إنشاء نسخة احتياطية. هل تريد المتابعة على أي حال؟','متابعة',()=>doWipe(null),1);return;}
+    doWipe(snap);
   });
 };
+function doWipe(snap){
+  tx=[];S.extraYears=[];S.year=null;S.recent=[];
+  save();saveS();closeM('set');render();
+  toastAct('تم حذف كل البيانات','تراجع',()=>{
+    if(!snap)return;
+    tx=JSON.parse(JSON.stringify(snap.tx));
+    S.extraYears=snap.extraYears.slice();
+    if(snap.year)S.year=snap.year;
+    save();saveS();render();toast('تم استرجاع البيانات');
+  });
+}
 
 /* ============ GLOBAL EVENTS ============ */
-document.addEventListener('click', e => {
-  const x = e.target.closest('[data-x]');
-  if (x) {
-    if (x.dataset.x === 'form') { closeFormSafe(false); }
+document.addEventListener('click',e=>{
+  const x=e.target.closest('[data-x]');
+  if(x){
+    if(x.dataset.x==='form')closeFormSafe(false);
     else closeM(x.dataset.x);
   }
-  const l = e.target.closest('[data-l]');
-  if (l) showList(l.dataset.l);
-  const p = e.target.closest('[data-cp]');
-  if (p) copy(p.dataset.cp);
-  if (e.target.classList.contains('bg')) {
-    if (e.target.id === 'form') { closeFormSafe(false); }
+  const l=e.target.closest('[data-l]');
+  if(l)showList(l.dataset.l);
+  const p=e.target.closest('[data-cp]');
+  if(p)copy(p.dataset.cp);
+  if(e.target.classList.contains('bg')){
+    if(e.target.id==='form')closeFormSafe(false);
     else e.target.classList.remove('on');
   }
 });
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    const openForm = document.getElementById('form').classList.contains('on');
-    if (openForm) { closeFormSafe(false); return; }
-    document.querySelectorAll('.bg.on').forEach(b => b.classList.remove('on'));
+document.addEventListener('keydown',e=>{
+  const inField=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
+  if(e.key==='Escape'){
+    const focusOpen=$('focus').classList.contains('on');
+    if(focusOpen){closeFocus();return;}
+    const openForm=document.getElementById('form').classList.contains('on');
+    if(openForm){closeFormSafe(false);return;}
+    document.querySelectorAll('.bg.on').forEach(b=>b.classList.remove('on'));
+    closeCtx();
+    return;
+  }
+  if(inField)return;
+  if(e.key==='n'||e.key==='N'){e.preventDefault();form();}
+  else if(e.key==='/'){e.preventDefault();$('q').focus();}
+  else if(e.key==='v'||e.key==='V'){toggleView();}
+  else if(e.key==='p'||e.key==='P'){$('pEye').click();}
+  else if(e.key===','&&(e.ctrlKey||e.metaKey)){e.preventDefault();openM('set');}
+  else if(e.key==='d'&&(e.ctrlKey||e.metaKey)){e.preventDefault();th.m=th.m==='dark'?'light':'dark';applyTheme();}
+  else if(e.key==='s'&&(e.ctrlKey||e.metaKey)){
+    e.preventDefault();
+    if($('form').classList.contains('on'))$('fSave').click();
+    else if($('det').classList.contains('on'))$('dSave').click();
   }
 });
 
-/* ============ BOOKING REMINDERS ============ */
-function checkN() {
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const tm = new Date(today); tm.setDate(today.getDate() + 1);
-  let overdue = 0;
-  tx.forEach(t => {
-    if (!t.bookingDate || t.done || t.cancelled) return;
-    const b = new Date(t.bookingDate + 'T00:00:00');
-    if (isNaN(b.getTime())) return;
-    b.setHours(0, 0, 0, 0);
-    if (b.getTime() === tm.getTime()) setTimeout(() => toast('تنبيه: حجز ' + (t.name || '') + ' غداً!', 'i'), 700);
-    else if (b.getTime() < today.getTime()) overdue++;
+/* ============ BOOKING REMINDERS + BADGE ============ */
+function checkN(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const tm=new Date(today);tm.setDate(today.getDate()+1);
+  let overdue=0,bookingToday=0;
+  tx.forEach(t=>{
+    if(!t.bookingDate||t.done||t.cancelled)return;
+    const b=new Date(t.bookingDate+'T00:00:00');
+    if(isNaN(b.getTime()))return;
+    b.setHours(0,0,0,0);
+    if(b.getTime()===tm.getTime())setTimeout(()=>toast('تنبيه: حجز '+(t.name||'')+' غداً!','i'),700);
+    else if(b.getTime()===today.getTime())bookingToday++;
+    else if(b.getTime()<today.getTime())overdue++;
   });
-  if (overdue) setTimeout(() => toast('لديك ' + overdue + ' حجز متأخر', 'i'), 1400);
+  const badge=overdue+bookingToday;
+  try{
+    if(navigator.setAppBadge){
+      if(badge>0)navigator.setAppBadge(badge).catch(()=>{});
+      else navigator.clearAppBadge().catch(()=>{});
+    }
+  }catch(e){}
+  if(overdue)setTimeout(()=>toast('لديك '+overdue+' حجز متأخر','i'),1400);
 }
 
 /* ============ BOOT ============ */
-(function boot() {
-  $('so').value = S.sortBy || 'none';
-  [...$('fl').children].forEach(b => b.classList.toggle('on', b.dataset.f === (S.flt || 'all')));
+(function boot(){
+  $('so').value=S.sortBy||'none';
+  [...$('fl').children].forEach(b=>b.classList.toggle('on',b.dataset.f===(S.flt||'all')));
+  $('bView').innerHTML=ic(S.view==='list'?'list':'activity');
   applyProfitUI();
   applyTheme();
   updateSnapCount();
-  render();
-  checkN();
+  // skeleton first
+  $('list').innerHTML=skeleton();
+  renderYears();
+  setTimeout(()=>{
+    render();
+    checkN();
+  },180);
 })();
 </script>
 </body>
