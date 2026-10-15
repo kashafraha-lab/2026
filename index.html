@@ -53,22 +53,24 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .sm{background:var(--cd);border:1px solid var(--bd);border-radius:24px;overflow:hidden;margin:2px 0 14px}
 .pfw{position:relative;display:flex;align-items:flex-start;gap:14px;padding:18px 20px}
 .pf{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
-.pf-lbl{color:var(--sub);font-size:12.5px}
+.pf-head{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.eye-mini{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:var(--sub);background:transparent;transition:.15s;flex:none}
+.eye-mini:hover{background:var(--bg);color:var(--ac)}
+.pf-lbl{color:var(--sub);font-size:12.5px;font-weight:500}
 .pf strong{font-size:34px;line-height:1.15;font-weight:700;letter-spacing:-1px;color:var(--ac);transition:.2s}
 .pf strong.neg{color:var(--no)}
 .pf strong.hid{color:var(--sub);letter-spacing:3px;font-size:28px}
-.pf-sub{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--bd);font-size:12.5px}
+.pf-sub{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--bd);font-size:12.5px}
 .pf-sub span{color:var(--sub)}
-.pf-sub b{color:var(--ac);font-weight:600;font-size:14px}
-.pf-sub b.hid{color:var(--sub);letter-spacing:2px;font-size:12.5px}
+.pf-sub b{color:var(--ac);font-weight:600;font-size:15px;transition:.2s}
+.pf-sub b.hid{color:var(--sub);letter-spacing:2px;font-size:13px}
 .pf-sub b.neg{color:var(--no)}
 .pf-note{color:var(--sub);font-size:11.5px;margin-top:6px}
-.rad{position:relative;width:78px;height:78px;flex:none}
+.rad{position:relative;width:78px;height:78px;flex:none;margin-top:4px}
 .rad svg{transform:rotate(-90deg)}
 .rad .rt{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
 .rad .rt b{display:block;font-size:15px;font-weight:700;color:var(--ac);line-height:1}
 .rad .rt small{font-size:9px;color:var(--sub)}
-.eye-mini{position:absolute;top:-10px;inset-inline-end:-8px;width:30px;height:30px;border-radius:50%;background:var(--cd);border:1px solid var(--bd);display:grid;place-items:center;color:var(--sub);z-index:3;box-shadow:0 3px 10px rgba(0,0,0,.1);transition:transform .12s}
 
 .gr3{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--bd)}
 .gr3 button{padding:12px 2px;display:grid;justify-items:center;gap:1px}
@@ -97,7 +99,7 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .nm{flex:1;min-width:0;cursor:pointer}.nm b{display:block;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nm small{display:flex;gap:10px;flex-wrap:wrap}
 .nm small i{color:var(--sub);font-size:11px;display:inline-flex;align-items:center;gap:3px}
-.ia{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--sub);flex:none;transition:transform .12s}.ia.d{color:var(--no)}
+.ia{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--sub);flex:none;transition:transform .12s}
 .more-btn{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--sub);flex:none;transition:transform .12s,background .15s}
 .more-btn:active{transform:scale(.92);background:var(--bg)}
 .chev{transition:transform .3s}
@@ -245,16 +247,18 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <section class="sm">
 <div class="pfw">
   <div class="pf">
-    <span class="pf-lbl">صافي الأرباح</span>
+    <div class="pf-head">
+      <button class="eye-mini" id="pEye" aria-label="إظهار/إخفاء الأرباح"><i data-ic="eyeoff" data-s="15"></i></button>
+      <span class="pf-lbl">صافي الأرباح</span>
+    </div>
     <strong id="sP">•••••</strong>
     <div class="pf-sub">
-      <span>بدون سعر الشراء</span>
+      <span>بدون شراء العملاء المنفذين</span>
       <b id="sP2">•••••</b>
     </div>
     <span id="hE" class="pf-note"></span>
   </div>
   <div class="rad">
-    <button class="eye-mini" id="pEye" aria-label="إظهار/إخفاء الأرباح"><i data-ic="eyeoff" data-s="15"></i></button>
     <svg width="78" height="78" viewBox="0 0 78 78">
       <circle cx="39" cy="39" r="32" fill="none" stroke="var(--bd)" stroke-width="7"/>
       <circle id="radArc" cx="39" cy="39" r="32" fill="none" stroke="var(--ac)" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 999"/>
@@ -647,6 +651,7 @@ const calc=t=>{
   const f=s-s*d/100;
   return t.isHalf?(f-c)/2:f-c-b;
 };
+/* بدون سعر الشراء — يُستخدم للعملاء المنفذين فقط */
 const calcNoBuy=t=>{
   const c=num(t.chargePrice),s=num(t.sellPrice),d=num(t.discount);
   const f=s-s*d/100;
@@ -669,9 +674,7 @@ const isToday=s=>{
 const smartColor=t=>{
   if(/^#[0-9a-f]{6}$/i.test(t.rowColor||'')&&t.rowColor.toLowerCase()!=='#ffffff')return t.rowColor;
   if(t.cancelled)return 'var(--sub)';
-  if(t.done){
-    return calc(t)>=0?'var(--ok)':'var(--no)';
-  }
+  if(t.done)return calc(t)>=0?'var(--ok)':'var(--no)';
   return 'var(--ac)';
 };
 
@@ -852,9 +855,15 @@ function stats(){
     n++;
     if(t.cancelled){cn++;return;}
     P+=calc(t);
-    P2+=calcNoBuy(t);
     B+=num(t.buyPrice);
-    if(t.done)dn++;else{pe++;if(t.bookingDate)bk++;}
+    if(t.done){
+      dn++;
+      /* بدون شراء — يُحسب للعملاء المنفذين فقط */
+      P2+=calcNoBuy(t);
+    }else{
+      pe++;
+      if(t.bookingDate)bk++;
+    }
   });
   const el=$('sP');
   el.textContent=S.hideProfit?'•••••':fmt(P);
@@ -881,7 +890,6 @@ function stats(){
 
 /* ============ STAGES ============ */
 function stages(t){
-  // للمعاملة بالنصف: أظهر شحن + بيع فقط، بدون شراء
   if(t.isHalf){
     const hasCharge=num(t.chargePrice)>0;
     const hasSell=num(t.sellPrice)>0||t.done;
@@ -895,7 +903,6 @@ function stages(t){
       <div class="stage ${s2}"><span class="dot">${i2}</span>بيع</div>
     </div>`;
   }
-  // معاملة عادية: 3 مراحل
   const hasBuy=num(t.buyPrice)>0;
   const hasCharge=num(t.chargePrice)>0;
   const hasSell=num(t.sellPrice)>0||t.done;
@@ -932,7 +939,7 @@ function ring(t){
 }
 
 /* ============ CARD ============ */
-function card(r,n,manual){
+function card(r,n){
   const t=r.t,i=r.i;
   const c=!!t.cancelled;
   const rc=smartColor(t);
@@ -1035,7 +1042,7 @@ function render(){
         <path d="M150 138v24M138 150h24" stroke="var(--ac)" stroke-width="4" stroke-linecap="round"/>
       </svg>
       <h3>${hasAny?'لا توجد نتائج مطابقة':'ابدأ بإضافة معاملتك الأولى'}</h3>
-      <p>${hasAny?'جرّب تعديل البحث أو الفلاتر':'سيظهر هنا كل عملائك، مع تتبع الأرباح والحجوزات'}</p>
+      <p>${hasAny?'جرّب تعديل البحث أو الفلاتر':'سيظهر هنا كل عملاؤك، مع تتبع الأرباح والحجوزات'}</p>
       ${!hasAny?'<div class="emActs"><button class="btn pr" id="emAdd" style="max-width:220px">'+ic('plus')+'إضافة معاملة</button></div>':''}
     </div>`;
   }
@@ -1088,7 +1095,7 @@ function applyProfitUI(){$('pEye').innerHTML=ic(S.hideProfit?'eyeoff':'eye',15);
 $('pEye').onclick=e=>{
   e.stopPropagation();
   S.hideProfit=!S.hideProfit;saveS();applyProfitUI();stats();render();hp(10);
-  toast(S.hideProfit?'تم إخفاء صافي الأرباح':'تم إظهار صافي الأرباح','i');
+  toast(S.hideProfit?'تم إخفاء الأرباح':'تم إظهار الأرباح','i');
 };
 
 /* ============ FOLD ============ */
@@ -1327,9 +1334,7 @@ function openMore(i){
     ['copy','copy','نسخ المعاملة'],
     ['move','move','نقل في القائمة']
   ];
-  if(t.cancelled){
-    items.unshift(['restore','undo','إعادة تفعيل المعاملة']);
-  }
+  if(t.cancelled)items.unshift(['restore','undo','إعادة تفعيل المعاملة']);
   items.push(['delete','trash','حذف نهائي',true]);
   $('moreItems').innerHTML=items.map(([a,icn,lbl,dg])=>
     `<button class="moreItem${dg?' dg':''}" data-mi="${a}">${ic(icn,20)}${lbl}</button>`
@@ -1447,31 +1452,25 @@ $('list').onclick=e=>{
   else if(act==='book')book(i);
   else if(act==='fold')toggleFold(i);
   else if(act==='sale'){
-    if(tx[i].done){
-      tx[i].done=false;save();render();toast('تم التراجع عن البيع','i');
-    }else sale(i);
+    if(tx[i].done){tx[i].done=false;save();render();toast('تم التراجع عن البيع','i');}
+    else sale(i);
   }
 };
 
-/* ============ LONG PRESS TO MOVE ============ */
-let lpTimer=null,lpCard=null,lpStart=null,lpFired=false;
+/* ============ LONG PRESS ============ */
+let lpTimer=null,lpCard=null,lpStart=null;
 $('list').addEventListener('touchstart',e=>{
   const card=e.target.closest('.c');
   if(!card||e.target.closest('button'))return;
   if(SO[S.sortBy])return;
   lpCard=card;
-  lpFired=false;
   lpStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
   clearTimeout(lpTimer);
   lpTimer=setTimeout(()=>{
     if(!lpCard)return;
-    lpFired=true;
     const id=lpCard.dataset.id;
     const i=tx.findIndex(t=>t.id===id);
-    if(i>=0){
-      hp([15,30,15]);
-      openMove(i);
-    }
+    if(i>=0){hp([15,30,15]);openMove(i);}
     lpCard=null;
   },550);
 },{passive:true});
@@ -1479,18 +1478,10 @@ $('list').addEventListener('touchmove',e=>{
   if(!lpStart)return;
   const dx=Math.abs(e.touches[0].clientX-lpStart.x);
   const dy=Math.abs(e.touches[0].clientY-lpStart.y);
-  if(dx>8||dy>8){
-    clearTimeout(lpTimer);lpTimer=null;lpCard=null;lpStart=null;
-  }
+  if(dx>8||dy>8){clearTimeout(lpTimer);lpTimer=null;lpCard=null;lpStart=null;}
 },{passive:true});
-$('list').addEventListener('touchend',()=>{
-  clearTimeout(lpTimer);lpTimer=null;
-  // إذا لم يُفعّل الوضع المطول، اترك الحدث العادي يعمل
-  lpCard=null;lpStart=null;
-});
-$('list').addEventListener('touchcancel',()=>{
-  clearTimeout(lpTimer);lpTimer=null;lpCard=null;lpStart=null;
-});
+$('list').addEventListener('touchend',()=>{clearTimeout(lpTimer);lpTimer=null;lpCard=null;lpStart=null;});
+$('list').addEventListener('touchcancel',()=>{clearTimeout(lpTimer);lpTimer=null;lpCard=null;lpStart=null;});
 
 /* ============ SUMMARY LISTS ============ */
 const LT={profit:'قائمة الأرباح',purchases:'قائمة المشتريات',pending:'المعاملات الجارية',done:'المعاملات المنفذة',cancelled:'المعاملات الملغية',booked:'قائمة الحجوزات'};
@@ -1661,10 +1652,6 @@ $('fi').onchange=e=>{
 $('bWipe').onclick=()=>{
   ask('حذف كل البيانات','سيتم حذف جميع المعاملات والسنوات نهائياً. سيتم حفظ نسخة تلقائية قبل الحذف.','نعم، احذف الكل',()=>{
     const snap=createSnapshot('قبل حذف كل البيانات',true);
-    if(!snap){
-      ask('تحذير','تعذّر إنشاء نسخة احتياطية. هل تريد المتابعة على أي حال؟','متابعة',()=>doWipe(null),1);
-      return;
-    }
     doWipe(snap);
   });
 };
