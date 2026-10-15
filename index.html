@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>إدارة المعاملات</title>
 <meta name="theme-color" content="#f2f3f8">
 <meta name="mobile-web-app-capable" content="yes">
@@ -114,7 +114,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .sws{display:flex;gap:10px;flex-wrap:wrap}.sws button,.sws label{width:36px;height:36px;border-radius:50%;border:3px solid var(--cd);box-shadow:0 0 0 2px var(--bd);position:relative;overflow:hidden}
 .sws button.on{box-shadow:0 0 0 2px var(--tx)}
 .sws label{background:conic-gradient(red,yellow,lime,aqua,blue,magenta,red)}.sws input{opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
-#pk{position:fixed;opacity:0;pointer-events:none;width:0;height:0}
+#pk{position:fixed;top:-200px;left:-200px;width:1px;height:1px;opacity:0;border:0;padding:0}
 #ts{position:fixed;top:calc(env(safe-area-inset-top) + 12px);left:0;right:0;z-index:99;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
 .toast{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:99px;background:rgba(18,20,43,.92);color:#fff;font-size:13px;transition:opacity .4s;animation:up .3s;pointer-events:auto;max-width:92vw}
 .toast.s svg{color:#34d399}.toast.e svg{color:#fb7185}.toast.i svg{color:#7dd3fc}
@@ -418,6 +418,24 @@ $('sw').onclick = e => { const b = e.target.closest('button'); if (b) { th.a = b
 $('sw').addEventListener('input', e => { if (e.target.id === 'cc') { th.a = e.target.value; applyTheme(); } });
 try { matchMedia('(prefers-color-scheme:dark)').addEventListener('change', applyTheme); } catch(e){}
 
+/* ============ PWA MANIFEST (runtime) ============ */
+(function attachManifest(){
+  try {
+    const icon = document.querySelector('link[rel="apple-touch-icon"]').href;
+    const mf = {
+      name: 'إدارة المعاملات', short_name: 'المعاملات', start_url: '.',
+      display: 'standalone', orientation: 'portrait',
+      background_color: '#f2f3f8', theme_color: '#5b4bff',
+      dir: 'rtl', lang: 'ar',
+      icons: [{ src: icon, sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' }]
+    };
+    const link = document.createElement('link');
+    link.rel = 'manifest';
+    link.href = 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(JSON.stringify(mf));
+    document.head.appendChild(link);
+  } catch(e){}
+})();
+
 /* ============ DATA ============ */
 let tx = [];
 try { const raw = JSON.parse(localStorage.getItem(KEY) || '[]'); if (Array.isArray(raw)) tx = raw; } catch(e){}
@@ -444,6 +462,14 @@ const calc = t => {
   return t.isHalf ? (f - c) / 2 : f - c - b;
 };
 
+const isOverdue = s => {
+  if (!s) return false;
+  const d = new Date(s + 'T00:00:00');
+  if (isNaN(d.getTime())) return false;
+  const t = new Date(); t.setHours(0,0,0,0);
+  return d.getTime() < t.getTime();
+};
+
 /* ============ SNAPSHOTS ============ */
 let snaps = [];
 try { const raw = JSON.parse(localStorage.getItem(SNAPK) || '[]'); if (Array.isArray(raw)) snaps = raw; } catch(e){}
@@ -454,7 +480,8 @@ function saveSnaps() {
   catch(e) { return false; }
 }
 function trimSnaps() {
-  while (snaps.length > 25) {
+  const MAX = 15;
+  while (snaps.length > MAX) {
     let removed = false;
     for (let i = snaps.length - 1; i >= 0; i--) {
       if (snaps[i].auto) { snaps.splice(i, 1); removed = true; break; }
@@ -474,18 +501,20 @@ function createSnapshot(name, auto) {
   };
   snaps.unshift(s);
   trimSnaps();
-  if (!saveSnaps()) {
-    // rollback and try again by trimming more
-    snaps.shift();
-    trimSnaps();
-    if (!saveSnaps()) {
-      // last resort: drop oldest snapshots
-      while (snaps.length > 3 && !saveSnaps()) snaps.pop();
-      if (!saveSnaps()) { toast('تعذر إنشاء نسخة، احذف نسخاً قديمة', 'e'); return null; }
-    }
-  }
+  if (saveSnaps()) { updateSnapCount(); return s; }
+  // rollback one step
+  snaps.shift();
+  trimSnaps();
+  if (saveSnaps()) { updateSnapCount(); return s; }
+  // aggressive: keep only 3 latest (memory + storage stay in sync)
+  while (snaps.length > 3) snaps.pop();
+  if (saveSnaps()) { updateSnapCount(); return s; }
+  // last resort: clear all snapshots and report
+  snaps = [];
+  try { localStorage.removeItem(SNAPK); } catch(e){}
   updateSnapCount();
-  return s;
+  toast('تعذر إنشاء نسخة، الذاكرة ممتلئة', 'e');
+  return null;
 }
 function updateSnapCount() { $('snapCount').textContent = snaps.length; }
 
@@ -496,7 +525,6 @@ function restoreSnapshot(id) {
   ask('استعادة النسخة',
     `سيتم استبدال البيانات الحالية (${curCount} معاملة) ببيانات هذه النسخة (${s.tx.length} معاملة). سيتم حفظ نسخة تلقائية من الحالة الحالية قبل الاستعادة.`,
     'استعادة', () => {
-      // auto snapshot current state
       createSnapshot('قبل استعادة: ' + s.name, true);
       tx = JSON.parse(JSON.stringify(s.tx));
       S.extraYears = Array.isArray(s.extraYears) ? s.extraYears.slice() : [];
@@ -582,7 +610,6 @@ function deleteYear(y) {
     : `سيتم حذف سنة ${y} الفارغة من القائمة.`;
   ask('حذف سنة ' + y, msg, 'حذف', () => {
     const snap = createSnapshot('قبل حذف سنة ' + y, true);
-    const removedTx = tx.filter(t => +t.year === y);
     tx = tx.filter(t => +t.year !== y);
     S.extraYears = S.extraYears.filter(x => +x !== y);
     if (+S.year === +y) S.year = null;
@@ -705,10 +732,13 @@ function card(r, n, manual) {
     : `<span class="pill wn">${ic('clock',13)}جاري البيع</span>`;
   let m = '';
   if (t.done || num(t.sellPrice) > 0) { const p = calc(t); m += `<span class="tag ${p >= 0 ? 'g' : 'r'}">ربح ${fmt(p)}</span>`; }
-  if (num(t.buyPrice) > 0) m += `<span class="tag">شراء ${fmt(num(t.buyPrice))}</span>`;
+  if (!t.isHalf && num(t.buyPrice) > 0) m += `<span class="tag">شراء ${fmt(num(t.buyPrice))}</span>`;
   if (num(t.chargePrice) > 0) m += `<span class="tag">شحن ${fmt(num(t.chargePrice))}</span>`;
   if (t.isHalf) m += '<span class="tag">بالنصف</span>';
-  if (t.bookingDate && !t.done) m += `<span class="tag">${ic('cal',12)}${esc(t.bookingDate)}</span>`;
+  if (t.bookingDate && !t.done) {
+    const over = isOverdue(t.bookingDate);
+    m += `<span class="tag ${over ? 'r' : ''}">${ic('cal',12)}${esc(t.bookingDate)}${over ? ' متأخر' : ''}</span>`;
+  }
   if (t.notes) m += `<span class="tag">${ic('note',12)}${esc(String(t.notes).slice(0, 24))}</span>`;
   const del = `<button class="ia d" data-a="del" ${k} aria-label="حذف">${ic('trash',18)}</button>`;
   const tools = c ? del : `<button class="ia" data-a="edit" ${k} aria-label="تعديل">${ic('edit',18)}</button><button class="ia" data-a="share" ${k} aria-label="مشاركة">${ic('share',18)}</button>${del}`;
@@ -778,8 +808,20 @@ $('pEye').onclick = e => {
 
 /* ============ FORM ============ */
 const F = ['name','phone','account','nationalId','passport','iban','buyPrice','chargePrice','sellPrice','discount','notes'];
-const fh = () => { $('f_buyPrice').disabled = $('f_half').checked; };
+const fh = () => {
+  const h = $('f_half').checked;
+  $('f_buyPrice').disabled = h;
+  if (h) $('f_buyPrice').value = '';
+};
 let edit = -1;
+let formDirty = false;
+
+// Track dirty state for the form
+F.concat(['year']).forEach(k => {
+  $('f_' + k).addEventListener('input', () => { formDirty = true; });
+});
+$('f_half').addEventListener('change', () => { formDirty = true; });
+
 function form(i = -1) {
   edit = i;
   const t = i > -1 ? tx[i] : {};
@@ -787,22 +829,37 @@ function form(i = -1) {
   $('f_year').value = t.year || selYear();
   $('f_half').checked = !!t.isHalf;
   fh();
+  formDirty = false;
   $('fT').textContent = i > -1 ? 'تعديل المعاملة' : 'معاملة جديدة';
   $('fSave').innerHTML = ic('check') + (i > -1 ? 'تحديث المعاملة' : 'حفظ المعاملة');
   $('fCan').style.display = i > -1 ? '' : 'none';
   if (i > -1) $('fCan').innerHTML = ic(t.cancelled ? 'undo' : 'ban') + (t.cancelled ? 'تفعيل المعاملة' : 'إلغاء المعاملة');
   openM('form');
 }
+function closeFormSafe(force) {
+  if (!force && formDirty) {
+    ask('إغلاق بدون حفظ؟', 'لديك تغييرات غير محفوظة في النموذج. هل تريد إغلاق النموذج بدون حفظ؟', 'إغلاق بدون حفظ', () => {
+      formDirty = false;
+      closeM('form');
+    });
+    return;
+  }
+  formDirty = false;
+  closeM('form');
+}
 $('bAdd').onclick = () => { hp(); form(); };
-$('f_half').onchange = fh;
+$('f_half').onchange = () => { fh(); };
 
 $('fSave').onclick = () => {
   hp(30);
   const v = k => $('f_' + k).value;
   if (!v('name').trim()) { toast('الاسم مطلوب!', 'e'); $('f_name').focus(); return; }
   const o = edit > -1 ? tx[edit] : null;
-  let done = o ? !!o.done : false;
-  if (parseFloat(v('sellPrice')) > 0) done = true;
+  const spRaw = String(v('sellPrice')).trim();
+  const sp = parseFloat(spRaw) || 0;
+  let done = !!(o && o.done);
+  if (sp > 0) done = true;
+  else if (!spRaw) done = false;   // cleared sell price → back to "pending"
   const y = parseInt(v('year'), 10) || selYear();
   const d = Object.assign({}, o || {}, Object.fromEntries(F.map(k => [k, k === 'name' ? v(k).trim() : v(k)])), {
     year: y,
@@ -813,15 +870,16 @@ $('fSave').onclick = () => {
     cancelled: o ? !!o.cancelled : false,
     bookingDate: o ? (o.bookingDate || '') : ''
   });
+  if (d.isHalf) d.buyPrice = '';
   if (o) tx[edit] = d; else tx.push(d);
   if (!o) { S.year = y; saveS(); }
-  save(); closeM('form'); render();
+  save(); formDirty = false; closeM('form'); render();
   toast(o ? 'تم تحديث البيانات' : 'تم الحفظ بنجاح');
 };
 $('fCan').onclick = () => {
   const t = tx[edit]; if (!t) return;
   ask(t.cancelled ? 'تفعيل المعاملة' : 'إلغاء المعاملة', 'هل أنت متأكد من تغيير حالة المعاملة؟', 'نعم، متأكد', () => {
-    t.cancelled = !t.cancelled; save(); closeM('form'); render();
+    t.cancelled = !t.cancelled; save(); formDirty = false; closeM('form'); render();
     toast(t.cancelled ? 'تم إلغاء المعاملة' : 'تم تفعيل المعاملة');
   }, !t.cancelled ? 1 : 0);
 };
@@ -857,9 +915,14 @@ $('qe_half').onchange = () => {
   $('qe_g').style.opacity = h ? .3 : 1;
 };
 $('qe_ok').onclick = () => {
-  const v = $('qe_in').value, h = $('qe_half').checked, t = tx[cur];
+  const v = $('qe_in').value, h = $('qe_half').checked;
+  const idx = cur;                 // capture index (avoids race with other modals)
+  const t = tx[idx];
   if (!t) return;
-  if (step === 'buy' && h) { t.isHalf = true; t.buyPrice = ''; save(); closeM('qe'); setTimeout(() => sale(cur), 250); return; }
+  if (step === 'buy' && h) {
+    t.isHalf = true; t.buyPrice = '';
+    save(); closeM('qe'); setTimeout(() => sale(idx), 250); return;
+  }
   if (step === 'buy') { t.buyPrice = v || '0'; t.isHalf = false; }
   else if (step === 'charge') t.chargePrice = v || '0';
   else {
@@ -867,7 +930,7 @@ $('qe_ok').onclick = () => {
     t.sellPrice = v; t.done = true;
   }
   save(); closeM('qe');
-  if (step !== 'sell') setTimeout(() => sale(cur), 250);
+  if (step !== 'sell') setTimeout(() => sale(idx), 250);
   else { toast('تم إتمام البيع وتحديث البيانات'); render(); }
 };
 
@@ -901,20 +964,29 @@ function dp() {
   $('dP').textContent = p.toFixed(2);
   $('dPc').style.background = p >= 0 ? 'var(--ok)' : 'var(--no)';
 }
-function dh() { $('d_buy').disabled = $('d_half').checked; dp(); }
+function dh() {
+  const h = $('d_half').checked;
+  $('d_buy').disabled = h;
+  if (h) $('d_buy').value = '';
+  dp();
+}
 ['d_buy','d_charge','d_sell','d_disc'].forEach(k => $(k).oninput = dp);
 $('d_half').onchange = dh;
 $('dSave').onclick = () => {
   const t = tx[cur]; if (!t) return;
   t.buyPrice = $('d_buy').value;
   t.chargePrice = $('d_charge').value;
-  t.sellPrice = $('d_sell').value;
+  const spRaw = String($('d_sell').value).trim();
+  t.sellPrice = spRaw;
   t.discount = $('d_disc').value;
   t.notes = $('d_notes').value;
   const y = parseInt($('d_year').value, 10);
   if (y >= 2000 && y <= 2100) t.year = y;
   t.isHalf = $('d_half').checked;
-  if (parseFloat(t.sellPrice) > 0) t.done = true;
+  if (t.isHalf) t.buyPrice = '';
+  const sp = parseFloat(spRaw) || 0;
+  if (sp > 0) t.done = true;
+  else if (!spRaw) t.done = false;   // cleared sell price → back to "pending"
   save(); render(); toast('تم حفظ التعديلات بنجاح'); closeM('det');
 };
 $('dDup').onclick = () => {
@@ -953,7 +1025,10 @@ function del(i) {
     const removed = tx.splice(i, 1)[0];
     save(); render();
     toastAct('تم حذف المعاملة', 'تراجع', () => {
-      tx.splice(Math.min(i, tx.length), 0, removed);
+      // reference-based undo (safe against concurrent edits)
+      if (tx.indexOf(removed) > -1) return;
+      const pos = Math.min(i, tx.length);
+      tx.splice(pos, 0, removed);
       save(); render(); toast('تم استرجاع المعاملة');
     });
   });
@@ -993,7 +1068,7 @@ function pick(i) {
   cur = i;
   const c = tx[i].rowColor;
   $('pk').value = /^#[0-9a-f]{6}$/i.test(c || '') ? c : th.a;
-  $('pk').click();
+  try { $('pk').click(); } catch(e){}
 }
 $('pk').onchange = e => { if (cur > -1 && tx[cur]) { tx[cur].rowColor = e.target.value; save(); render(); } };
 
@@ -1059,6 +1134,7 @@ $('lS').onclick = () => { hp(30); share(shareTxt, $('lT').textContent); };
 
 /* ============ STATS MODAL ============ */
 $('bStat').onclick = () => {
+  closeM('set');
   const ys = years();
   let html = '';
   let gP = 0, gB = 0, gN = 0;
@@ -1186,7 +1262,7 @@ $('fj').onchange = e => {
         S.extraYears = extra;
         S.year = null;
         if (importedSnaps.length) {
-          snaps = importedSnaps.concat(snaps).slice(0, 25);
+          snaps = importedSnaps.concat(snaps).slice(0, 15);
           saveSnaps();
         }
         saveS(); save(); render(); updateSnapCount();
@@ -1218,31 +1294,41 @@ $('bWipe').onclick = () => {
 /* ============ GLOBAL EVENTS ============ */
 document.addEventListener('click', e => {
   const x = e.target.closest('[data-x]');
-  if (x) closeM(x.dataset.x);
+  if (x) {
+    if (x.dataset.x === 'form') { closeFormSafe(false); }
+    else closeM(x.dataset.x);
+  }
   const l = e.target.closest('[data-l]');
   if (l) showList(l.dataset.l);
   const p = e.target.closest('[data-cp]');
   if (p) copy(p.dataset.cp);
-  if (e.target.classList.contains('bg')) e.target.classList.remove('on');
+  if (e.target.classList.contains('bg')) {
+    if (e.target.id === 'form') { closeFormSafe(false); }
+    else e.target.classList.remove('on');
+  }
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') document.querySelectorAll('.bg.on').forEach(b => b.classList.remove('on'));
+  if (e.key === 'Escape') {
+    const openForm = document.getElementById('form').classList.contains('on');
+    if (openForm) { closeFormSafe(false); return; }
+    document.querySelectorAll('.bg.on').forEach(b => b.classList.remove('on'));
+  }
 });
 
 /* ============ BOOKING REMINDERS ============ */
 function checkN() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const tm = new Date(today); tm.setDate(today.getDate() + 1);
-  let ch = false;
+  let overdue = 0;
   tx.forEach(t => {
     if (!t.bookingDate || t.done || t.cancelled) return;
     const b = new Date(t.bookingDate + 'T00:00:00');
     if (isNaN(b.getTime())) return;
     b.setHours(0, 0, 0, 0);
     if (b.getTime() === tm.getTime()) setTimeout(() => toast('تنبيه: حجز ' + (t.name || '') + ' غداً!', 'i'), 700);
-    else if (b.getTime() < today.getTime()) { t.bookingDate = ''; ch = true; }
+    else if (b.getTime() < today.getTime()) overdue++;
   });
-  if (ch) { save(); render(); }
+  if (overdue) setTimeout(() => toast('لديك ' + overdue + ' حجز متأخر', 'i'), 1400);
 }
 
 /* ============ BOOT ============ */
