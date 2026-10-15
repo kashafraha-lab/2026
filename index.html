@@ -50,13 +50,13 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .recent button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 /* summary */
-.sm{background:var(--cd);border:1px solid var(--bd);border-radius:24px;overflow:hidden;margin:2px 0 14px}
-.pfw{position:relative;display:flex;align-items:flex-start;gap:14px;padding:18px 20px}
+.sm{position:relative;background:var(--cd);border:1px solid var(--bd);border-radius:24px;overflow:hidden;margin:2px 0 14px}
+.eye-mini{position:absolute;top:12px;inset-inline-start:12px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--sub);background:var(--bg);border:1px solid var(--bd);z-index:3;transition:transform .12s,color .15s,background .15s}
+.eye-mini:hover{color:var(--ac);background:var(--acs)}
+.eye-mini:active{transform:scale(.9)}
+.pfw{position:relative;display:flex;align-items:flex-start;gap:14px;padding:48px 20px 18px}
 .pf{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
-.pf-head{display:flex;align-items:center;gap:8px;margin-bottom:2px}
-.eye-mini{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:var(--sub);background:transparent;transition:.15s;flex:none}
-.eye-mini:hover{background:var(--bg);color:var(--ac)}
-.pf-lbl{color:var(--sub);font-size:12.5px;font-weight:500}
+.pf-lbl{color:var(--sub);font-size:12.5px;font-weight:500;margin-bottom:2px}
 .pf strong{font-size:34px;line-height:1.15;font-weight:700;letter-spacing:-1px;color:var(--ac);transition:.2s}
 .pf strong.neg{color:var(--no)}
 .pf strong.hid{color:var(--sub);letter-spacing:3px;font-size:28px}
@@ -66,7 +66,7 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .pf-sub b.hid{color:var(--sub);letter-spacing:2px;font-size:13px}
 .pf-sub b.neg{color:var(--no)}
 .pf-note{color:var(--sub);font-size:11.5px;margin-top:6px}
-.rad{position:relative;width:78px;height:78px;flex:none;margin-top:4px}
+.rad{position:relative;width:78px;height:78px;flex:none;margin-top:-2px}
 .rad svg{transform:rotate(-90deg)}
 .rad .rt{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
 .rad .rt b{display:block;font-size:15px;font-weight:700;color:var(--ac);line-height:1}
@@ -245,15 +245,13 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="recent" id="recent"></div>
 
 <section class="sm">
+<button class="eye-mini" id="pEye" aria-label="إظهار/إخفاء الأرباح"><i data-ic="eyeoff" data-s="14"></i></button>
 <div class="pfw">
   <div class="pf">
-    <div class="pf-head">
-      <button class="eye-mini" id="pEye" aria-label="إظهار/إخفاء الأرباح"><i data-ic="eyeoff" data-s="15"></i></button>
-      <span class="pf-lbl">صافي الأرباح</span>
-    </div>
+    <span class="pf-lbl">صافي الأرباح</span>
     <strong id="sP">•••••</strong>
     <div class="pf-sub">
-      <span>بدون شراء العملاء المنفذين</span>
+      <span>الأرباح من المنفذة</span>
       <b id="sP2">•••••</b>
     </div>
     <span id="hE" class="pf-note"></span>
@@ -646,16 +644,11 @@ function nextClientId(y){
 }
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(tx));return true;}catch(e){toast('تعذر حفظ البيانات، الذاكرة ممتلئة','e');return false;}};
 
+/* ربح المعاملة الكامل = بيع - شحن - شراء */
 const calc=t=>{
   const b=num(t.buyPrice),c=num(t.chargePrice),s=num(t.sellPrice),d=num(t.discount);
   const f=s-s*d/100;
   return t.isHalf?(f-c)/2:f-c-b;
-};
-/* بدون سعر الشراء — يُستخدم للعملاء المنفذين فقط */
-const calcNoBuy=t=>{
-  const c=num(t.chargePrice),s=num(t.sellPrice),d=num(t.discount);
-  const f=s-s*d/100;
-  return t.isHalf?(f-c)/2:(f-c);
 };
 const isOverdue=s=>{
   if(!s)return false;
@@ -854,12 +847,13 @@ function stats(){
     if(+t.year!==Y)return;
     n++;
     if(t.cancelled){cn++;return;}
+    /* صافي الأرباح = كل المعاملات غير الملغية */
     P+=calc(t);
     B+=num(t.buyPrice);
     if(t.done){
       dn++;
-      /* بدون شراء — يُحسب للعملاء المنفذين فقط */
-      P2+=calcNoBuy(t);
+      /* الأرباح من المنفذة = ربح كامل للمعاملات المنفذة فقط (يشمل خصم الشراء) */
+      P2+=calc(t);
     }else{
       pe++;
       if(t.bookingDate)bk++;
@@ -1091,7 +1085,7 @@ $('fl').onclick=e=>{
 };
 
 /* ============ PROFIT PRIVACY ============ */
-function applyProfitUI(){$('pEye').innerHTML=ic(S.hideProfit?'eyeoff':'eye',15);}
+function applyProfitUI(){$('pEye').innerHTML=ic(S.hideProfit?'eyeoff':'eye',14);}
 $('pEye').onclick=e=>{
   e.stopPropagation();
   S.hideProfit=!S.hideProfit;saveS();applyProfitUI();stats();render();hp(10);
