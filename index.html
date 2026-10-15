@@ -230,6 +230,21 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .moveControls button:active{transform:scale(.95)}
 .moveControls button:disabled{opacity:.35;pointer-events:none}
 .moveControls button svg{color:var(--ac)}
+
+/* ========== AUTOCOMPLETE ========== */
+.acwrap{position:relative}
+.sugg{position:absolute;top:calc(100% + 4px);inset-inline:0;background:var(--cd);border:1px solid var(--bd);border-radius:14px;box-shadow:0 14px 36px rgba(0,0,0,.18);max-height:236px;overflow:auto;z-index:70;display:none;padding:5px}
+.sugg.on{display:block;animation:suggIn .16s ease-out}
+@keyframes suggIn{from{opacity:0;transform:translateY(-4px)}}
+.sugg .sg{padding:9px 10px;display:flex;align-items:center;gap:10px;cursor:pointer;border-radius:10px;transition:background .12s}
+.sugg .sg:hover{background:var(--bg)}
+.sugg .sg:active{background:var(--acs)}
+.sugg .sg .av{width:30px;height:30px;border-radius:50%;background:var(--acs);color:var(--ac);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
+.sugg .sg .info{flex:1;min-width:0}
+.sugg .sg .info b{display:block;font-weight:600;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
+.sugg .sg .info small{font-size:11px;color:var(--sub);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
+.sugg .sg .yr{font-size:10.5px;color:var(--sub);background:var(--bg);padding:2px 8px;border-radius:6px;flex:none;font-weight:600}
+.sugg .sugg-empty{padding:12px;text-align:center;color:var(--sub);font-size:12.5px}
 </style>
 </head>
 <body>
@@ -304,8 +319,16 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="bg" id="form"><div class="sh">
 <div class="th"><h2 id="fT"></h2><button class="ib" data-x="form" aria-label="إغلاق"><i data-ic="x"></i></button></div>
 <div class="g2">
-<div class="f w2"><label>الاسم</label><input id="f_name" autocomplete="off"></div>
-<div class="f"><label>التليفون</label><input id="f_phone" inputmode="tel"></div>
+<div class="f w2 acwrap">
+  <label>الاسم</label>
+  <input id="f_name" autocomplete="off">
+  <div class="sugg" id="suggName"></div>
+</div>
+<div class="f acwrap">
+  <label>التليفون</label>
+  <input id="f_phone" inputmode="tel" autocomplete="off">
+  <div class="sugg" id="suggPhone"></div>
+</div>
 <div class="f"><label>الحساب</label><input id="f_account"></div>
 <div class="f"><label>الرقم الوطني</label><input id="f_nationalId"></div>
 <div class="f"><label>جواز السفر</label><input id="f_passport"></div>
@@ -877,8 +900,6 @@ function stats(){
 }
 
 /* ============ STAGES ============ */
-/* شراء: أخضر دائماً بمجرد إضافة العميل
-   شحن / بيع: أخضر فقط عند إدخال البيانات المطلوبة */
 function stages(t){
   if(t.isHalf){
     const hasCharge=num(t.chargePrice)>0;
@@ -893,17 +914,14 @@ function stages(t){
       <div class="stage ${s2}"><span class="dot">${i2}</span>بيع</div>
     </div>`;
   }
-  const hasBuy = true; /* دائماً أخضر منذ إضافة العميل */
   const hasCharge=num(t.chargePrice)>0;
   const hasSell=num(t.sellPrice)>0||t.done;
-  const s1='done';
   const s2=hasCharge?'done':'active';
   const s3=hasCharge?(hasSell?'done':'active'):'';
-  const i1=ic('check',10);
   const i2=hasCharge?ic('check',10):'2';
   const i3=hasSell?ic('check',10):'3';
   return `<div class="stages foldable">
-    <div class="stage ${s1}"><span class="dot">${i1}</span>شراء</div>
+    <div class="stage done"><span class="dot">${ic('check',10)}</span>شراء</div>
     <span class="line done"></span>
     <div class="stage ${s2}"><span class="dot">${i2}</span>شحن</div>
     <span class="line ${hasCharge?'done':''}"></span>
@@ -936,18 +954,16 @@ function card(r,n){
   const k=`data-k="${i}"`;
   const idAttr=`data-id="${t.id}"`;
   const collapsed=S.collapsed.indexOf(t.id)>-1;
-  const H=S.hideData;             /* إخفاء عام — نقاط بدل الضباب */
-  const HP=S.hideProfit || H;     /* إخفاء الأرباح أيضاً */
+  const H=S.hideData;
+  const HP=S.hideProfit || H;
 
   const pill=c?'<span class="pill gr">ملغية</span>':t.done?`<span class="pill ok">${ic('check',13)}تم البيع</span>`:`<span class="pill wn">${ic('clock',13)}جاري البيع</span>`;
 
-  /* الاسم والهاتف */
   const nameDisp = H ? DOTS : (esc(t.name)||'-');
   const nmSmall = H
     ? '<span>••••••</span>'
     : [t.phone,t.date].filter(Boolean).map(esc).map(s=>`<span>${s}</span>`).join('');
 
-  /* الوسوم المالية */
   let m='';
   if(t.done||num(t.sellPrice)>0){
     const p=calc(t);
@@ -1126,6 +1142,145 @@ function toggleFold(i){
   if(el)el.classList.toggle('col',S.collapsed.indexOf(t.id)>-1);
 }
 
+/* ============================================================
+   AUTOCOMPLETE — تعبئة تلقائية من العملاء السابقين
+   ============================================================ */
+let clientIndex = [];
+
+function rebuildClientIndex(){
+  const map = new Map();
+  tx.forEach(t => {
+    if (!t.name && !t.phone) return;
+    /* المفتاح: الهاتف إن وُجد، وإلا الاسم */
+    const key = (t.phone || '').trim() || ('__n:' + (t.name || '').trim().toLowerCase());
+    if (!key) return;
+    const yNew = +t.year || 0;
+    const existing = map.get(key);
+    const yOld = existing ? (+existing.year || 0) : -1;
+    if (!existing || yNew >= yOld) {
+      map.set(key, {
+        name: t.name || '',
+        phone: t.phone || '',
+        account: t.account || '',
+        nationalId: t.nationalId || '',
+        passport: t.passport || '',
+        iban: t.iban || '',
+        clientId: t.clientId || '',
+        year: yNew,
+        _hay: [t.name, t.phone, t.clientId, t.account, t.iban, t.nationalId, t.passport]
+              .map(x => String(x || '').toLowerCase()).join(' ')
+      });
+    }
+  });
+  clientIndex = [...map.values()];
+}
+
+function findMatches(q){
+  q = q.trim().toLowerCase();
+  if (!q) return [];
+  const out = [];
+  for (const c of clientIndex){
+    if (c._hay.indexOf(q) > -1){
+      out.push(c);
+      if (out.length >= 8) break;
+    }
+  }
+  return out;
+}
+
+function renderSuggestions(target, matches){
+  const box = target === 'name' ? $('suggName') : $('suggPhone');
+  if (!box) return;
+  if (!matches.length){
+    box.classList.remove('on');
+    box.innerHTML = '';
+    box._matches = [];
+    return;
+  }
+  box.innerHTML = matches.map((c, i) => {
+    const initial = (c.name || '?').trim().charAt(0) || '?';
+    const sub = [c.phone, c.clientId].filter(Boolean).join(' • ');
+    return `<div class="sg" data-i="${i}">
+      <span class="av">${esc(initial)}</span>
+      <div class="info"><b>${esc(c.name || '-')}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>
+      ${c.year ? `<span class="yr">${dispNum(c.year)}</span>` : ''}
+    </div>`;
+  }).join('');
+  box._matches = matches;
+  box.classList.add('on');
+}
+
+function closeSuggestions(target){
+  if (!target || target === 'name'){
+    const b = $('suggName');
+    if (b){ b.classList.remove('on'); b.innerHTML = ''; b._matches = []; }
+  }
+  if (!target || target === 'phone'){
+    const b = $('suggPhone');
+    if (b){ b.classList.remove('on'); b.innerHTML = ''; b._matches = []; }
+  }
+}
+
+function fillFromClient(c){
+  $('f_name').value = c.name || '';
+  $('f_phone').value = c.phone || '';
+  $('f_account').value = c.account || '';
+  $('f_nationalId').value = c.nationalId || '';
+  $('f_passport').value = c.passport || '';
+  $('f_iban').value = c.iban || '';
+  formDirty = true;
+  hp(15);
+  toast('تم تعبئة بيانات العميل', 'i');
+  setTimeout(() => { try { $('f_buyPrice').focus(); } catch(e){} }, 120);
+}
+
+const suggTimers = { name: null, phone: null };
+
+function attachSuggestion(inputId, target){
+  const inp = $(inputId);
+  const box = target === 'name' ? $('suggName') : $('suggPhone');
+  if (!inp || !box) return;
+
+  inp.addEventListener('input', () => {
+    if (edit > -1) return; /* التعبئة التلقائية فقط عند إضافة معاملة جديدة */
+    clearTimeout(suggTimers[target]);
+    suggTimers[target] = setTimeout(() => {
+      const q = inp.value;
+      if (!q.trim()){ closeSuggestions(target); return; }
+      const matches = findMatches(q);
+      renderSuggestions(target, matches);
+    }, 110);
+  });
+
+  inp.addEventListener('focus', () => {
+    if (edit > -1) return;
+    const q = inp.value;
+    if (!q.trim()) return;
+    const matches = findMatches(q);
+    if (matches.length) renderSuggestions(target, matches);
+  });
+
+  inp.addEventListener('blur', () => {
+    setTimeout(() => closeSuggestions(target), 200);
+  });
+
+  inp.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSuggestions(target);
+  });
+
+  /* استخدام pointerdown لتفادي فقدان التركيز قبل النقر */
+  box.addEventListener('pointerdown', (e) => {
+    const sg = e.target.closest('.sg');
+    if (!sg) return;
+    e.preventDefault();
+    const i = +sg.dataset.i;
+    const c = (box._matches || [])[i];
+    if (!c) return;
+    fillFromClient(c);
+    closeSuggestions(target);
+  });
+}
+
 /* ============ FORM ============ */
 const F=['name','phone','account','nationalId','passport','iban','buyPrice','chargePrice','sellPrice','discount','notes'];
 const fh=()=>{const h=$('f_half').checked;$('f_buyPrice').disabled=h;if(h)$('f_buyPrice').value='';updatePreview();};
@@ -1153,6 +1308,8 @@ function form(i=-1){
   $('f_half').checked=!!t.isHalf;
   fh();
   formDirty=false;updatePreview();
+  closeSuggestions();
+  if (i === -1) rebuildClientIndex();
   $('fT').textContent=i>-1?'تعديل المعاملة':'معاملة جديدة';
   $('fSave').innerHTML=ic('check')+(i>-1?'تحديث المعاملة':'حفظ المعاملة');
   $('fCan').style.display=i>-1?'':'none';
@@ -1161,9 +1318,12 @@ function form(i=-1){
 }
 function closeFormSafe(force){
   if(!force&&formDirty){
-    ask('إغلاق بدون حفظ؟','لديك تغييرات غير محفوظة في النموذج. هل تريد إغلاقه بدون حفظ؟','إغلاق بدون حفظ',()=>{formDirty=false;closeM('form');});
+    ask('إغلاق بدون حفظ؟','لديك تغييرات غير محفوظة في النموذج. هل تريد إغلاقه بدون حفظ؟','إغلاق بدون حفظ',()=>{
+      closeSuggestions();formDirty=false;closeM('form');
+    });
     return;
   }
+  closeSuggestions();
   formDirty=false;closeM('form');
 }
 $('bAdd').onclick=()=>{hp();form();};
@@ -1712,6 +1872,9 @@ document.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{
   const inField=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
   if(e.key==='Escape'){
+    /* إغلاق الاقتراحات أولاً */
+    const anySugg = $('suggName').classList.contains('on') || $('suggPhone').classList.contains('on');
+    if (anySugg){ closeSuggestions(); return; }
     const openForm=document.getElementById('form').classList.contains('on');
     if(openForm){closeFormSafe(false);return;}
     document.querySelectorAll('.bg.on').forEach(b=>b.classList.remove('on'));
@@ -1762,6 +1925,9 @@ function checkN(){
   applyHideUI();
   applyTheme();
   updateSnapCount();
+  /* تفعيل التعبئة التلقائية */
+  attachSuggestion('f_name','name');
+  attachSuggestion('f_phone','phone');
   $('list').innerHTML=skeleton();
   renderYears();
   setTimeout(()=>{
