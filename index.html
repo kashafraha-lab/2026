@@ -80,7 +80,7 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .sr{display:flex;gap:8px;margin-bottom:10px}
 .se{flex:1;display:flex;align-items:center;gap:8px;padding:0 14px;height:46px;border-radius:14px;background:var(--cd);border:1px solid var(--bd);color:var(--sub)}
 .se input{flex:1;min-width:0;border:0;background:none;outline:0;height:100%;color:var(--tx)}
-#so{height:46px;max-width:126px;border-radius:14px;border:1px solid var(--bd);background:var(--cd);padding:0 8px;outline:0;font-size:12.5px}
+#so{height:46px;max-width:150px;border-radius:14px;border:1px solid var(--bd);background:var(--cd);padding:0 8px;outline:0;font-size:12.5px}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 1px 12px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
 .chips button{flex:0 0 auto;padding:6px 16px;border-radius:99px;background:var(--cd);border:1px solid var(--bd);color:var(--sub);font-size:13px}
 .chips button.on{background:var(--tx);border-color:var(--tx);color:var(--bg)}
@@ -132,6 +132,29 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 @keyframes soldPulse{0%{box-shadow:0 0 0 0 rgba(15,157,110,.6)}100%{box-shadow:0 0 0 20px rgba(15,157,110,0)}}
 .c.pulse .inner{animation:soldPulse .8s ease-out}
 
+/* ═══════ أقسام القائمة (مكتملة / ملغية) ═══════ */
+.sec-h{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:13px 16px;
+  background:var(--bg);color:var(--sub);
+  font-size:12.5px;font-weight:600;
+  border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);
+  cursor:pointer;transition:background .15s;text-align:start;
+}
+.sec-h:hover{background:color-mix(in srgb,var(--bd) 45%,var(--bg))}
+.sec-h:active{background:color-mix(in srgb,var(--bd) 70%,var(--bg))}
+.sec-h>span:first-child{flex:1}
+.sec-h .sec-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:26px;height:22px;padding:0 9px;border-radius:99px;
+  background:var(--cd);color:var(--sub);font-size:11.5px;font-weight:600;
+  border:1px solid var(--bd);
+}
+.sec-h .chev{display:inline-flex;color:var(--sub);transition:transform .3s}
+.sec-h.col .chev{transform:rotate(180deg)}
+.sec-body{overflow:hidden;transition:max-height .4s cubic-bezier(.2,.8,.3,1),opacity .25s;opacity:1;max-height:200000px}
+.sec-body.col{max-height:0;opacity:0}
+
 .dv{padding:8px 16px;background:var(--bg);color:var(--sub);font-size:12px;font-weight:500}
 .em{text-align:center;color:var(--sub);padding:40px 16px}.em p{margin:8px 0 0}
 .em h3{margin:12px 0 4px;color:var(--tx);font-size:16px;font-weight:600}
@@ -182,7 +205,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .toast{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:99px;background:rgba(18,20,43,.92);color:#fff;font-size:13px;transition:opacity .4s;animation:up .3s;pointer-events:auto;max-width:92vw}
 .toast.s svg{color:#34d399}.toast.e svg{color:#fb7185}.toast.i svg{color:#7dd3fc}
 .tact{background:rgba(255,255,255,.18);color:#fff;padding:4px 13px;border-radius:99px;font-size:12px;font-weight:600;flex:none}
-.hint{font-size:11.5px;color:var(--sub);text-align:center;padding:0 0 10px}
+.hint{font-size:11.5px;color:var(--sub);text-align:center;padding:0 0 10px;min-height:14px}
 
 .row{display:flex;align-items:flex-start;gap:10px;padding:12px 4px;border-bottom:1px solid var(--bd)}
 .row:last-child{border-bottom:0}
@@ -293,7 +316,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="gr3">
 <button data-l="purchases"><i data-ic="cart" data-s="16"></i><b id="sB">0</b><span>المشتريات</span></button>
 <button data-l="pending"><i data-ic="clock" data-s="16"></i><b id="sN">0</b><span>جارية</span></button>
-<button data-l="done"><i data-ic="check" data-s="16"></i><b id="sD">0</b><span>منفذة</span></button>
+<button data-l="done"><i data-ic="check" data-s="16"></i><b id="sD">0</b><span>مكتملة</span></button>
 <button data-l="booked"><i data-ic="cal" data-s="16"></i><b id="sK">0</b><span>حجوزات</span></button>
 <button data-l="cancelled"><i data-ic="ban" data-s="16"></i><b id="sC">0</b><span>ملغية</span></button>
 </div></section>
@@ -301,22 +324,23 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="sr">
 <label class="se"><i data-ic="search"></i><input id="q" type="search" placeholder="ابحث بالاسم، الهاتف، الحساب، IBAN..."></label>
 <select id="so" aria-label="الترتيب">
+<option value="booking">الأقدم حجزاً (الأولوية)</option>
+<option value="bookingNew">الأحدث حجزاً</option>
 <option value="none">ترتيب يدوي</option>
-<option value="dateNew">الأحدث</option>
-<option value="dateOld">الأقدم</option>
+<option value="dateNew">الأحدث إدخالاً</option>
+<option value="dateOld">الأقدم إدخالاً</option>
 <option value="asc">أبجدي (أ-ي)</option>
 <option value="desc">أبجدي (ي-أ)</option>
 <option value="buyHigh">الشراء الأعلى</option>
 <option value="buyLow">الشراء الأقل</option>
 <option value="profitHigh">الربح الأعلى</option>
-<option value="doneFirst">المنفذة أولاً</option>
 <option value="pendingFirst">الجارية أولاً</option>
 </select>
 </div>
 <div class="chips" id="fl">
 <button data-f="all" class="on">الكل</button>
 <button data-f="pending">جارية</button>
-<button data-f="done">منفذة</button>
+<button data-f="done">مكتملة</button>
 <button data-f="booked">محجوزة</button>
 <button data-f="todayBook">حجوزات اليوم</button>
 <button data-f="waiting">بانتظار الصرافة</button>
@@ -403,7 +427,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="f"><label>تاريخ الحجز</label><input type="date" id="bk_d"></div>
 <div class="noteBox" id="bkNote">
   <i data-ic="clock" data-s="16"></i>
-  <div>يبقى الحجز <b class="w">بانتظار اختيار شركة صرافة</b> لمدة <b>30 يوم</b> من تاريخ الحجز. بعد انقضاء المهلة يتحول النص إلى <b class="d">اللون الأحمر</b> مع تنبيه.</div>
+  <div>يبقى الحجز <b class="w">بانتظار اختيار شركة صرافة</b> لمدة <b>30 يوم</b>. بعد انقضاء المهلة يتحول النص إلى <b class="d">الأحمر</b> مع تنبيه.</div>
 </div>
 <div class="ac2"><button class="btn pr" id="bk_s">حفظ التاريخ</button><button class="btn dg" id="bk_c">إلغاء الحجز</button></div>
 </div></div>
@@ -596,7 +620,8 @@ const I = {
   more:'M12 6v.01|M12 12v.01|M12 18v.01',
   move:'M5 9l-3 3 3 3|M9 5l3-3 3 3|M15 19l-3 3-3-3|M19 9l3 3-3 3|M2 12h20|M12 2v20',
   phone:'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z',
-  info:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20|M12 16v-4|M12 8h.01'
+  info:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20|M12 16v-4|M12 8h.01',
+  layers:'M12 2 2 7l10 5 10-5-10-5z|M2 17l10 5 10-5|M2 12l10 5 10-5'
 };
 const ic=(n,s=19)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${(I[n]||'').split('|').map(d=>`<path d="${d}"/>`).join('')}</svg>`;
 document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic,+e.dataset.s||19));
@@ -613,7 +638,7 @@ const uid=()=>'tx_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice
 const toAr=s=>String(s).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
 const DOTS='•••••';
 
-let S={year:null,hideProfit:true,hideData:false,extraYears:[],sortBy:'none',flt:'all',month:'all',numerals:'western',goal:0,collapsed:[],recent:[]};
+let S={year:null,hideProfit:true,hideData:false,extraYears:[],sortBy:'booking',flt:'all',month:'all',numerals:'western',goal:0,collapsed:[],recent:[],doneCollapsed:false,cancCollapsed:false};
 
 const dispNum=n=>S.numerals==='arabic'?toAr(n):String(n);
 const fmt=n=>{const v=Math.round(n*100)/100;const s=v.toLocaleString('en-US',{maximumFractionDigits:2});return S.numerals==='arabic'?toAr(s):s;};
@@ -663,7 +688,18 @@ if(!Array.isArray(S.extraYears))S.extraYears=[];
 if(!Array.isArray(S.collapsed))S.collapsed=[];
 if(!Array.isArray(S.recent))S.recent=[];
 if(typeof S.hideData!=='boolean')S.hideData=false;
+if(typeof S.doneCollapsed!=='boolean')S.doneCollapsed=false;
+if(typeof S.cancCollapsed!=='boolean')S.cancCollapsed=false;
 const saveS=()=>{try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}};
+
+/* ═══════ ترقية تلقائية: الترتيب الافتراضي = الأقدم حجزاً ═══════ */
+if(S._v !== 3){
+  if(!S.sortBy || S.sortBy === 'none' || S.sortBy === 'doneFirst'){
+    S.sortBy = 'booking';
+  }
+  S._v = 3;
+  saveS();
+}
 
 /* ============ THEME ============ */
 const SW=['#5b4bff','#0f9d6e','#0ea5e9','#e5395b','#e8960c','#d946ef','#14b8a6'];
@@ -729,9 +765,7 @@ const calc=t=>{
   return t.isHalf?(f-c)/2:f-c-b;
 };
 
-/* ═══════════════════════════════════════════════
-   مهلة الحجز = 30 يوم بانتظار شركة الصرافة
-   ═══════════════════════════════════════════════ */
+/* ═══════ مهلة الحجز = 30 يوم بانتظار شركة الصرافة ═══════ */
 const GRACE_DAYS = 30;
 const MS_DAY = 86400000;
 
@@ -855,10 +889,10 @@ function doDeleteYear(y,snap){
   if(+S.year===+y)S.year=null;
   save();saveS();closeM('yrMg');closeM('snaps');render();
   toastAct('تم حذف سنة '+y,'تراجع',()=>{
-    if(!snap)return;
-    tx=JSON.parse(JSON.stringify(snap.tx));
-    S.extraYears=snap.extraYears.slice();
-    if(snap.year)S.year=snap.year;
+    d if(!snap)return;
+    tx=JSON".parse(JSON.stringify(snap.tx));
+    S. dataextraYears=snap.extraYears.slice();
+   -y ifrd(snap.year)S.year=snap.year;
     save();saveS();render();toast('تم استرجاع السنة');
   });
 }
@@ -869,8 +903,8 @@ function renderYrMg(){
     const done=tx.filter(t=>+t.year===y&&t.done&&!t.cancelled).length;
     const pend=tx.filter(t=>+t.year===y&&!t.done&&!t.cancelled).length;
     const canc=tx.filter(t=>+t.year===y&&t.cancelled).length;
-    return `<div class="row"><div class="info"><b>سنة ${dispNum(y)}</b><small>${dispNum(count)} معاملة • ${dispNum(done)} منفذة • ${dispNum(pend)} جارية${canc?' • '+dispNum(canc)+' ملغية':''}</small></div>
-    <div class="acts"><span class="badge-count">${dispNum(count)}</span><button class="ia d" data-yrdel="${y}" aria-label="حذف السنة">${ic('trash',17)}</button></div></div>`;
+    return `<div class="row"><div class="info"><b>سنة ${dispNum(y)}</b><small>${dispNum(count)} معاملة • ${dispNum(done)} مكتملة • ${dispNum(pend)} جارية${canc?' • '+dispNum(canc)+' ملغية':''}</small></div>
+    <div class="acts"><span class="badge-count">${dispNum(count)}</span><button class="iael="${y}" aria-label="حذف السنة">${ic('trash',17)}</button></div></div>`;
   }).join(''):'<div class="em">لا توجد سنوات</div>';
 }
 $('yrB').onclick=e=>{const b=e.target.closest('[data-yrdel]');if(!b)return;deleteYear(+b.dataset.yrdel);};
@@ -886,17 +920,32 @@ $('yrAdd').onclick=()=>{
 
 /* ============ SEARCH / SORT ============ */
 const pd=s=>{if(!s)return 0;const p=String(s).split('/');return p.length===3?new Date(+p[2],+p[1]-1,+p[0]).getTime():(new Date(s).getTime()||0);};
+
 const SO={
+  booking:(a,b)=>{
+    const da=a.t.bookingDate||'', db=b.t.bookingDate||'';
+    if(!da&&!db)return a.i-b.i;
+    if(!da)return 1;
+    if(!db)return -1;
+    return da.localeCompare(db);
+  },
+  bookingNew:(a,b)=>{
+    const da=a.t.bookingDate||'', db=b.t.bookingDate||'';
+    if(!da&&!db)return a.i-b.i;
+    if(!da)return 1;
+    if(!db)return -1;
+    return db.localeCompare(da);
+  },
   asc:(a,b)=>String(a.t.name||'').localeCompare(String(b.t.name||''),'ar'),
   desc:(a,b)=>SO.asc(b,a),
   buyHigh:(a,b)=>num(b.t.buyPrice)-num(a.t.buyPrice),
   buyLow:(a,b)=>num(a.t.buyPrice)-num(b.t.buyPrice),
   profitHigh:(a,b)=>calc(b.t)-calc(a.t),
-  doneFirst:(a,b)=>(!!b.t.done)-(!!a.t.done),
   pendingFirst:(a,b)=>(!!a.t.done)-(!!b.t.done),
   dateNew:(a,b)=>pd(b.t.date)-pd(a.t.date),
   dateOld:(a,b)=>pd(a.t.date)-pd(b.t.date)
 };
+
 const FL={
   all:()=>true,
   pending:r=>!r.t.done,
@@ -906,6 +955,7 @@ const FL={
   waiting:r=>{const b=bookingInfo(r.t);return b&&b.status==='waiting';},
   overdue:r=>{const b=bookingInfo(r.t);return b&&b.status==='overdue';}
 };
+
 function computeRows(){
   const Y=selYear();
   const q=$('q').value.trim().toLowerCase();
@@ -920,13 +970,26 @@ function computeRows(){
     return hay.indexOf(q)>-1;
   };
   const rows=tx.map((t,i)=>({t,i})).filter(match);
-  let a=rows.filter(r=>!r.t.cancelled);
-  let c=rows.filter(r=>r.t.cancelled);
-  if(S.flt==='cancelled'){a=[];}
-  else if(S.flt!=='all'){a=a.filter(FL[S.flt]);c=[];}
-  const fn=SO[S.sortBy];
-  if(fn){a.sort(fn);c.sort(fn);}
-  return {a,c};
+  let active    = rows.filter(r=>!r.t.done && !r.t.cancelled);
+  let done      = rows.filter(r=> r.t.done && !r.t.cancelled);
+  let cancelled = rows.filter(r=> r.t.cancelled);
+
+  if(S.flt === 'cancelled'){
+    active = []; done = [];
+  } else if(S.flt === 'done'){
+    active = []; cancelled = [];
+  } else if(S.flt !== 'all'){
+    done = []; cancelled = [];
+    active = active.filter(FL[S.flt]);
+  }
+
+  const fn = SO[S.sortBy];
+  if(fn){
+    active.sort(fn);
+    done.sort(fn);
+    cancelled.sort(fn);
+  }
+  return {active, done, cancelled};
 }
 
 /* ============ STATS ============ */
@@ -952,7 +1015,7 @@ function stats(){
   el2.textContent=HP?DOTS:fmt(P2);
   el2.classList.toggle('neg',!HP&&P2<0);
   el2.classList.toggle('hid',!!HP);
-  $('hE').textContent='من '+dispNum(dn)+' معاملة منفذة';
+  $('hE').textContent='من '+dispNum(dn)+' معاملة مكتملة';
   $('sB').textContent=H?DOTS:fmt(B);
   $('sN').textContent=dispNum(pe);
   $('sD').textContent=dispNum(dn);
@@ -1025,15 +1088,11 @@ function card(r,n){
   const H=S.hideData;
   const HP=S.hideProfit || H;
 
-  const pill=c?'<span class="pill gr">ملغية</span>':t.done?`<span class="pill ok">${ic('check',13)}تم البيع</span>`:`<span class="pill wn">${ic('clock',13)}جاري البيع</span>`;
+  const pill=c?'<span class="pill gr">ملغية</span>':t.done?`<span class="pill ok">${ic('check',13)}مكتملة</span>`:`<span class="pill wn">${ic('clock',13)}جارية</span>`;
 
   const nameDisp = H ? DOTS : (esc(t.name)||'-');
 
-  /* ─────── السطر الوصفي الجديد ───────
-     • تاريخ الإدخال (أخضر)     — مكان رقم الهاتف سابقاً
-     • تاريخ الحجز  (أخضر)      — مكان تاريخ الإدخال سابقاً
-     • الحالة (أصفر/أحمر) على سطر جديد
-  */
+  /* ─────── السطر الوصفي: إدخال (أخضر) • حجز (أخضر) • الحالة ─────── */
   let meta = '';
   if(H){
     meta = '<i>••••••</i>';
@@ -1081,7 +1140,7 @@ function card(r,n){
 
   const moreBtn=`<button class="more-btn" data-a="more" ${k} aria-label="خيارات">${ic('more',20)}</button>`;
   const acts=c?`<button class="ab ac" data-a="rest" ${k}>${ic('undo',17)}تفعيل المعاملة</button>`
-    :`<button class="ab${t.done?'':' ac'}" data-a="sale" ${k}>${t.done?ic('undo',17)+'تراجع عن البيع':ic('check',17)+'إتمام البيع'}</button><button class="ab" data-a="book" ${k}>${ic('cal',17)}${t.done?'منتهي':t.bookingDate?'تم الحجز':'حجز موعد'}</button>`;
+    :`<button class="ab${t.done?'':' ac'}" data-a="sale" ${k}>${t.done?ic('undo',17)+'تراجع عن الإتمام':ic('check',17)+'إتمام البيع'}</button><button class="ab" data-a="book" ${k}>${ic('cal',17)}${t.done?'منتهي':t.bookingDate?'تم الحجز':'حجز موعد'}</button>`;
 
   return `<div class="c${c?' x':''}${collapsed?' col':''}" style="--rc:${rc}" ${idAttr}>
     <div class="inner">
@@ -1140,13 +1199,43 @@ function skeleton(){
   for(let i=0;i<4;i++)h+=`<div class="skl"><div class="sk av"></div><div style="flex:1"><div class="sk l1"></div><div class="sk l2"></div></div></div>`;
   return h;
 }
+
 function render(){
   renderYears();
   renderMonths();
   renderRecent();
-  const {a,c}=computeRows();
-  let n=0,h=a.map(r=>card(r,++n)).join('');
-  if(c.length)h+=(a.length?'<div class="dv">المعاملات الملغية</div>':'')+c.map(r=>card(r,++n)).join('');
+  const {active,done,cancelled}=computeRows();
+  let n=0,h='';
+
+  /* القسم الرئيسي: الجارية */
+  h += active.map(r=>card(r,++n)).join('');
+
+  /* قسم المعاملات المكتملة */
+  if(done.length){
+    const isCol = !!S.doneCollapsed;
+    h += `<button class="sec-h${isCol?' col':''}" data-sec="done" aria-label="طي/فتح المعاملات المكتملة" aria-expanded="${!isCol}">
+      <span>${ic('check',14)} المعاملات المكتملة</span>
+      <span class="sec-badge">${dispNum(done.length)}</span>
+      <i class="chev">${ic('chevUp',16)}</i>
+    </button>
+    <div class="sec-body${isCol?' col':''}" data-sec-body="done">
+      ${done.map(r=>card(r,++n)).join('')}
+    </div>`;
+  }
+
+  /* قسم المعاملات الملغية */
+  if(cancelled.length){
+    const isCol = !!S.cancCollapsed;
+    h += `<button class="sec-h${isCol?' col':''}" data-sec="cancelled" aria-label="طي/فتح المعاملات الملغية" aria-expanded="${!isCol}">
+      <span>${ic('ban',14)} المعاملات الملغية</span>
+      <span class="sec-badge">${dispNum(cancelled.length)}</span>
+      <i class="chev">${ic('chevUp',16)}</i>
+    </button>
+    <div class="sec-body${isCol?' col':''}" data-sec-body="cancelled">
+      ${cancelled.map(r=>card(r,++n)).join('')}
+    </div>`;
+  }
+
   if(!h){
     const hasAny=tx.length;
     h=`<div class="em">
@@ -1166,13 +1255,17 @@ function render(){
     </div>`;
   }
   $('list').innerHTML=h;
-  const total=a.length+c.length;
+  const total=active.length+done.length+cancelled.length;
   const filtered=!!$('q').value.trim()||S.flt!=='all'||S.month!=='all';
-  $('hint').textContent=(!SO[S.sortBy]&&total>1)?'اضغط مطولاً على أي بطاقة لنقلها':(filtered?'':'');
+  let hintTxt = '';
+  if(!SO[S.sortBy] && total > 1) hintTxt = 'اضغط مطولاً على أي بطاقة لنقلها';
+  else if(!filtered && active.length > 0) hintTxt = 'مرتبة من الأقدم حجزاً إلى الأحدث';
+  $('hint').textContent = hintTxt;
   stats();
   const em=$('emAdd');
   if(em)em.onclick=()=>form();
 }
+
 function pulseCard(id){
   const el=document.querySelector(`.c[data-id="${id}"]`);
   if(!el)return;
@@ -1209,9 +1302,9 @@ $('fl').onclick=e=>{
   saveS();render();
 };
 
-/* ============ HIDE UI ============ */
-function applyHideUI(){
-  $('bPv').innerHTML = ic(S.hideData?'eyeoff':'eye');
+/* ============phone HIDE UI ============ */
+function || applyHideUI(){
+ ''  $('bPv).').innerHTML = ic(Strim.hideData?'eyeoff()':'eye');
   $('pEye').innerHTML = ic(S.hideProfit?'eyeoff':'eye',14);
 }
 $('pEye').onclick=e=>{
@@ -1224,7 +1317,7 @@ $('bPv').onclick=()=>{
   toast(S.hideData?'تم إخفاء كل البيانات':'تم إظهار البيانات','i');
 };
 
-/* ============ FOLD ============ */
+/* ============ FOLD CARD ============ */
 function toggleFold(i){
   const t=tx[i];if(!t)return;
   const pos=S.collapsed.indexOf(t.id);
@@ -1243,7 +1336,7 @@ function rebuildClientIndex(){
   const map = new Map();
   tx.forEach(t => {
     if (!t.name && !t.phone) return;
-    const key = (t.phone || '').trim() || ('__n:' + (t.name || '').trim().toLowerCase());
+    const key = (t. || ('__n:' + (t.name || '').trim().toLowerCase());
     if (!key) return;
     const yNew = +t.year || 0;
     const existing = map.get(key);
@@ -1509,7 +1602,11 @@ $('qe_ok').onclick=()=>{
   }
   save();closeM('qe');
   if(step!=='sell')setTimeout(()=>sale(idx),250);
-  else{toast('تم إتمام البيع وتحديث البيانات');render();pulseCard(t.id);}
+  else{
+    render();
+    pulseCard(t.id);
+    toast('تم إتمام البيع — انتقلت إلى المعاملات المكتملة');
+  }
 };
 
 /* ============ DETAILS ============ */
@@ -1651,7 +1748,7 @@ function copyTx(i){
 /* ============ MOVE MODE ============ */
 let moveIdx=-1;
 function openMove(i){
-  if(SO[S.sortBy]){toast('الترتيب اليدوي غير مفعّل','i');return;}
+  if(SO[S.sortBy]){toast('الترتيب اليدوي غير مفعّل. اختر "ترتيب يدوي" من قائمة الترتيب','i');return;}
   moveIdx=i;
   const t=tx[i];if(!t)return;
   const initial=(t.name||'?').trim().charAt(0);
@@ -1665,16 +1762,16 @@ function openMove(i){
   openM('moveM');
 }
 function updateMoveButtons(){
-  const {a,c}=computeRows();
-  const vis=a.concat(c).map(r=>r.i);
+  const {active,done,cancelled}=computeRows();
+  const vis=active.concat(done).concat(cancelled).map(r=>r.i);
   const p=vis.indexOf(moveIdx);
   $('moveUp').disabled=p<=0;
   $('moveDown').disabled=p<0||p>=vis.length-1;
 }
 function moveOne(dir){
   if(SO[S.sortBy]){toast('الترتيب اليدوي غير مفعّل','i');return;}
-  const {a,c}=computeRows();
-  const vis=a.concat(c).map(r=>r.i);
+  const {active,done,cancelled}=computeRows();
+  const vis=active.concat(done).concat(cancelled).map(r=>r.i);
   const p=vis.indexOf(moveIdx);
   if(p<0)return;
   const np=p+dir;
@@ -1719,14 +1816,31 @@ function shareTx(i){
     'السنة: '+(t.year||'-'),
     'تاريخ الإدخال: '+(t.date||'-'),
     'تاريخ الحجز: '+(t.bookingDate||'-'),
-    'الحالة: '+(t.cancelled?'ملغية':t.done?'تم البيع':'جاري البيع')
+    'الحالة: '+(t.cancelled?'ملغية':t.done?'مكتملة':'جارية')
   ];
   share(lines.join('\n'),'بيانات العميل');
 }
 
-/* ============ LIST CLICK ============ */
+/* ============ LIST CLICK (يشمل أقسام القائمة) ============ */
 $('list').onclick=e=>{
-  const b=e.target.closest('[data-a]');if(!b)return;
+  // أولوية: اضغط على رأس قسم (مكتملة/ملغية)
+  const sec = e.target.closest('.sec-h');
+  if(sec){
+    e.preventDefault();
+    const name = sec.dataset.sec;
+    if(name === 'done')         S.doneCollapsed = !S.doneCollapsed;
+    else if(name === 'cancelled') S.cancCollapsed = !S.cancCollapsed;
+    saveS();
+    sec.classList.toggle('col');
+    sec.setAttribute('aria-expanded', sec.classList.contains('col') ? 'false' : 'true');
+    const body = $('list').querySelector(`[data-sec-body="${name}"]`);
+    if(body) body.classList.toggle('col');
+    hp(10);
+    return;
+  }
+
+  const b=e.target.closest('[data-a]');
+  if(!b)return;
   const i=+b.dataset.k;
   const act=b.dataset.a;
   hp(12);
@@ -1737,7 +1851,10 @@ $('list').onclick=e=>{
   else if(act==='book')book(i);
   else if(act==='fold')toggleFold(i);
   else if(act==='sale'){
-    if(tx[i].done){tx[i].done=false;save();render();toast('تم التراجع عن البيع','i');}
+    if(tx[i].done){
+      tx[i].done=false;save();render();
+      toast('تم التراجع عن الإتمام — عادت إلى الجارية','i');
+    }
     else sale(i);
   }
 };
@@ -1769,7 +1886,7 @@ $('list').addEventListener('touchend',()=>{clearTimeout(lpTimer);lpTimer=null;lp
 $('list').addEventListener('touchcancel',()=>{clearTimeout(lpTimer);lpTimer=null;lpCard=null;lpStart=null;});
 
 /* ============ SUMMARY LISTS ============ */
-const LT={profit:'قائمة الأرباح',purchases:'قائمة المشتريات',pending:'المعاملات الجارية',done:'المعاملات المنفذة',cancelled:'المعاملات الملغية',booked:'قائمة الحجوزات'};
+const LT={profit:'قائمة الأرباح',purchases:'قائمة المشتريات',pending:'المعاملات الجارية',done:'المعاملات المكتملة',cancelled:'المعاملات الملغية',booked:'قائمة الحجوزات'};
 let shareTxt='';
 function showList(type){
   hp(15);
@@ -1848,7 +1965,7 @@ $('bStat').onclick=()=>{
       <div class="ii"><small>صافي الربح</small><b style="color:${curP2>=0?'var(--ok)':'var(--no)'}">${M(curP2)}</b></div>
       <div class="ii"><small>إجمالي المشتريات</small><b>${M2(curB)}</b></div>
       <div class="ii"><small>المعاملات</small><b>${dispNum(curN)}</b></div>
-      <div class="ii"><small>منفذة / جارية</small><b>${dispNum(curDone)} / ${dispNum(curPend)}</b></div>
+      <div class="ii"><small>مكتملة / جارية</small><b>${dispNum(curDone)} / ${dispNum(curPend)}</b></div>
     </div>`;
   const months=Array(12).fill(0);
   tx.forEach(t=>{
@@ -1874,7 +1991,7 @@ $('bStat').onclick=()=>{
       if(t.done){dn++;P2+=calc(t);}else pe++;
     });
     gP+=P;gB+=B;gN+=n;gP2+=P2;
-    html+=`<div class="s2">سنة ${dispNum(y)} — ${dispNum(n)} معاملة (${dispNum(dn)} منفذة، ${dispNum(pe)} جارية، ${dispNum(cn)} ملغية)</div>
+    html+=`<div class="s2">سنة ${dispNum(y)} — ${dispNum(n)} معاملة (${dispNum(dn)} مكتملة، ${dispNum(pe)} جارية، ${dispNum(cn)} ملغية)</div>
       <div class="g2">
         <div class="ii"><small>الربح بعد الشراء</small><b style="color:${P>=0?'var(--ok)':'var(--no)'}">${M(P)}</b></div>
         <div class="ii"><small>صافي الربح</small><b style="color:${P2>=0?'var(--ok)':'var(--no)'}">${M(P2)}</b></div>
@@ -2098,7 +2215,7 @@ function checkN(){
 
 /* ============ BOOT ============ */
 (function boot(){
-  $('so').value=S.sortBy||'none';
+  $('so').value=S.sortBy||'booking';
   [...$('fl').children].forEach(b=>b.classList.toggle('on',b.dataset.f===(S.flt||'all')));
   applyHideUI();
   applyTheme();
