@@ -97,12 +97,13 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .ring .rt{position:absolute;inset:0;display:grid;place-items:center;font-size:9px;font-weight:700;color:var(--ac)}
 .nm{flex:1;min-width:0;cursor:pointer}
 .nm>b{display:block;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nm .meta{display:flex;gap:4px 10px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.nm .meta{display:flex;flex-wrap:wrap;gap:3px 12px;align-items:center;margin-top:4px}
 .nm .meta i{color:var(--sub);font-size:11.5px;display:inline-flex;align-items:center;gap:4px;font-style:normal;line-height:1.5;white-space:nowrap}
-.nm .meta i.meta-phone{font-variant-numeric:tabular-nums}
-.nm .meta i.meta-book.w{color:var(--wn);font-weight:500}
-.nm .meta i.meta-book.d{color:var(--no);font-weight:600}
-.nm .meta i.meta-book.f{color:var(--ac);font-weight:500}
+.nm .meta i.meta-date{color:var(--ok);font-weight:500}
+.nm .meta i.meta-status{flex-basis:100%;font-weight:500}
+.nm .meta i.meta-status.w{color:var(--wn)}
+.nm .meta i.meta-status.d{color:var(--no);font-weight:600}
+.nm .meta i.meta-status.f{color:var(--ac)}
 .ia{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--sub);flex:none;transition:transform .12s}
 .more-btn{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--sub);flex:none;transition:transform .12s,background .15s}
 .more-btn:active{transform:scale(.92);background:var(--bg)}
@@ -402,7 +403,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="f"><label>تاريخ الحجز</label><input type="date" id="bk_d"></div>
 <div class="noteBox" id="bkNote">
   <i data-ic="clock" data-s="16"></i>
-  <div>يبقى الحجز <b class="w">في انتظار شركة صرافة</b> لمدة <b>30 يوم</b> من تاريخ الحجز. بعد انقضاء المهلة يتحول إلى <b class="d">متأخر</b> مع تنبيه.</div>
+  <div>يبقى الحجز <b class="w">بانتظار اختيار شركة صرافة</b> لمدة <b>30 يوم</b> من تاريخ الحجز. بعد انقضاء المهلة يتحول النص إلى <b class="d">اللون الأحمر</b> مع تنبيه.</div>
 </div>
 <div class="ac2"><button class="btn pr" id="bk_s">حفظ التاريخ</button><button class="btn dg" id="bk_c">إلغاء الحجز</button></div>
 </div></div>
@@ -746,10 +747,10 @@ function bookingInfo(t){
   const b = new Date(t.bookingDate + 'T00:00:00');
   if(isNaN(b.getTime())) return null;
   const today = new Date(); today.setHours(0,0,0,0);
-  const passed = Math.floor((today - b) / MS_DAY); // الأيام المنقضية من تاريخ الحجز
-  if(passed < 0)              return {status:'future',  passed:passed, days:0, remain:GRACE_DAYS, label:'حجز قادم'};
-  if(passed < GRACE_DAYS)     return {status:'waiting', passed:passed, days:passed, remain:GRACE_DAYS - passed, label:'بانتظار الصرافة'};
-  return                             {status:'overdue', passed:passed, days:passed, remain:0, label:'متأخر'};
+  const passed = Math.floor((today - b) / MS_DAY);
+  if(passed < 0)              return {status:'future',  passed:passed};
+  if(passed < GRACE_DAYS)     return {status:'waiting', passed:passed};
+  return                             {status:'overdue', passed:passed};
 }
 
 const smartColor=t=>{
@@ -1028,25 +1029,30 @@ function card(r,n){
 
   const nameDisp = H ? DOTS : (esc(t.name)||'-');
 
-  /* ─────── السطر الوصفي: هاتف • إدخال • حجز ─────── */
+  /* ─────── السطر الوصفي الجديد ───────
+     • تاريخ الإدخال (أخضر)     — مكان رقم الهاتف سابقاً
+     • تاريخ الحجز  (أخضر)      — مكان تاريخ الإدخال سابقاً
+     • الحالة (أصفر/أحمر) على سطر جديد
+  */
   let meta = '';
   if(H){
     meta = '<i>••••••</i>';
   } else {
     const parts = [];
-    if(t.phone) parts.push(`<i class="meta-phone">${ic('phone',11)}${esc(t.phone)}</i>`);
-    if(t.date)  parts.push(`<i>${ic('note',11)}إدخال ${esc(t.date)}</i>`);
+    if(t.date){
+      parts.push(`<i class="meta-date">${ic('note',11)}إدخال ${esc(t.date)}</i>`);
+    }
     if(t.bookingDate){
-      const bd = esc(t.bookingDate);
+      parts.push(`<i class="meta-date">${ic('cal',11)}حجز ${esc(t.bookingDate)}</i>`);
       const bi = bookingInfo(t);
-      if(bi && bi.status === 'waiting'){
-        parts.push(`<i class="meta-book w">${ic('cal',11)}حجز ${bd} • بانتظار الصرافة (${dispNum(bi.passed)}/${dispNum(GRACE_DAYS)} يوم)</i>`);
-      } else if(bi && bi.status === 'overdue'){
-        parts.push(`<i class="meta-book d">${ic('cal',11)}حجز ${bd} • متأخر ${dispNum(bi.passed)} يوم</i>`);
-      } else if(bi && bi.status === 'future'){
-        parts.push(`<i class="meta-book f">${ic('cal',11)}حجز ${bd} • قادم</i>`);
-      } else {
-        parts.push(`<i>${ic('cal',11)}حجز ${bd}</i>`);
+      if(bi){
+        if(bi.status === 'future'){
+          parts.push(`<i class="meta-status f">موعد حجز قادم</i>`);
+        } else if(bi.status === 'overdue'){
+          parts.push(`<i class="meta-status d">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);
+        } else {
+          parts.push(`<i class="meta-status w">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);
+        }
       }
     }
     meta = parts.join('');
@@ -1802,15 +1808,14 @@ function showList(type){
       const bi=bookingInfo(t);
       let extra='';
       if(bi){
-        if(bi.status==='waiting') extra=' — بانتظار الصرافة ('+bi.passed+'/'+GRACE_DAYS+' يوم)';
-        else if(bi.status==='overdue') extra=' — متأخر ('+bi.passed+' يوم)';
+        if(bi.status==='waiting'||bi.status==='overdue') extra=' — مضي '+bi.passed+' يوم';
       }
       pl='موعد: '+(H?'••••':t.bookingDate)+extra;
       inf=H?'••••':esc(t.bookingDate);
     }
     else if(type==='cancelled'){pl='ملغية';inf=`<button class="mini" data-r="${i}">استرجاع</button>`;}
     txt+=(k+1)+'- '+(H?'••••••':(t.name||'-'))+(pl?' ('+pl+')':'')+'\n';
-    return `<div class="lr"><span class="ln">${ closek+1}</span><b>${nameDisp}</b><span>${inf}</span></div>`;
+    return `<div class="lr"><span class="ln">${k+1}</span><b>${nameDisp}</b><span>${inf}</span></div>`;
   }).join(''):'<div class="em">لا توجد بيانات مطابقة</div>';
   if(rows.length&&(type==='profit'||type==='purchases')&&!HP)txt+='\nالإجمالي: '+fmt(sum);
   if(!rows.length)txt+='لا توجد بيانات مطابقة';
@@ -1939,7 +1944,7 @@ $('fi').onchange=e=>{
         bookingDate:o.bookingDate||'',rowColor:o.rowColor||'#ffffff'
       }));
       data.forEach(t=>t.clientId=nextClientId(t.year));
-     M('set');
+      closeM('set');
       ask('استيراد نسخة','سيتم استبدال البيانات الحالية بـ '+data.length+' معاملة من الملف. سيتم حفظ نسخة تلقائية أولاً.','استيراد',()=>{
         createSnapshot('قبل استيراد Excel',true);
         tx=data;S.year=null;saveS();save();render();toast('تم استيراد البيانات');
@@ -2087,8 +2092,8 @@ function checkN(){
       else navigator.clearAppBadge().catch(()=>{});
     }
   }catch(e){}
-  if(overdue)setTimeout(()=>toast('⚠ '+overdue+' حجز تجاوز '+GRACE_DAYS+' يوم بدون اختيار شركة صرافة','i'),1400);
-  else if(waiting)setTimeout(()=>toast(waiting+' حجز في انتظار شركة الصرافة','i'),1400);
+  if(overdue)setTimeout(()=>toast('⚠ '+overdue+' حجز تجاوز '+GRACE_DAYS+' يوم بانتظار شركة الصرافة','i'),1400);
+  else if(waiting)setTimeout(()=>toast(waiting+' حجز بانتظار شركة الصرافة','i'),1400);
 }
 
 /* ============ BOOT ============ */
