@@ -95,17 +95,8 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .c .inner{position:relative;padding:14px 22px 14px 14px;transition:background .25s}
 .c:before{content:"";position:absolute;inset-block:14px;inset-inline-start:7px;width:4px;border-radius:99px;background:var(--rc);z-index:2}
 .c.x{opacity:.55}.c.x .nm b{text-decoration:line-through}
-
-/* #11 خلفية متدرجة للمعاملات المتأخرة جداً (35+ يوم) */
-.c.very-overdue .inner{
-  background:linear-gradient(120deg,
-    color-mix(in srgb,var(--no) 8%,transparent) 0%,
-    color-mix(in srgb,var(--no) 3%,transparent) 35%,
-    transparent 65%);
-}
-.c.very-overdue:before{
-  box-shadow:0 0 10px color-mix(in srgb,var(--no) 60%,transparent);
-}
+.c.very-overdue .inner{background:linear-gradient(120deg,color-mix(in srgb,var(--no) 8%,transparent) 0%,color-mix(in srgb,var(--no) 3%,transparent) 35%,transparent 65%)}
+.c.very-overdue:before{box-shadow:0 0 10px color-mix(in srgb,var(--no) 60%,transparent)}
 
 .ch{display:flex;align-items:center;gap:10px}
 .ring{width:34px;height:34px;flex:none;position:relative}
@@ -113,23 +104,43 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .ring .rt{position:absolute;inset:0;display:grid;place-items:center;font-size:9px;font-weight:700;color:var(--ac)}
 .nm{flex:1;min-width:0;cursor:pointer}
 .nm>b{display:block;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nm .meta{display:flex;flex-wrap:wrap;gap:3px 12px;align-items:center;margin-top:4px}
-.nm .meta i{color:var(--sub);font-size:11.5px;display:inline-flex;align-items:center;gap:4px;font-style:normal;line-height:1.5;white-space:nowrap}
+
+/* ═══════ السطر الوصفي — محاذاة موحّدة ═══════ */
+.nm .meta{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin-top:4px}
+.nm .meta i{color:var(--sub);font-size:11.5px;display:inline-flex;align-items:center;gap:4px;font-style:normal;line-height:1.4;white-space:nowrap}
 .nm .meta i.meta-date{color:var(--ok);font-weight:500}
-.nm .meta i.meta-status{flex-basis:100%;font-weight:500}
+.nm .meta i.meta-status{flex-basis:100%;font-weight:500;display:inline-flex;align-items:center;gap:0;line-height:1;min-height:26px}
 .nm .meta i.meta-status.w{color:var(--wn)}
 .nm .meta i.meta-status.d{color:var(--no);font-weight:600}
 .nm .meta i.meta-status.f{color:var(--ac)}
+.ms-txt{display:inline-flex;align-items:center;line-height:26px;white-space:nowrap}
 
-/* #12 أيقونة 📌 لمعاملات اليوم */
-.pin{display:inline-block;vertical-align:-2px;margin-inline-end:5px;color:var(--ac);width:13px;height:13px}
-
-/* #13 شريط تقدّم دائري حول رقم الأيام */
-.days-prog{position:relative;display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;vertical-align:middle;margin-inline:5px;flex:none}
-.days-prog svg{position:absolute;inset:0;pointer-events:none}
-.days-prog b{font-size:10px;font-weight:700;line-height:1;position:relative;z-index:1}
-.days-prog.w{color:var(--wn)}
-.days-prog.d{color:var(--no)}
+/* دائرة الأيام — محاذاة دقيقة */
+.days-prog{
+  position:relative;
+  display:inline-grid;
+  place-items:center;
+  width:26px;height:26px;
+  margin-inline:6px;
+  flex:none;
+  vertical-align:middle;
+}
+.days-prog svg{
+  position:absolute;
+  inset:0;
+  width:26px;height:26px;
+  display:block;
+  pointer-events:none;
+}
+.days-prog b{
+  position:relative;
+  z-index:1;
+  font-size:10.5px;
+  font-weight:700;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:-.2px;
+}
 
 .ia{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--sub);flex:none;transition:transform .12s}
 .more-btn{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--sub);flex:none;transition:transform .12s,background .15s}
@@ -159,23 +170,9 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 @keyframes soldPulse{0%{box-shadow:0 0 0 0 rgba(15,157,110,.6)}100%{box-shadow:0 0 0 20px rgba(15,157,110,0)}}
 .c.pulse .inner{animation:soldPulse .8s ease-out}
 
-/* رأس قسم (المكتملة / الملغية) */
-.sec-h{
-  display:flex;align-items:center;gap:10px;
-  padding:12px 16px;
-  background:var(--bg);
-  border-top:1px solid var(--bd);
-  border-bottom:1px solid var(--bd);
-  color:var(--sub);
-  font-size:12.5px;font-weight:600;
-}
+.sec-h{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);color:var(--sub);font-size:12.5px;font-weight:600}
 .sec-h .sec-t{flex:1;display:inline-flex;align-items:center;gap:6px}
-.sec-h .sec-badge{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-width:26px;height:22px;padding:0 9px;border-radius:99px;
-  background:var(--cd);color:var(--sub);font-size:11.5px;font-weight:600;
-  border:1px solid var(--bd);
-}
+.sec-h .sec-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:22px;padding:0 9px;border-radius:99px;background:var(--cd);color:var(--sub);font-size:11.5px;font-weight:600;border:1px solid var(--bd)}
 
 .dv{padding:8px 16px;background:var(--bg);color:var(--sub);font-size:12px;font-weight:500}
 .em{text-align:center;color:var(--sub);padding:40px 16px}.em p{margin:8px 0 0}
@@ -641,8 +638,7 @@ const I = {
   more:'M12 6v.01|M12 12v.01|M12 18v.01',
   move:'M5 9l-3 3 3 3|M9 5l3-3 3 3|M15 19l-3 3-3-3|M19 9l3 3-3 3|M2 12h20|M12 2v20',
   phone:'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z',
-  info:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20|M12 16v-4|M12 8h.01',
-  pin:'M16 9V4h1V2H7v2h1v5c0 1.66-1.34 3-3 3v2h5.97v7l1 1 1-1v-7H19v-2c-1.66 0-3-1.34-3-3z'
+  info:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20|M12 16v-4|M12 8h.01'
 };
 const ic=(n,s=19)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${(I[n]||'').split('|').map(d=>`<path d="${d}"/>`).join('')}</svg>`;
 document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic,+e.dataset.s||19));
@@ -658,7 +654,6 @@ const closeM=id=>$(id).classList.remove('on');
 const uid=()=>'tx_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
 const toAr=s=>String(s).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
 const DOTS='•••••';
-const todayStr = new Date().toLocaleDateString('en-GB');
 
 let S={year:null,hideProfit:true,hideData:false,extraYears:[],sortBy:'booking',flt:'all',month:'all',numerals:'western',goal:0,collapsed:[],recent:[]};
 
@@ -711,33 +706,25 @@ if(!Array.isArray(S.collapsed))S.collapsed=[];
 if(!Array.isArray(S.recent))S.recent=[];
 if(typeof S.hideData!=='boolean')S.hideData=false;
 if(!S._v || S._v < 4){
-  if(!S.sortBy || S.sortBy === 'doneFirst' || S.sortBy === 'bookingNew'){
-    S.sortBy = 'booking';
-  }
+  if(!S.sortBy || S.sortBy === 'doneFirst' || S.sortBy === 'bookingNew'){S.sortBy = 'booking';}
   S._v = 4;
 }
 const saveS=()=>{try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}};
 try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}
 
-/* ═══════════════════════════════════════════════
-   #16 ضغط البيانات بـ LZ-String
-   ═══════════════════════════════════════════════ */
+/* ═══════ ضغط البيانات LZ-String ═══════ */
 const LZ_OK = (typeof LZString !== 'undefined');
 const LZ_PREFIX = 'LZ:';
-
 function lzEncode(json){
   if(!LZ_OK) return json;
-  try{ return LZ_PREFIX + LZString.compressToUTF16(json); }
-  catch(e){ return json; }
+  try{ return LZ_PREFIX + LZString.compressToUTF16(json); }catch(e){ return json; }
 }
 function lzDecode(raw){
   if(typeof raw !== 'string' || !raw) return null;
   if(raw.indexOf(LZ_PREFIX) === 0){
     if(!LZ_OK) return {error:'lz-missing'};
-    try{
-      const json = LZString.decompressFromUTF16(raw.substring(LZ_PREFIX.length));
-      return {json: json};
-    }catch(e){ return {error:'lz-bad'}; }
+    try{ return {json: LZString.decompressFromUTF16(raw.substring(LZ_PREFIX.length))}; }
+    catch(e){ return {error:'lz-bad'}; }
   }
   return {json: raw};
 }
@@ -790,9 +777,7 @@ let tx=[];
     if(!raw){ tx=[]; return; }
     const dec = lzDecode(raw);
     if(dec.error === 'lz-missing'){
-      console.warn('LZ-String missing, cannot decompress data');
-      toast('تنبيه: تعذّر قراءة البيانات (المكتبة غير محمّلة)','e');
-      tx=[]; return;
+      console.warn('LZ-String missing');toast('تنبيه: تعذّر قراءة البيانات','e');tx=[];return;
     }
     if(dec.error){ tx=[]; return; }
     const parsed = JSON.parse(dec.json || '[]');
@@ -814,13 +799,8 @@ function nextClientId(y){
   return `C-${y}-${String(max+1).padStart(3,'0')}`;
 }
 const save=()=>{
-  try{
-    localStorage.setItem(KEY, lzEncode(JSON.stringify(tx)));
-    return true;
-  }catch(e){
-    toast('تعذر حفظ البيانات، الذاكرة ممتلئة','e');
-    return false;
-  }
+  try{ localStorage.setItem(KEY, lzEncode(JSON.stringify(tx))); return true; }
+  catch(e){ toast('تعذر حفظ البيانات، الذاكرة ممتلئة','e'); return false; }
 };
 
 const calc=t=>{
@@ -829,7 +809,6 @@ const calc=t=>{
   return t.isHalf?(f-c)/2:f-c-b;
 };
 
-/* ═══════ مهلة الحجز = 30 يوم بانتظار شركة الصرافة ═══════ */
 const GRACE_DAYS = 30;
 const MS_DAY = 86400000;
 
@@ -851,7 +830,6 @@ function bookingInfo(t){
   return                             {status:'overdue', passed:passed};
 }
 
-/* ═══════ #13 شريط تقدّم دائري حول رقم الأيام ═══════ */
 function daysProgress(passed, max, status){
   const r = 10;
   const C = 2 * Math.PI * r;
@@ -859,8 +837,8 @@ function daysProgress(passed, max, status){
   const dash = (pct * C).toFixed(1);
   const Cstr = C.toFixed(1);
   const cls = status === 'overdue' ? 'd' : 'w';
-  return `<span class="days-prog ${cls}">
-    <svg width="26" height="26" viewBox="0 0 26 26">
+  return `<span class="days-prog ${cls}" aria-label="${passed} يوم من ${max}">
+    <svg viewBox="0 0 26 26" aria-hidden="true">
       <circle cx="13" cy="13" r="${r}" fill="none" stroke="currentColor" stroke-width="2" opacity=".18"/>
       <circle cx="13" cy="13" r="${r}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="${dash} ${Cstr}" transform="rotate(-90 13 13)"/>
     </svg>
@@ -888,12 +866,7 @@ let snaps=[];
   }catch(e){ snaps=[]; }
 })();
 snaps=snaps.filter(s=>s&&typeof s==='object'&&Array.isArray(s.tx));
-function saveSnaps(){
-  try{
-    localStorage.setItem(SNAPK, lzEncode(JSON.stringify(snaps)));
-    return true;
-  }catch(e){ return false; }
-}
+function saveSnaps(){try{localStorage.setItem(SNAPK, lzEncode(JSON.stringify(snaps)));return true;}catch(e){return false;}}
 function trimSnaps(){
   const MAX=15;
   while(snaps.length>MAX){
@@ -1062,27 +1035,16 @@ function computeRows(){
   let done      = rows.filter(r=> r.t.done && !r.t.cancelled);
   let cancelled = rows.filter(r=> r.t.cancelled);
 
-  if(S.flt === 'cancelled'){
-    active = []; done = [];
-  } else if(S.flt === 'done'){
-    active = []; cancelled = [];
-  } else if(S.flt !== 'all'){
-    done = []; cancelled = [];
-    active = active.filter(FL[S.flt]);
-  }
+  if(S.flt === 'cancelled'){ active = []; done = []; }
+  else if(S.flt === 'done'){ active = []; cancelled = []; }
+  else if(S.flt !== 'all'){ done = []; cancelled = []; active = active.filter(FL[S.flt]); }
 
   const fn = SO[S.sortBy];
-  if(fn){
-    active.sort(fn);
-    done.sort(fn);
-    cancelled.sort(fn);
-  }
+  if(fn){ active.sort(fn); done.sort(fn); cancelled.sort(fn); }
   return {active, done, cancelled};
 }
 
-/* ═══════════════════════════════════════════════
-   #15 حساب الإحصائيات عند الخمول (requestIdleCallback)
-   ═══════════════════════════════════════════════ */
+/* ═══════ إحصائيات عند الخمول ═══════ */
 let _statsHandle = null;
 function scheduleStats(){
   if(_statsHandle !== null){
@@ -1091,17 +1053,13 @@ function scheduleStats(){
     _statsHandle = null;
   }
   if(window.requestIdleCallback){
-    try{
-      _statsHandle = requestIdleCallback(()=>{ _statsHandle=null; stats(); }, {timeout:300});
-    }catch(e){
-      _statsHandle = setTimeout(()=>{ _statsHandle=null; stats(); }, 0);
-    }
+    try{ _statsHandle = requestIdleCallback(()=>{ _statsHandle=null; stats(); }, {timeout:300}); }
+    catch(e){ _statsHandle = setTimeout(()=>{ _statsHandle=null; stats(); }, 0); }
   } else {
     _statsHandle = setTimeout(()=>{ _statsHandle=null; stats(); }, 0);
   }
 }
 
-/* ============ STATS ============ */
 function stats(){
   const Y=selYear();
   let P=0,P2=0,B=0,pe=0,dn=0,cn=0,bk=0,n=0;
@@ -1109,10 +1067,8 @@ function stats(){
     if(+t.year!==Y)return;
     n++;
     if(t.cancelled){cn++;return;}
-    P+=calc(t);
-    B+=num(t.buyPrice);
-    if(t.done){dn++;P2+=calc(t);}
-    else{pe++;if(t.bookingDate)bk++;}
+    P+=calc(t);B+=num(t.buyPrice);
+    if(t.done){dn++;P2+=calc(t);}else{pe++;if(t.bookingDate)bk++;}
   });
   const H = S.hideData;
   const HP = S.hideProfit || H;
@@ -1199,31 +1155,29 @@ function card(r,n){
 
   const bi = bookingInfo(t);
   const veryOverdue = !!(bi && bi.status === 'overdue' && bi.passed >= 35);
-  const isAddedToday = !H && t.date === todayStr;
 
-  const pill=c?'<span class="pill gr">ملغية</span>':t.done?`<span class="pill ok">${ic('check',13)}مكتملة</span>`:`<span class="pill wn">${ic('clock',13)}جارية</span>`;
+  const pill=c?'<span class="pill gr">ملغية</span>':t.done?`<span class="pill ok">${ic('check',12)}مكتملة</span>`:`<span class="pill wn">${ic('clock',12)}جارية</span>`;
 
   const nameDisp = H ? DOTS : (esc(t.name)||'-');
-  const pinIcon = isAddedToday ? `<svg class="pin" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${I.pin}"/></svg>` : '';
 
-  /* السطر الوصفي: إدخال (أخضر) • حجز (أخضر) • الحالة */
+  /* السطر الوصفي — نفس البنية للأصفر والأحمر */
   let meta = '';
   if(H){
     meta = '<i>••••••</i>';
   } else {
     const parts = [];
     if(t.date){
-      parts.push(`<i class="meta-date">${ic('note',11)}إدخال ${esc(t.date)}</i>`);
+      parts.push(`<i class="meta-date">${ic('note',12)}إدخال ${esc(t.date)}</i>`);
     }
     if(t.bookingDate){
-      parts.push(`<i class="meta-date">${ic('cal',11)}حجز ${esc(t.bookingDate)}</i>`);
+      parts.push(`<i class="meta-date">${ic('cal',12)}حجز ${esc(t.bookingDate)}</i>`);
       if(bi){
         if(bi.status === 'future'){
-          parts.push(`<i class="meta-status f">موعد حجز قادم</i>`);
+          parts.push(`<i class="meta-status f"><span class="ms-txt">موعد حجز قادم</span></i>`);
         } else if(bi.status === 'overdue'){
-          parts.push(`<i class="meta-status d">بانتظار اختيار شركة صرافة ${daysProgress(bi.passed, GRACE_DAYS, 'overdue')} يوم</i>`);
+          parts.push(`<i class="meta-status d"><span class="ms-txt">بانتظار اختيار شركة صرافة</span>${daysProgress(bi.passed, GRACE_DAYS, 'overdue')}<span class="ms-txt">يوم</span></i>`);
         } else {
-          parts.push(`<i class="meta-status w">بانتظار اختيار شركة صرافة ${daysProgress(bi.passed, GRACE_DAYS, 'waiting')} يوم</i>`);
+          parts.push(`<i class="meta-status w"><span class="ms-txt">بانتظار اختيار شركة صرافة</span>${daysProgress(bi.passed, GRACE_DAYS, 'waiting')}<span class="ms-txt">يوم</span></i>`);
         }
       }
     }
@@ -1259,7 +1213,7 @@ function card(r,n){
     <div class="inner">
       <div class="ch">
         ${ring(t)}
-        <div class="nm" data-a="det" ${k}><b>${pinIcon}${nameDisp}</b><div class="meta">${meta}</div></div>
+        <div class="nm" data-a="det" ${k}><b>${nameDisp}</b><div class="meta">${meta}</div></div>
         ${moreBtn}
         <button class="ia chev" data-a="fold" ${k} aria-label="طي">${ic('chevUp',18)}</button>
       </div>
@@ -1515,12 +1469,8 @@ function attachSuggestion(inputId, target){
     const matches = findMatches(q);
     if (matches.length) renderSuggestions(target, matches);
   });
-  inp.addEventListener('blur', () => {
-    setTimeout(() => closeSuggestions(target), 250);
-  });
-  inp.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeSuggestions(target);
-  });
+  inp.addEventListener('blur', () => { setTimeout(() => closeSuggestions(target), 250); });
+  inp.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSuggestions(target); });
   box.addEventListener('pointerdown', (e) => {
     const sg = e.target.closest('.sg');
     if (!sg) return;
@@ -2152,8 +2102,7 @@ $('fj').onchange=e=>{
     try{
       const data = JSON.parse(ev.target.result);
       if(!data || typeof data !== 'object') throw 0;
-      const incoming = Array.isArray(data.tx) ? data.tx
-                     : (Array.isArray(data) ? data : null);
+      const incoming = Array.isArray(data.tx) ? data.tx : (Array.isArray(data) ? data : null);
       if(!incoming) throw 0;
       incoming.forEach(t=>{
         if(!t.id) t.id = uid();
@@ -2264,25 +2213,17 @@ function checkN(){
   else if(waiting)setTimeout(()=>toast(waiting+' حجز بانتظار شركة الصرافة','i'),1400);
 }
 
-/* ═══════════════════════════════════════════════
-   #14 Service Worker + Cache API
-   ═══════════════════════════════════════════════ */
+/* ═══════ Service Worker + Cache ═══════ */
 const CACHE_NAME = 'app2026_assets_v1';
 const CACHE_ASSETS = [
   'https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
   'https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js'
 ];
-
 function prefetchAssets(){
   if(!('caches' in window)) return;
-  try{
-    caches.open(CACHE_NAME).then(c => {
-      c.addAll(CACHE_ASSETS).catch(()=>{});
-    }).catch(()=>{});
-  }catch(e){}
+  try{ caches.open(CACHE_NAME).then(c => { c.addAll(CACHE_ASSETS).catch(()=>{}); }).catch(()=>{}); }catch(e){}
 }
-
 (function tryRegisterSW(){
   if(!('serviceWorker' in navigator)) return;
   if(location.protocol === 'file:') return;
@@ -2294,12 +2235,10 @@ function prefetchAssets(){
       "self.addEventListener('fetch',e=>{",
       "  const u=e.request.url;",
       "  if(u.indexOf('cdnjs.cloudflare.com')>-1||u.indexOf('fonts.googleapis.com')>-1||u.indexOf('fonts.gstatic.com')>-1){",
-      "    e.respondWith(",
-      "      caches.open(CACHE).then(c=>c.match(e.request).then(r=>{",
-      "        const net=fetch(e.request).then(res=>{if(res&&res.ok){c.put(e.request,res.clone());}return res;}).catch(()=>r);",
-      "        return r||net;",
-      "      }))",
-      "    );",
+      "    e.respondWith(caches.open(CACHE).then(c=>c.match(e.request).then(r=>{",
+      "      const net=fetch(e.request).then(res=>{if(res&&res.ok){c.put(e.request,res.clone());}return res;}).catch(()=>r);",
+      "      return r||net;",
+      "    })));",
       "  }",
       "});"
     ].join('\n');
