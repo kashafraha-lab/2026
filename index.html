@@ -109,7 +109,7 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .pill,.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:500}
 .pill.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}.pill.wn{background:color-mix(in srgb,var(--wn) 16%,transparent);color:var(--wn)}.pill.gr{background:var(--bd);color:var(--sub)}
 .tag{background:var(--bg);color:var(--sub);border-radius:8px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tag.g{color:var(--ok)}.tag.r{color:var(--no)}
+.tag.g{color:var(--ok)}.tag.r{color:var(--no)}.tag.w{color:var(--wn);background:color-mix(in srgb,var(--wn) 14%,transparent)}
 .ca{display:flex;gap:8px;margin-top:12px}
 .ab{flex:1;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:500;background:var(--bg);color:var(--tx);transition:transform .12s}
 .ab.ac{background:var(--ac);color:#fff}
@@ -243,6 +243,8 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .sugg .sg .info b{display:block;font-weight:600;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
 .sugg .sg .info small{font-size:11px;color:var(--sub);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
 .sugg .sg .yr{font-size:10.5px;color:var(--sub);background:var(--bg);padding:2px 8px;border-radius:6px;flex:none;font-weight:600}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
@@ -305,7 +307,8 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <button data-f="done">منفذة</button>
 <button data-f="booked">محجوزة</button>
 <button data-f="todayBook">حجوزات اليوم</button>
-<button data-f="overdue">متأخرة</button>
+<button data-f="waiting">بانتظار الصرافة</button>
+<button data-f="overdue">متأخرة +28</button>
 <button data-f="cancelled">ملغية</button>
 </div>
 <div class="hint" id="hint"></div>
@@ -386,6 +389,9 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="bg" id="bk"><div class="sh">
 <div class="th"><h2>موعد الحجز</h2><button class="ib" data-x="bk" aria-label="إغلاق"><i data-ic="x"></i></button></div>
 <div class="f"><label>تاريخ الحجز</label><input type="date" id="bk_d"></div>
+<div style="font-size:11.5px;color:var(--sub);margin-top:8px;line-height:1.6">
+  سيظهر الحجز كـ <b style="color:var(--wn)">في انتظار شركة صرافة</b> لمدة 28 يوم، ثم يتحول إلى <b style="color:var(--no)">متأخر</b> مع تنبيه.
+</div>
 <div class="ac2"><button class="btn pr" id="bk_s">حفظ التاريخ</button><button class="btn dg" id="bk_c">إلغاء الحجز</button></div>
 </div></div>
 
@@ -444,10 +450,14 @@ label{font-size:12px;color:var(--sub);font-weight:500}
   <button class="btn" id="bYrMg"><i data-ic="cal"></i>فتح إدارة السنوات</button>
 </div>
 
-<div class="s2">ملفات Excel</div>
+<div class="s2">ملفات Excel / JSON</div>
 <div class="ac2" style="margin-top:0">
   <button class="btn" id="bEx"><i data-ic="down"></i>تصدير Excel</button>
   <button class="btn" id="bIm"><i data-ic="up"></i>استيراد Excel</button>
+</div>
+<div class="ac2" style="margin-top:0">
+  <button class="btn" id="bJsonEx"><i data-ic="down"></i>نسخة JSON كاملة</button>
+  <button class="btn" id="bJsonIm"><i data-ic="up"></i>استيراد JSON</button>
 </div>
 
 <div class="s2">أدوات</div>
@@ -504,6 +514,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="ac2"><button class="btn" data-x="inp">إلغاء</button><button class="btn pr" id="iOk">تأكيد</button></div></div></div>
 
 <input type="file" id="fi" hidden accept=".xlsx,.xls,.csv">
+<input type="file" id="fj" hidden accept=".json,application/json">
 <input type="color" id="pk">
 <div id="ts"></div>
 
@@ -580,7 +591,7 @@ $('mkIcon').innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="n
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0;};
 const curYear=new Date().getFullYear();
-const hp=m=>{try{navigator.vibrate&&navigator.vibrate(m);}catch(e){}};
+const hp=(m=0)=>{try{navigator.vibrate&&navigator.vibrate(m);}catch(e){}};
 const openM=id=>$(id).classList.add('on');
 const closeM=id=>$(id).classList.remove('on');
 const uid=()=>'tx_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
@@ -647,7 +658,7 @@ th=th||{m:(oldT==='dark'||oldT==='light')?oldT:'auto',a:SW[0]};
 if(!th.m)th.m='auto';
 if(!th.a)th.a=SW[0];
 
-$('sw').innerHTML=SW.map(c=>`<button data-c="${c}" style="background:${c}" aria-label="${c}"></button>`).join('')+'<label><input type="color" id="cc"></label>';
+$('sw').innerHTML=SW.map(c=>`<button data-c="${c}" style="background:${c}" aria-label="${c}"></button>`).join('')+'<label aria-label="لون مخصص"><input type="color" id="cc"></label>';
 
 function applyTheme(){
   const dark=th.m==='dark'||th.m==='amoled'||(th.m==='auto'&&matchMedia('(prefers-color-scheme:dark)').matches);
@@ -702,18 +713,37 @@ const calc=t=>{
   const f=s-s*d/100;
   return t.isHalf?(f-c)/2:f-c-b;
 };
-const isOverdue=s=>{
-  if(!s)return false;
-  const d=new Date(s+'T00:00:00');if(isNaN(d.getTime()))return false;
-  const t=new Date();t.setHours(0,0,0,0);
-  return d.getTime()<t.getTime();
-};
+
+/* ═══════ مهلة الحجز: 28 يوم في انتظار شركة صرافة ═══════ */
+const GRACE_DAYS = 28;
+const MS_DAY = 86400000;
+
 const isToday=s=>{
   if(!s)return false;
   const d=new Date(s+'T00:00:00');if(isNaN(d.getTime()))return false;
   const t=new Date();t.setHours(0,0,0,0);
   return d.getTime()===t.getTime();
 };
+
+function bookingInfo(t){
+  if(!t || !t.bookingDate || t.done || t.cancelled) return null;
+  const b = new Date(t.bookingDate + 'T00:00:00');
+  if(isNaN(b.getTime())) return null;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.floor((today - b) / MS_DAY); // موجب = مضى
+  if(diff < 0)             return {status:'future',  days:diff,  remain:-diff,             label:'حجز قادم'};
+  if(diff < GRACE_DAYS)    return {status:'waiting', days:diff,  remain:GRACE_DAYS - diff, label:'في انتظار شركة صرافة'};
+  return                          {status:'overdue', days:diff,  remain:0,                 label:'متأخر'};
+}
+// للتوافق مع الاستخدام القديم
+const isOverdue = s => {
+  if(!s) return false;
+  const b = new Date(s + 'T00:00:00');
+  if(isNaN(b.getTime())) return false;
+  const today = new Date(); today.setHours(0,0,0,0);
+  return Math.floor((today - b) / MS_DAY) >= GRACE_DAYS;
+};
+
 const smartColor=t=>{
   if(/^#[0-9a-f]{6}$/i.test(t.rowColor||'')&&t.rowColor.toLowerCase()!=='#ffffff')return t.rowColor;
   if(t.cancelled)return 'var(--sub)';
@@ -862,9 +892,10 @@ const FL={
   all:()=>true,
   pending:r=>!r.t.done,
   done:r=>!!r.t.done,
-  booked:r=>r.t.bookingDate&&!r.t.done,
+  booked:r=>r.t.bookingDate&&!r.t.done&&!r.t.cancelled,
   todayBook:r=>r.t.bookingDate&&!r.t.done&&isToday(r.t.bookingDate),
-  overdue:r=>r.t.bookingDate&&!r.t.done&&isOverdue(r.t.bookingDate)
+  waiting:r=>{const b=bookingInfo(r.t);return b&&b.status==='waiting';},
+  overdue:r=>{const b=bookingInfo(r.t);return b&&b.status==='overdue';}
 };
 function computeRows(){
   const Y=selYear();
@@ -1010,11 +1041,19 @@ function card(r,n){
     m+=H?'<span class="tag">شحن •••••</span>':`<span class="tag">شحن ${fmt(num(t.chargePrice))}</span>`;
   }
   if(t.isHalf)m+='<span class="tag">بالنصف</span>';
-  if(t.bookingDate&&!t.done){
-    const over=isOverdue(t.bookingDate);
+
+  const bi = bookingInfo(t);
+  if(bi){
     const txt = H ? '••••••' : esc(t.bookingDate);
-    m+=`<span class="tag ${over?'r':''}">${ic('cal',12)}${txt}${over&&!H?' متأخر':''}</span>`;
+    if(bi.status === 'overdue'){
+      m += `<span class="tag r">${ic('cal',12)}${txt}${H?'':' • متأخر ('+dispNum(bi.days)+' ي)'}</span>`;
+    } else if(bi.status === 'waiting'){
+      m += `<span class="tag w">${ic('clock',12)}${H?'••••••':(esc(bi.label)+' • باقي '+dispNum(bi.remain)+' ي')}</span>`;
+    } else {
+      m += `<span class="tag">${ic('cal',12)}${txt}</span>`;
+    }
   }
+
   if(t.notes)m+=`<span class="tag">${ic('note',12)}${H?'••••••':esc(String(t.notes).slice(0,24))}</span>`;
   if(t.clientId)m+=`<span class="tag" style="font-family:monospace;font-size:11px">${H?'••••••':esc(t.clientId)}</span>`;
 
@@ -1291,7 +1330,7 @@ function attachSuggestion(inputId, target){
   });
 
   inp.addEventListener('blur', () => {
-    setTimeout(() => closeSuggestions(target), 200);
+    setTimeout(() => closeSuggestions(target), 250);
   });
 
   inp.addEventListener('keydown', (e) => {
@@ -1308,6 +1347,19 @@ function attachSuggestion(inputId, target){
     fillFromClient(c);
     closeSuggestions(target);
   });
+
+  // iOS Safari fallback — يضمن التقاط النقر قبل blur
+  box.addEventListener('touchstart', (e) => {
+    const sg = e.target.closest('.sg');
+    if (!sg) return;
+    e.preventDefault();
+    const i = +sg.dataset.i;
+    const c = (box._matches || [])[i];
+    if (!c) return;
+    if (document.activeElement === inp) inp.blur();
+    fillFromClient(c);
+    closeSuggestions(target);
+  }, {passive:false});
 }
 
 /* ============ FORM ============ */
@@ -1364,7 +1416,7 @@ $('fSave').onclick=()=>{
   const spRaw=String(v('sellPrice')).trim();
   const sp=parseFloat(spRaw)||0;
   let done=!!(o&&o.done);
-  if(sp>0)done=true;else if(!spRaw)done=false;
+  if(spRaw!==''){ done = sp>0; }
   const y=parseInt(v('year'),10)||selYear();
   const d=Object.assign({},o||{},Object.fromEntries(F.map(k=>[k,k==='name'?v(k).trim():v(k)])),{
     id:o?o.id:uid(),
@@ -1498,7 +1550,7 @@ $('dSave').onclick=()=>{
   t.isHalf=$('d_half').checked;
   if(t.isHalf)t.buyPrice='';
   const sp=parseFloat(spRaw)||0;
-  if(sp>0)t.done=true;else if(!spRaw)t.done=false;
+  if(spRaw!=='') t.done = sp>0;
   save();render();toast('تم حفظ التعديلات بنجاح');closeM('det');
 };
 $('dDup').onclick=()=>{
@@ -1728,7 +1780,16 @@ function showList(type){
       pl = H ? 'شراء: ••••' : ('شراء: '+fmt(num(t.buyPrice)));
       inf = pl;
     }
-    else if(type==='booked'){pl='موعد: '+(H?'••••':t.bookingDate);inf=H?'••••':esc(t.bookingDate);}
+    else if(type==='booked'){
+      const bi=bookingInfo(t);
+      let extra='';
+      if(bi){
+        if(bi.status==='waiting') extra=' — بانتظار الصرافة ('+bi.remain+' ي)';
+        else if(bi.status==='overdue') extra=' — متأخر ('+bi.days+' ي)';
+      }
+      pl='موعد: '+(H?'••••':t.bookingDate)+extra;
+      inf=H?'••••':esc(t.bookingDate);
+    }
     else if(type==='cancelled'){pl='ملغية';inf=`<button class="mini" data-r="${i}">استرجاع</button>`;}
     txt+=(k+1)+'- '+(H?'••••••':(t.name||'-'))+(pl?' ('+pl+')':'')+'\n';
     return `<div class="lr"><span class="ln">${k+1}</span><b>${nameDisp}</b><span>${inf}</span></div>`;
@@ -1870,6 +1931,62 @@ $('fi').onchange=e=>{
   r.readAsArrayBuffer(f);
 };
 
+/* ═══════ نسخة احتياطية JSON كاملة ═══════ */
+$('bJsonEx').onclick=()=>{
+  try{
+    const payload = {
+      app:'app2026_pro_db', v:2,
+      exported: new Date().toISOString(),
+      tx,
+      extraYears: S.extraYears,
+      year: S.year,
+      settings: {goal:S.goal, numerals:S.numerals, sortBy:S.sortBy},
+      snaps: snaps.map(s=>({...s, tx:s.tx}))
+    };
+    const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'backup_'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    toast('تم تصدير النسخة الاحتياطية');
+  }catch(e){toast('تعذر التصدير','e');}
+};
+$('bJsonIm').onclick=()=>$('fj').click();
+$('fj').onchange=e=>{
+  const f=e.target.files[0]; e.target.value=''; if(!f) return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!data || typeof data !== 'object') throw 0;
+      const incoming = Array.isArray(data.tx) ? data.tx
+                     : (Array.isArray(data) ? data : null);
+      if(!incoming) throw 0;
+      incoming.forEach(t=>{
+        if(!t.id) t.id = uid();
+        if(!t.year){let y=curYear;const m=String(t.date||'').match(/(\d{4})/);if(m)y=+m[1];t.year=y;}
+        if(!t.clientId) t.clientId = nextClientId(t.year);
+        if(typeof t.notes!=='string') t.notes='';
+        if(typeof t.rowColor!=='string') t.rowColor='#ffffff';
+      });
+      closeM('set');
+      ask('استيراد نسخة JSON',
+          'سيتم استبدال البيانات الحالية بـ '+incoming.length+' معاملة. سيتم حفظ نسخة تلقائية أولاً.',
+          'استيراد', ()=>{
+        createSnapshot('قبل استيراد JSON', true);
+        tx = incoming;
+        if(Array.isArray(data.extraYears)) S.extraYears = data.extraYears.slice();
+        S.year = null;
+        saveS(); save(); render();
+        toast('تم الاستيراد بنجاح');
+      }, 0);
+    }catch(x){toast('الملف غير صالح','e');}
+  };
+  r.readAsText(f);
+};
+
 $('bWipe').onclick=()=>{
   ask('حذف كل البيانات','سيتم حذف جميع المعاملات والسنوات نهائياً. سيتم حفظ نسخة تلقائية قبل الحذف.','نعم، احذف الكل',()=>{
     const snap=createSnapshot('قبل حذف كل البيانات',true);
@@ -1928,11 +2045,12 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-/* ============ BOOKING REMINDERS + BADGE ============ */
+/* ============ BOOKING REMINDERS + BADGE ═══════
+   مهلة 28 يوم: لا تنبيه قبل انقضائها. */
 function checkN(){
   const today=new Date();today.setHours(0,0,0,0);
   const tm=new Date(today);tm.setDate(today.getDate()+1);
-  let overdue=0,bookingToday=0;
+  let overdue=0,bookingToday=0,waiting=0;
   tx.forEach(t=>{
     if(!t.bookingDate||t.done||t.cancelled)return;
     const b=new Date(t.bookingDate+'T00:00:00');
@@ -1940,7 +2058,10 @@ function checkN(){
     b.setHours(0,0,0,0);
     if(b.getTime()===tm.getTime())setTimeout(()=>toast('تنبيه: حجز '+(t.name||'')+' غداً!','i'),700);
     else if(b.getTime()===today.getTime())bookingToday++;
-    else if(b.getTime()<today.getTime())overdue++;
+    const info=bookingInfo(t);
+    if(!info)return;
+    if(info.status==='overdue')overdue++;
+    else if(info.status==='waiting')waiting++;
   });
   const badge=overdue+bookingToday;
   try{
@@ -1949,7 +2070,8 @@ function checkN(){
       else navigator.clearAppBadge().catch(()=>{});
     }
   }catch(e){}
-  if(overdue)setTimeout(()=>toast('لديك '+overdue+' حجز متأخر','i'),1400);
+  if(overdue)setTimeout(()=>toast('⚠ '+overdue+' حجز تجاوز '+GRACE_DAYS+' يوم بدون اختيار شركة صرافة','i'),1400);
+  else if(waiting)setTimeout(()=>toast(waiting+' حجز في انتظار شركة الصرافة','i'),1400);
 }
 
 /* ============ BOOT ============ */
