@@ -9,14 +9,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="المعاملات">
-<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237b6bff'/%3E%3Cstop offset='1' stop-color='%234a3aff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Cpath d='M17 42V32M27 42V20M37 42V27M47 42V15' stroke='white' stroke-width='4.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237b6bff'/%3E%3Cstop offset='1' stop-color='%234a3aff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='18' fill='url(%23g)'/%3E%3Cpath d='M17 42V32M27 42V20M37 42V27M47 42V15' stroke='white' stroke-width='4.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
 <style>
 :root{--ac:#5b4bff;--acs:color-mix(in srgb,var(--ac) 14%,transparent);--bg:#f2f3f8;--cd:#fff;--tx:#12142b;--sub:#6c7090;--bd:#e4e6f0;--ok:#0f9d6e;--no:#e5395b;--wn:#e8960c;color-scheme:light}
 [data-theme=dark]{--bg:#0a0b16;--cd:#14162a;--tx:#eef0ff;--sub:#9296b8;--bd:#25283f;--ok:#2fd39a;--no:#ff6b88;--wn:#ffb02e;color-scheme:dark}
@@ -92,56 +88,22 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 #list{background:var(--cd);border:1px solid var(--bd);border-radius:24px;overflow:hidden}
 .c{position:relative;border-bottom:1px solid var(--bd)}
 .c:last-child{border-bottom:0}
-.c .inner{position:relative;padding:14px 22px 14px 14px;transition:background .25s}
+.c .inner{position:relative;padding:14px 22px 14px 14px}
 .c:before{content:"";position:absolute;inset-block:14px;inset-inline-start:7px;width:4px;border-radius:99px;background:var(--rc);z-index:2}
 .c.x{opacity:.55}.c.x .nm b{text-decoration:line-through}
-.c.very-overdue .inner{background:linear-gradient(120deg,color-mix(in srgb,var(--no) 8%,transparent) 0%,color-mix(in srgb,var(--no) 3%,transparent) 35%,transparent 65%)}
-.c.very-overdue:before{box-shadow:0 0 10px color-mix(in srgb,var(--no) 60%,transparent)}
-
 .ch{display:flex;align-items:center;gap:10px}
 .ring{width:34px;height:34px;flex:none;position:relative}
 .ring svg{transform:rotate(-90deg)}
 .ring .rt{position:absolute;inset:0;display:grid;place-items:center;font-size:9px;font-weight:700;color:var(--ac)}
 .nm{flex:1;min-width:0;cursor:pointer}
 .nm>b{display:block;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* ═══════ السطر الوصفي — محاذاة موحّدة ═══════ */
-.nm .meta{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin-top:4px}
-.nm .meta i{color:var(--sub);font-size:11.5px;display:inline-flex;align-items:center;gap:4px;font-style:normal;line-height:1.4;white-space:nowrap}
+.nm .meta{display:flex;flex-wrap:wrap;gap:3px 12px;align-items:center;margin-top:4px}
+.nm .meta i{color:var(--sub);font-size:11.5px;display:inline-flex;align-items:center;gap:4px;font-style:normal;line-height:1.5;white-space:nowrap}
 .nm .meta i.meta-date{color:var(--ok);font-weight:500}
-.nm .meta i.meta-status{flex-basis:100%;font-weight:500;display:inline-flex;align-items:center;gap:0;line-height:1;min-height:26px}
+.nm .meta i.meta-status{flex-basis:100%;font-weight:500}
 .nm .meta i.meta-status.w{color:var(--wn)}
 .nm .meta i.meta-status.d{color:var(--no);font-weight:600}
 .nm .meta i.meta-status.f{color:var(--ac)}
-.ms-txt{display:inline-flex;align-items:center;line-height:26px;white-space:nowrap}
-
-/* دائرة الأيام — محاذاة دقيقة */
-.days-prog{
-  position:relative;
-  display:inline-grid;
-  place-items:center;
-  width:26px;height:26px;
-  margin-inline:6px;
-  flex:none;
-  vertical-align:middle;
-}
-.days-prog svg{
-  position:absolute;
-  inset:0;
-  width:26px;height:26px;
-  display:block;
-  pointer-events:none;
-}
-.days-prog b{
-  position:relative;
-  z-index:1;
-  font-size:10.5px;
-  font-weight:700;
-  line-height:1;
-  font-variant-numeric:tabular-nums;
-  letter-spacing:-.2px;
-}
-
 .ia{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--sub);flex:none;transition:transform .12s}
 .more-btn{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--sub);flex:none;transition:transform .12s,background .15s}
 .more-btn:active{transform:scale(.92);background:var(--bg)}
@@ -170,9 +132,23 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 @keyframes soldPulse{0%{box-shadow:0 0 0 0 rgba(15,157,110,.6)}100%{box-shadow:0 0 0 20px rgba(15,157,110,0)}}
 .c.pulse .inner{animation:soldPulse .8s ease-out}
 
-.sec-h{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);color:var(--sub);font-size:12.5px;font-weight:600}
+/* ═══════ رأس قسم (المكتملة / الملغية) ═══════ */
+.sec-h{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;
+  background:var(--bg);
+  border-top:1px solid var(--bd);
+  border-bottom:1px solid var(--bd);
+  color:var(--sub);
+  font-size:12.5px;font-weight:600;
+}
 .sec-h .sec-t{flex:1;display:inline-flex;align-items:center;gap:6px}
-.sec-h .sec-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:22px;padding:0 9px;border-radius:99px;background:var(--cd);color:var(--sub);font-size:11.5px;font-weight:600;border:1px solid var(--bd)}
+.sec-h .sec-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:26px;height:22px;padding:0 9px;border-radius:99px;
+  background:var(--cd);color:var(--sub);font-size:11.5px;font-weight:600;
+  border:1px solid var(--bd);
+}
 
 .dv{padding:8px 16px;background:var(--bg);color:var(--sub);font-size:12px;font-weight:500}
 .em{text-align:center;color:var(--sub);padding:40px 16px}.em p{margin:8px 0 0}
@@ -297,26 +273,6 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .noteBox b{font-weight:600}
 .noteBox b.w{color:var(--wn)}
 .noteBox b.d{color:var(--no)}
-
-/* ===== توحيد أحجام الأيقونات ===== */
-svg{flex:none}
-i[data-ic] svg,.ib svg,.ia svg,.more-btn svg{display:block}
-.ib svg{width:20px;height:20px}
-.ia svg,.more-btn svg{width:20px;height:20px}
-.eye-mini svg{width:15px;height:15px}
-.gr3 svg{width:18px;height:18px}
-.se svg{width:19px;height:19px}
-.ychips .add svg{width:18px;height:18px}
-.ab svg,.btn svg,.moreItem svg{width:19px;height:19px}
-.fab svg{width:22px;height:22px}
-.pill svg,.tag svg,.nm .meta i svg{width:13px;height:13px}
-.sec-h svg{width:15px;height:15px}
-.stage .dot svg{width:10px;height:10px}
-.noteBox svg{width:17px;height:17px}
-.toast svg{width:17px;height:17px}
-.mini{display:inline-flex;align-items:center;gap:5px}
-.mini svg{width:15px;height:15px}
-.em>svg:not(.emptyArt){display:block;margin:0 auto;width:44px;height:44px}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
@@ -598,7 +554,7 @@ i[data-ic] svg,.ib svg,.ia svg,.more-btn svg{display:block}
 const $ = i => document.getElementById(i);
 const KEY='app2026_pro_db',TK='app2026_theme',SK='app2026_settings_v2',SNAPK='app2026_snapshots_v1';
 
-/* ============ منع الزوم ============ */
+/* ============ منع الزوم بالكامل ============ */
 (function(){
   ['gesturestart','gesturechange','gestureend'].forEach(evt=>{
     document.addEventListener(evt, e => e.preventDefault(), {passive:false});
@@ -660,7 +616,7 @@ const I = {
   phone:'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z',
   info:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20|M12 16v-4|M12 8h.01'
 };
-const ic=(n,s=19)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${n==='more'?3.6:(s<=10?3:2)}" stroke-linecap="round" stroke-linejoin="round">${(I[n]||'').split('|').map(d=>`<path d="${d}"/>`).join('')}</svg>`;
+const ic=(n,s=19)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${(I[n]||'').split('|').map(d=>`<path d="${d}"/>`).join('')}</svg>`;
 document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic,+e.dataset.s||19));
 $('mkIcon').innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M5 19v-5M11 19V7M17 19v-8"/></svg>`;
 
@@ -725,29 +681,16 @@ if(!Array.isArray(S.extraYears))S.extraYears=[];
 if(!Array.isArray(S.collapsed))S.collapsed=[];
 if(!Array.isArray(S.recent))S.recent=[];
 if(typeof S.hideData!=='boolean')S.hideData=false;
+
+/* ═══════ ترقية تلقائية للترتيب الافتراضي = الأقدم حجزاً ═══════ */
 if(!S._v || S._v < 4){
-  if(!S.sortBy || S.sortBy === 'doneFirst' || S.sortBy === 'bookingNew'){S.sortBy = 'booking';}
+  if(!S.sortBy || S.sortBy === 'doneFirst' || S.sortBy === 'bookingNew'){
+    S.sortBy = 'booking';
+  }
   S._v = 4;
 }
 const saveS=()=>{try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}};
 try{localStorage.setItem(SK,JSON.stringify(S));}catch(e){}
-
-/* ═══════ ضغط البيانات LZ-String ═══════ */
-const LZ_OK = (typeof LZString !== 'undefined');
-const LZ_PREFIX = 'LZ:';
-function lzEncode(json){
-  if(!LZ_OK) return json;
-  try{ return LZ_PREFIX + LZString.compressToUTF16(json); }catch(e){ return json; }
-}
-function lzDecode(raw){
-  if(typeof raw !== 'string' || !raw) return null;
-  if(raw.indexOf(LZ_PREFIX) === 0){
-    if(!LZ_OK) return {error:'lz-missing'};
-    try{ return {json: LZString.decompressFromUTF16(raw.substring(LZ_PREFIX.length))}; }
-    catch(e){ return {error:'lz-bad'}; }
-  }
-  return {json: raw};
-}
 
 /* ============ THEME ============ */
 const SW=['#5b4bff','#0f9d6e','#0ea5e9','#e5395b','#e8960c','#d946ef','#14b8a6'];
@@ -775,7 +718,7 @@ $('seg').onclick=e=>{const b=e.target.closest('button');if(b){th.m=b.dataset.m;a
 $('numSeg').onclick=e=>{const b=e.target.closest('button');if(b){S.numerals=b.dataset.n;saveS();applyTheme();render();}};
 $('sw').onclick=e=>{const b=e.target.closest('button');if(b){th.a=b.dataset.c;saveS();applyTheme();render();}};
 $('sw').addEventListener('input',e=>{if(e.target.id==='cc'){th.a=e.target.value;saveS();applyTheme();render();}});
-$('setGoal').addEventListener('input',e=>{S.goal=num(e.target.value);saveS();scheduleStats();});
+$('setGoal').addEventListener('input',e=>{S.goal=num(e.target.value);saveS();stats();});
 try{matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyTheme);}catch(e){}
 
 /* ============ PWA MANIFEST ============ */
@@ -791,20 +734,7 @@ try{matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyThe
 
 /* ============ DATA ============ */
 let tx=[];
-(function loadTX(){
-  try{
-    const raw = localStorage.getItem(KEY);
-    if(!raw){ tx=[]; return; }
-    const dec = lzDecode(raw);
-    if(dec.error === 'lz-missing'){
-      console.warn('LZ-String missing');toast('تنبيه: تعذّر قراءة البيانات','e');tx=[];return;
-    }
-    if(dec.error){ tx=[]; return; }
-    const parsed = JSON.parse(dec.json || '[]');
-    tx = Array.isArray(parsed) ? parsed : [];
-  }catch(e){ tx=[]; }
-})();
-
+try{const raw=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(raw))tx=raw;}catch(e){}
 tx=tx.filter(t=>t&&typeof t==='object');
 tx.forEach(t=>{
   if(!t.id)t.id=uid();
@@ -818,10 +748,7 @@ function nextClientId(y){
   const max=nums.length?Math.max(...nums):0;
   return `C-${y}-${String(max+1).padStart(3,'0')}`;
 }
-const save=()=>{
-  try{ localStorage.setItem(KEY, lzEncode(JSON.stringify(tx))); return true; }
-  catch(e){ toast('تعذر حفظ البيانات، الذاكرة ممتلئة','e'); return false; }
-};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(tx));return true;}catch(e){toast('تعذر حفظ البيانات، الذاكرة ممتلئة','e');return false;}};
 
 const calc=t=>{
   const b=num(t.buyPrice),c=num(t.chargePrice),s=num(t.sellPrice),d=num(t.discount);
@@ -829,6 +756,7 @@ const calc=t=>{
   return t.isHalf?(f-c)/2:f-c-b;
 };
 
+/* ═══════ مهلة الحجز = 30 يوم بانتظار شركة الصرافة ═══════ */
 const GRACE_DAYS = 30;
 const MS_DAY = 86400000;
 
@@ -850,22 +778,6 @@ function bookingInfo(t){
   return                             {status:'overdue', passed:passed};
 }
 
-function daysProgress(passed, max, status){
-  const r = 10;
-  const C = 2 * Math.PI * r;
-  const pct = Math.min(Math.max(passed, 0) / max, 1);
-  const dash = (pct * C).toFixed(1);
-  const Cstr = C.toFixed(1);
-  const cls = status === 'overdue' ? 'd' : 'w';
-  return `<span class="days-prog ${cls}" aria-label="${passed} يوم من ${max}">
-    <svg viewBox="0 0 26 26" aria-hidden="true">
-      <circle cx="13" cy="13" r="${r}" fill="none" stroke="currentColor" stroke-width="2" opacity=".18"/>
-      <circle cx="13" cy="13" r="${r}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="${dash} ${Cstr}" transform="rotate(-90 13 13)"/>
-    </svg>
-    <b>${dispNum(passed)}</b>
-  </span>`;
-}
-
 const smartColor=t=>{
   if(/^#[0-9a-f]{6}$/i.test(t.rowColor||'')&&t.rowColor.toLowerCase()!=='#ffffff')return t.rowColor;
   if(t.cancelled)return 'var(--sub)';
@@ -875,18 +787,9 @@ const smartColor=t=>{
 
 /* ============ SNAPSHOTS ============ */
 let snaps=[];
-(function loadSnaps(){
-  try{
-    const raw = localStorage.getItem(SNAPK);
-    if(!raw){ snaps=[]; return; }
-    const dec = lzDecode(raw);
-    if(dec.error){ snaps=[]; return; }
-    const parsed = JSON.parse(dec.json || '[]');
-    snaps = Array.isArray(parsed) ? parsed : [];
-  }catch(e){ snaps=[]; }
-})();
+try{const raw=JSON.parse(localStorage.getItem(SNAPK)||'[]');if(Array.isArray(raw))snaps=raw;}catch(e){}
 snaps=snaps.filter(s=>s&&typeof s==='object'&&Array.isArray(s.tx));
-function saveSnaps(){try{localStorage.setItem(SNAPK, lzEncode(JSON.stringify(snaps)));return true;}catch(e){return false;}}
+function saveSnaps(){try{localStorage.setItem(SNAPK,JSON.stringify(snaps));return true;}catch(e){return false;}}
 function trimSnaps(){
   const MAX=15;
   while(snaps.length>MAX){
@@ -1055,31 +958,25 @@ function computeRows(){
   let done      = rows.filter(r=> r.t.done && !r.t.cancelled);
   let cancelled = rows.filter(r=> r.t.cancelled);
 
-  if(S.flt === 'cancelled'){ active = []; done = []; }
-  else if(S.flt === 'done'){ active = []; cancelled = []; }
-  else if(S.flt !== 'all'){ done = []; cancelled = []; active = active.filter(FL[S.flt]); }
+  if(S.flt === 'cancelled'){
+    active = []; done = [];
+  } else if(S.flt === 'done'){
+    active = []; cancelled = [];
+  } else if(S.flt !== 'all'){
+    done = []; cancelled = [];
+    active = active.filter(FL[S.flt]);
+  }
 
   const fn = SO[S.sortBy];
-  if(fn){ active.sort(fn); done.sort(fn); cancelled.sort(fn); }
+  if(fn){
+    active.sort(fn);
+    done.sort(fn);
+    cancelled.sort(fn);
+  }
   return {active, done, cancelled};
 }
 
-/* ═══════ إحصائيات عند الخمول ═══════ */
-let _statsHandle = null;
-function scheduleStats(){
-  if(_statsHandle !== null){
-    if(window.cancelIdleCallback) { try{cancelIdleCallback(_statsHandle);}catch(e){} }
-    else clearTimeout(_statsHandle);
-    _statsHandle = null;
-  }
-  if(window.requestIdleCallback){
-    try{ _statsHandle = requestIdleCallback(()=>{ _statsHandle=null; stats(); }, {timeout:300}); }
-    catch(e){ _statsHandle = setTimeout(()=>{ _statsHandle=null; stats(); }, 0); }
-  } else {
-    _statsHandle = setTimeout(()=>{ _statsHandle=null; stats(); }, 0);
-  }
-}
-
+/* ============ STATS ============ */
 function stats(){
   const Y=selYear();
   let P=0,P2=0,B=0,pe=0,dn=0,cn=0,bk=0,n=0;
@@ -1087,8 +984,10 @@ function stats(){
     if(+t.year!==Y)return;
     n++;
     if(t.cancelled){cn++;return;}
-    P+=calc(t);B+=num(t.buyPrice);
-    if(t.done){dn++;P2+=calc(t);}else{pe++;if(t.bookingDate)bk++;}
+    P+=calc(t);
+    B+=num(t.buyPrice);
+    if(t.done){dn++;P2+=calc(t);}
+    else{pe++;if(t.bookingDate)bk++;}
   });
   const H = S.hideData;
   const HP = S.hideProfit || H;
@@ -1173,31 +1072,29 @@ function card(r,n){
   const H=S.hideData;
   const HP=S.hideProfit || H;
 
-  const bi = bookingInfo(t);
-  const veryOverdue = !!(bi && bi.status === 'overdue' && bi.passed >= 35);
-
-  const pill=c?'<span class="pill gr">ملغية</span>':t.done?`<span class="pill ok">${ic('check',12)}مكتملة</span>`:`<span class="pill wn">${ic('clock',12)}جارية</span>`;
+  const pill=c?'<span class="pill gr">ملغية</span>':t.done?`<span class="pill ok">${ic('check',13)}مكتملة</span>`:`<span class="pill wn">${ic('clock',13)}جارية</span>`;
 
   const nameDisp = H ? DOTS : (esc(t.name)||'-');
 
-  /* السطر الوصفي — نفس البنية للأصفر والأحمر */
+  /* ─────── السطر الوصفي: إدخال (أخضر) • حجز (أخضر) • الحالة ─────── */
   let meta = '';
   if(H){
     meta = '<i>••••••</i>';
   } else {
     const parts = [];
     if(t.date){
-      parts.push(`<i class="meta-date">${ic('note',12)}إدخال ${esc(t.date)}</i>`);
+      parts.push(`<i class="meta-date">${ic('note',11)}إدخال ${esc(t.date)}</i>`);
     }
     if(t.bookingDate){
-      parts.push(`<i class="meta-date">${ic('cal',12)}حجز ${esc(t.bookingDate)}</i>`);
+      parts.push(`<i class="meta-date">${ic('cal',11)}حجز ${esc(t.bookingDate)}</i>`);
+      const bi = bookingInfo(t);
       if(bi){
         if(bi.status === 'future'){
-          parts.push(`<i class="meta-status f"><span class="ms-txt">موعد حجز قادم</span></i>`);
+          parts.push(`<i class="meta-status f">موعد حجز قادم</i>`);
         } else if(bi.status === 'overdue'){
-          parts.push(`<i class="meta-status d"><span class="ms-txt">بانتظار اختيار شركة صرافة</span>${daysProgress(bi.passed, GRACE_DAYS, 'overdue')}<span class="ms-txt">يوم</span></i>`);
+          parts.push(`<i class="meta-status d">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);
         } else {
-          parts.push(`<i class="meta-status w"><span class="ms-txt">بانتظار اختيار شركة صرافة</span>${daysProgress(bi.passed, GRACE_DAYS, 'waiting')}<span class="ms-txt">يوم</span></i>`);
+          parts.push(`<i class="meta-status w">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);
         }
       }
     }
@@ -1229,7 +1126,7 @@ function card(r,n){
   const acts=c?`<button class="ab ac" data-a="rest" ${k}>${ic('undo',17)}تفعيل المعاملة</button>`
     :`<button class="ab${t.done?'':' ac'}" data-a="sale" ${k}>${t.done?ic('undo',17)+'تراجع عن الإتمام':ic('check',17)+'إتمام البيع'}</button><button class="ab" data-a="book" ${k}>${ic('cal',17)}${t.done?'منتهي':t.bookingDate?'تم الحجز':'حجز موعد'}</button>`;
 
-  return `<div class="c${c?' x':''}${collapsed?' col':''}${veryOverdue?' very-overdue':''}" style="--rc:${rc}" ${idAttr}>
+  return `<div class="c${c?' x':''}${collapsed?' col':''}" style="--rc:${rc}" ${idAttr}>
     <div class="inner">
       <div class="ch">
         ${ring(t)}
@@ -1294,8 +1191,10 @@ function render(){
   const {active,done,cancelled}=computeRows();
   let n=0,h='';
 
+  /* 1) المعاملات الجارية (الأساسية) */
   h += active.map(r=>card(r,++n)).join('');
 
+  /* 2) قسم المعاملات المكتملة — يظهر أسفل الجارية */
   if(done.length){
     h += `<div class="sec-h">
       <span class="sec-t">${ic('check',14)} المعاملات المكتملة</span>
@@ -1304,6 +1203,7 @@ function render(){
     ${done.map(r=>card(r,++n)).join('')}`;
   }
 
+  /* 3) قسم المعاملات الملغية */
   if(cancelled.length){
     h += `<div class="sec-h">
       <span class="sec-t">${ic('ban',14)} المعاملات الملغية</span>
@@ -1334,7 +1234,7 @@ function render(){
   const total=active.length+done.length+cancelled.length;
   const filtered=!!$('q').value.trim()||S.flt!=='all'||S.month!=='all';
   $('hint').textContent=(!SO[S.sortBy]&&total>1)?'اضغط مطولاً على أي بطاقة لنقلها':(filtered?'':'');
-  scheduleStats();
+  stats();
   const em=$('emAdd');
   if(em)em.onclick=()=>form();
 }
@@ -1346,7 +1246,7 @@ function pulseCard(id){
   setTimeout(()=>el.classList.remove('pulse'),1000);
 }
 
-/* ============ EVENTS ============ */
+/* ============ EVENTS: YEAR / MONTH / RECENT ============ */
 $('yr').onclick=e=>{
   const b=e.target.closest('button');if(!b)return;
   const v=b.dataset.y;
@@ -1364,6 +1264,7 @@ $('yr').onclick=e=>{
 $('mo').onclick=e=>{const b=e.target.closest('button');if(!b)return;S.month=b.dataset.m;saveS();render();};
 $('recent').onclick=e=>{const b=e.target.closest('[data-recent]');if(!b)return;const i=tx.findIndex(t=>t.id===b.dataset.recent);if(i>=0)details(i);};
 
+/* ============ SEARCH / FILTER / SORT ============ */
 let qTimer;
 $('q').oninput=()=>{clearTimeout(qTimer);qTimer=setTimeout(render,120);};
 $('so').onchange=e=>{S.sortBy=e.target.value;saveS();render();};
@@ -1374,6 +1275,7 @@ $('fl').onclick=e=>{
   saveS();render();
 };
 
+/* ============ HIDE UI ============ */
 function applyHideUI(){
   $('bPv').innerHTML = ic(S.hideData?'eyeoff':'eye');
   $('pEye').innerHTML = ic(S.hideProfit?'eyeoff':'eye',14);
@@ -1388,6 +1290,7 @@ $('bPv').onclick=()=>{
   toast(S.hideData?'تم إخفاء كل البيانات':'تم إظهار البيانات','i');
 };
 
+/* ============ FOLD ============ */
 function toggleFold(i){
   const t=tx[i];if(!t)return;
   const pos=S.collapsed.indexOf(t.id);
@@ -1397,8 +1300,11 @@ function toggleFold(i){
   if(el)el.classList.toggle('col',S.collapsed.indexOf(t.id)>-1);
 }
 
-/* ============ AUTOCOMPLETE ============ */
+/* ============================================================
+   AUTOCOMPLETE — تعبئة تلقائية من العملاء السابقين
+   ============================================================ */
 let clientIndex = [];
+
 function rebuildClientIndex(){
   const map = new Map();
   tx.forEach(t => {
@@ -1410,9 +1316,14 @@ function rebuildClientIndex(){
     const yOld = existing ? (+existing.year || 0) : -1;
     if (!existing || yNew >= yOld) {
       map.set(key, {
-        name: t.name || '', phone: t.phone || '', account: t.account || '',
-        nationalId: t.nationalId || '', passport: t.passport || '', iban: t.iban || '',
-        clientId: t.clientId || '', year: yNew,
+        name: t.name || '',
+        phone: t.phone || '',
+        account: t.account || '',
+        nationalId: t.nationalId || '',
+        passport: t.passport || '',
+        iban: t.iban || '',
+        clientId: t.clientId || '',
+        year: yNew,
         _hay: [t.name, t.phone, t.clientId, t.account, t.iban, t.nationalId, t.passport]
               .map(x => String(x || '').toLowerCase()).join(' ')
       });
@@ -1420,19 +1331,29 @@ function rebuildClientIndex(){
   });
   clientIndex = [...map.values()];
 }
+
 function findMatches(q){
   q = q.trim().toLowerCase();
   if (!q) return [];
   const out = [];
   for (const c of clientIndex){
-    if (c._hay.indexOf(q) > -1){ out.push(c); if (out.length >= 8) break; }
+    if (c._hay.indexOf(q) > -1){
+      out.push(c);
+      if (out.length >= 8) break;
+    }
   }
   return out;
 }
+
 function renderSuggestions(target, matches){
   const box = target === 'name' ? $('suggName') : $('suggPhone');
   if (!box) return;
-  if (!matches.length){ box.classList.remove('on'); box.innerHTML = ''; box._matches = []; return; }
+  if (!matches.length){
+    box.classList.remove('on');
+    box.innerHTML = '';
+    box._matches = [];
+    return;
+  }
   box.innerHTML = matches.map((c, i) => {
     const initial = (c.name || '?').trim().charAt(0) || '?';
     const sub = [c.phone, c.clientId].filter(Boolean).join(' • ');
@@ -1445,6 +1366,7 @@ function renderSuggestions(target, matches){
   box._matches = matches;
   box.classList.add('on');
 }
+
 function closeSuggestions(target){
   if (!target || target === 'name'){
     const b = $('suggName');
@@ -1455,6 +1377,7 @@ function closeSuggestions(target){
     if (b){ b.classList.remove('on'); b.innerHTML = ''; b._matches = []; }
   }
 }
+
 function fillFromClient(c){
   $('f_name').value = c.name || '';
   $('f_phone').value = c.phone || '';
@@ -1467,11 +1390,14 @@ function fillFromClient(c){
   toast('تم تعبئة بيانات العميل', 'i');
   setTimeout(() => { try { $('f_buyPrice').focus(); } catch(e){} }, 120);
 }
+
 const suggTimers = { name: null, phone: null };
+
 function attachSuggestion(inputId, target){
   const inp = $(inputId);
   const box = target === 'name' ? $('suggName') : $('suggPhone');
   if (!inp || !box) return;
+
   inp.addEventListener('input', () => {
     if (edit > -1) return;
     clearTimeout(suggTimers[target]);
@@ -1482,6 +1408,7 @@ function attachSuggestion(inputId, target){
       renderSuggestions(target, matches);
     }, 110);
   });
+
   inp.addEventListener('focus', () => {
     if (edit > -1) return;
     const q = inp.value;
@@ -1489,8 +1416,15 @@ function attachSuggestion(inputId, target){
     const matches = findMatches(q);
     if (matches.length) renderSuggestions(target, matches);
   });
-  inp.addEventListener('blur', () => { setTimeout(() => closeSuggestions(target), 250); });
-  inp.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSuggestions(target); });
+
+  inp.addEventListener('blur', () => {
+    setTimeout(() => closeSuggestions(target), 250);
+  });
+
+  inp.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSuggestions(target);
+  });
+
   box.addEventListener('pointerdown', (e) => {
     const sg = e.target.closest('.sg');
     if (!sg) return;
@@ -1501,6 +1435,7 @@ function attachSuggestion(inputId, target){
     fillFromClient(c);
     closeSuggestions(target);
   });
+
   box.addEventListener('touchstart', (e) => {
     const sg = e.target.closest('.sg');
     if (!sg) return;
@@ -2122,7 +2057,8 @@ $('fj').onchange=e=>{
     try{
       const data = JSON.parse(ev.target.result);
       if(!data || typeof data !== 'object') throw 0;
-      const incoming = Array.isArray(data.tx) ? data.tx : (Array.isArray(data) ? data : null);
+      const incoming = Array.isArray(data.tx) ? data.tx
+                     : (Array.isArray(data) ? data : null);
       if(!incoming) throw 0;
       incoming.forEach(t=>{
         if(!t.id) t.id = uid();
@@ -2205,7 +2141,7 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-/* ============ BOOKING REMINDERS ============ */
+/* ============ BOOKING REMINDERS + BADGE ============ */
 function checkN(){
   const today=new Date();today.setHours(0,0,0,0);
   const tm=new Date(today);tm.setDate(today.getDate()+1);
@@ -2233,41 +2169,6 @@ function checkN(){
   else if(waiting)setTimeout(()=>toast(waiting+' حجز بانتظار شركة الصرافة','i'),1400);
 }
 
-/* ═══════ Service Worker + Cache ═══════ */
-const CACHE_NAME = 'app2026_assets_v1';
-const CACHE_ASSETS = [
-  'https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&display=swap',
-  'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js'
-];
-function prefetchAssets(){
-  if(!('caches' in window)) return;
-  try{ caches.open(CACHE_NAME).then(c => { c.addAll(CACHE_ASSETS).catch(()=>{}); }).catch(()=>{}); }catch(e){}
-}
-(function tryRegisterSW(){
-  if(!('serviceWorker' in navigator)) return;
-  if(location.protocol === 'file:') return;
-  try{
-    const swSrc = [
-      "const CACHE='" + CACHE_NAME + "';",
-      "self.addEventListener('install',e=>{self.skipWaiting();});",
-      "self.addEventListener('activate',e=>{e.waitUntil(self.clients.claim());});",
-      "self.addEventListener('fetch',e=>{",
-      "  const u=e.request.url;",
-      "  if(u.indexOf('cdnjs.cloudflare.com')>-1||u.indexOf('fonts.googleapis.com')>-1||u.indexOf('fonts.gstatic.com')>-1){",
-      "    e.respondWith(caches.open(CACHE).then(c=>c.match(e.request).then(r=>{",
-      "      const net=fetch(e.request).then(res=>{if(res&&res.ok){c.put(e.request,res.clone());}return res;}).catch(()=>r);",
-      "      return r||net;",
-      "    })));",
-      "  }",
-      "});"
-    ].join('\n');
-    const blob = new Blob([swSrc], {type:'application/javascript'});
-    const url = URL.createObjectURL(blob);
-    navigator.serviceWorker.register(url).catch(()=>{});
-  }catch(e){}
-})();
-
 /* ============ BOOT ============ */
 (function boot(){
   $('so').value=S.sortBy||'booking';
@@ -2279,7 +2180,6 @@ function prefetchAssets(){
   attachSuggestion('f_phone','phone');
   $('list').innerHTML=skeleton();
   renderYears();
-  prefetchAssets();
   setTimeout(()=>{
     render();
     checkN();
