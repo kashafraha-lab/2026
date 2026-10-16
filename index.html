@@ -97,10 +97,9 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .ring .rt{position:absolute;inset:0;display:grid;place-items:center;font-size:9px;font-weight:700;color:var(--ac)}
 .nm{flex:1;min-width:0;cursor:pointer}
 .nm>b{display:block;font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nm .meta{display:flex;gap:6px 12px;flex-wrap:wrap;align-items:center;margin-top:3px}
-.nm .meta i{color:var(--sub);font-size:11.5px;display:inline-flex;align-items:center;gap:4px;font-style:normal;line-height:1.4}
+.nm .meta{display:flex;gap:4px 10px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.nm .meta i{color:var(--sub);font-size:11.5px;display:inline-flex;align-items:center;gap:4px;font-style:normal;line-height:1.5;white-space:nowrap}
 .nm .meta i.meta-phone{font-variant-numeric:tabular-nums}
-.nm .meta i.meta-book{color:var(--sub)}
 .nm .meta i.meta-book.w{color:var(--wn);font-weight:500}
 .nm .meta i.meta-book.d{color:var(--no);font-weight:600}
 .nm .meta i.meta-book.f{color:var(--ac);font-weight:500}
@@ -146,29 +145,7 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .sk.l1{height:14px;width:60%}
 .sk.l2{height:11px;width:40%;margin-top:6px}
 
-/* ═══════ FAB — تصميم ثابت لا يعلق أثناء السكرول ═══════ */
-.fab{
-  position:fixed;
-  inset-inline:0;
-  bottom:calc(env(safe-area-inset-bottom) + 18px);
-  z-index:30;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  height:54px;
-  width:max-content;
-  margin-inline:auto;
-  padding:0 26px;
-  border-radius:99px;
-  color:#fff;
-  font-weight:600;
-  background:var(--ac);
-  box-shadow:0 10px 26px color-mix(in srgb,var(--ac) 42%,transparent);
-  transition:transform .12s;
-  -webkit-user-select:none;
-  user-select:none;
-}
+.fab{position:fixed;inset-inline:0;bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:30;display:flex;align-items:center;justify-content:center;gap:8px;height:54px;width:max-content;margin-inline:auto;padding:0 26px;border-radius:99px;color:#fff;font-weight:600;background:var(--ac);box-shadow:0 10px 26px color-mix(in srgb,var(--ac) 42%,transparent);transition:transform .12s;-webkit-user-select:none;user-select:none}
 .fab:active{transform:scale(.95)}
 
 .bg{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background:rgba(8,8,24,.5);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}.bg.on{display:flex}
@@ -272,6 +249,12 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .sugg .sg .info small{font-size:11px;color:var(--sub);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px}
 .sugg .sg .yr{font-size:10.5px;color:var(--sub);background:var(--bg);padding:2px 8px;border-radius:6px;flex:none;font-weight:600}
 
+.noteBox{margin-top:12px;padding:12px 14px;border-radius:12px;background:var(--bg);color:var(--sub);font-size:12px;line-height:1.7;display:flex;gap:10px;align-items:flex-start}
+.noteBox svg{color:var(--ac);flex:none;margin-top:1px}
+.noteBox b{font-weight:600}
+.noteBox b.w{color:var(--wn)}
+.noteBox b.d{color:var(--no)}
+
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
@@ -336,7 +319,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <button data-f="booked">محجوزة</button>
 <button data-f="todayBook">حجوزات اليوم</button>
 <button data-f="waiting">بانتظار الصرافة</button>
-<button data-f="overdue">متأخرة +28</button>
+<button data-f="overdue">متأخرة +30</button>
 <button data-f="cancelled">ملغية</button>
 </div>
 <div class="hint" id="hint"></div>
@@ -417,8 +400,9 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="bg" id="bk"><div class="sh">
 <div class="th"><h2>موعد الحجز</h2><button class="ib" data-x="bk" aria-label="إغلاق"><i data-ic="x"></i></button></div>
 <div class="f"><label>تاريخ الحجز</label><input type="date" id="bk_d"></div>
-<div style="font-size:11.5px;color:var(--sub);margin-top:8px;line-height:1.6">
-  سيظهر الحجز كـ <b style="color:var(--wn)">في انتظار شركة صرافة</b> لمدة 28 يوم، ثم يتحول إلى <b style="color:var(--no)">متأخر</b> مع تنبيه.
+<div class="noteBox" id="bkNote">
+  <i data-ic="clock" data-s="16"></i>
+  <div>يبقى الحجز <b class="w">في انتظار شركة صرافة</b> لمدة <b>30 يوم</b> من تاريخ الحجز. بعد انقضاء المهلة يتحول إلى <b class="d">متأخر</b> مع تنبيه.</div>
 </div>
 <div class="ac2"><button class="btn pr" id="bk_s">حفظ التاريخ</button><button class="btn dg" id="bk_c">إلغاء الحجز</button></div>
 </div></div>
@@ -610,7 +594,8 @@ const I = {
   keyboard:'M2 6h20v12H2z|M6 10h.01|M10 10h.01|M14 10h.01|M18 10h.01|M7 14h10',
   more:'M12 6v.01|M12 12v.01|M12 18v.01',
   move:'M5 9l-3 3 3 3|M9 5l3-3 3 3|M15 19l-3 3-3-3|M19 9l3 3-3 3|M2 12h20|M12 2v20',
-  phone:'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z'
+  phone:'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z',
+  info:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20|M12 16v-4|M12 8h.01'
 };
 const ic=(n,s=19)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${(I[n]||'').split('|').map(d=>`<path d="${d}"/>`).join('')}</svg>`;
 document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic,+e.dataset.s||19));
@@ -743,8 +728,10 @@ const calc=t=>{
   return t.isHalf?(f-c)/2:f-c-b;
 };
 
-/* ═══════ مهلة الحجز: 28 يوم في انتظار شركة صرافة ═══════ */
-const GRACE_DAYS = 28;
+/* ═══════════════════════════════════════════════
+   مهلة الحجز = 30 يوم بانتظار شركة الصرافة
+   ═══════════════════════════════════════════════ */
+const GRACE_DAYS = 30;
 const MS_DAY = 86400000;
 
 const isToday=s=>{
@@ -759,18 +746,11 @@ function bookingInfo(t){
   const b = new Date(t.bookingDate + 'T00:00:00');
   if(isNaN(b.getTime())) return null;
   const today = new Date(); today.setHours(0,0,0,0);
-  const diff = Math.floor((today - b) / MS_DAY);
-  if(diff < 0)             return {status:'future',  days:diff,  remain:-diff,             label:'حجز قادم'};
-  if(diff < GRACE_DAYS)    return {status:'waiting', days:diff,  remain:GRACE_DAYS - diff, label:'في انتظار شركة صرافة'};
-  return                          {status:'overdue', days:diff,  remain:0,                 label:'متأخر'};
+  const passed = Math.floor((today - b) / MS_DAY); // الأيام المنقضية من تاريخ الحجز
+  if(passed < 0)              return {status:'future',  passed:passed, days:0, remain:GRACE_DAYS, label:'حجز قادم'};
+  if(passed < GRACE_DAYS)     return {status:'waiting', passed:passed, days:passed, remain:GRACE_DAYS - passed, label:'بانتظار الصرافة'};
+  return                             {status:'overdue', passed:passed, days:passed, remain:0, label:'متأخر'};
 }
-const isOverdue = s => {
-  if(!s) return false;
-  const b = new Date(s + 'T00:00:00');
-  if(isNaN(b.getTime())) return false;
-  const today = new Date(); today.setHours(0,0,0,0);
-  return Math.floor((today - b) / MS_DAY) >= GRACE_DAYS;
-};
 
 const smartColor=t=>{
   if(/^#[0-9a-f]{6}$/i.test(t.rowColor||'')&&t.rowColor.toLowerCase()!=='#ffffff')return t.rowColor;
@@ -1048,31 +1028,26 @@ function card(r,n){
 
   const nameDisp = H ? DOTS : (esc(t.name)||'-');
 
-  /* ── السطر الوصفي: الهاتف • تاريخ الإدخال • تاريخ الحجز ── */
+  /* ─────── السطر الوصفي: هاتف • إدخال • حجز ─────── */
   let meta = '';
   if(H){
     meta = '<i>••••••</i>';
   } else {
     const parts = [];
     if(t.phone) parts.push(`<i class="meta-phone">${ic('phone',11)}${esc(t.phone)}</i>`);
-    if(t.date)  parts.push(`<i>${ic('note',11)}إدخال: ${esc(t.date)}</i>`);
+    if(t.date)  parts.push(`<i>${ic('note',11)}إدخال ${esc(t.date)}</i>`);
     if(t.bookingDate){
       const bd = esc(t.bookingDate);
       const bi = bookingInfo(t);
-      let cls = '', label = '';
       if(bi && bi.status === 'waiting'){
-        cls = ' w';
-        label = `حجز: ${bd} • في انتظار شركة صرافة (باقي ${dispNum(bi.remain)} ي)`;
+        parts.push(`<i class="meta-book w">${ic('cal',11)}حجز ${bd} • بانتظار الصرافة (${dispNum(bi.passed)}/${dispNum(GRACE_DAYS)} يوم)</i>`);
       } else if(bi && bi.status === 'overdue'){
-        cls = ' d';
-        label = `حجز: ${bd} • متأخر (${dispNum(bi.days)} ي)`;
+        parts.push(`<i class="meta-book d">${ic('cal',11)}حجز ${bd} • متأخر ${dispNum(bi.passed)} يوم</i>`);
       } else if(bi && bi.status === 'future'){
-        cls = ' f';
-        label = `حجز: ${bd}`;
+        parts.push(`<i class="meta-book f">${ic('cal',11)}حجز ${bd} • قادم</i>`);
       } else {
-        label = `حجز: ${bd}`;
+        parts.push(`<i>${ic('cal',11)}حجز ${bd}</i>`);
       }
-      parts.push(`<i class="meta-book${cls}">${ic('cal',11)}${label}</i>`);
     }
     meta = parts.join('');
   }
@@ -1827,15 +1802,15 @@ function showList(type){
       const bi=bookingInfo(t);
       let extra='';
       if(bi){
-        if(bi.status==='waiting') extra=' — بانتظار الصرافة ('+bi.remain+' ي)';
-        else if(bi.status==='overdue') extra=' — متأخر ('+bi.days+' ي)';
+        if(bi.status==='waiting') extra=' — بانتظار الصرافة ('+bi.passed+'/'+GRACE_DAYS+' يوم)';
+        else if(bi.status==='overdue') extra=' — متأخر ('+bi.passed+' يوم)';
       }
       pl='موعد: '+(H?'••••':t.bookingDate)+extra;
       inf=H?'••••':esc(t.bookingDate);
     }
     else if(type==='cancelled'){pl='ملغية';inf=`<button class="mini" data-r="${i}">استرجاع</button>`;}
     txt+=(k+1)+'- '+(H?'••••••':(t.name||'-'))+(pl?' ('+pl+')':'')+'\n';
-    return `<div class="lr"><span class="ln">${k+1}</span><b>${nameDisp}</b><span>${inf}</span></div>`;
+    return `<div class="lr"><span class="ln">${ closek+1}</span><b>${nameDisp}</b><span>${inf}</span></div>`;
   }).join(''):'<div class="em">لا توجد بيانات مطابقة</div>';
   if(rows.length&&(type==='profit'||type==='purchases')&&!HP)txt+='\nالإجمالي: '+fmt(sum);
   if(!rows.length)txt+='لا توجد بيانات مطابقة';
@@ -1964,7 +1939,7 @@ $('fi').onchange=e=>{
         bookingDate:o.bookingDate||'',rowColor:o.rowColor||'#ffffff'
       }));
       data.forEach(t=>t.clientId=nextClientId(t.year));
-      closeM('set');
+     M('set');
       ask('استيراد نسخة','سيتم استبدال البيانات الحالية بـ '+data.length+' معاملة من الملف. سيتم حفظ نسخة تلقائية أولاً.','استيراد',()=>{
         createSnapshot('قبل استيراد Excel',true);
         tx=data;S.year=null;saveS();save();render();toast('تم استيراد البيانات');
