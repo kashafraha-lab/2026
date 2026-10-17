@@ -132,23 +132,9 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 @keyframes soldPulse{0%{box-shadow:0 0 0 0 rgba(15,157,110,.6)}100%{box-shadow:0 0 0 20px rgba(15,157,110,0)}}
 .c.pulse .inner{animation:soldPulse .8s ease-out}
 
-/* ═══════ رأس قسم (المكتملة / الملغية) ═══════ */
-.sec-h{
-  display:flex;align-items:center;gap:10px;
-  padding:12px 16px;
-  background:var(--bg);
-  border-top:1px solid var(--bd);
-  border-bottom:1px solid var(--bd);
-  color:var(--sub);
-  font-size:12.5px;font-weight:600;
-}
+.sec-h{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);color:var(--sub);font-size:12.5px;font-weight:600}
 .sec-h .sec-t{flex:1;display:inline-flex;align-items:center;gap:6px}
-.sec-h .sec-badge{
-  display:inline-flex;align-items:center;justify-content:center;
-  min-width:26px;height:22px;padding:0 9px;border-radius:99px;
-  background:var(--cd);color:var(--sub);font-size:11.5px;font-weight:600;
-  border:1px solid var(--bd);
-}
+.sec-h .sec-badge{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:22px;padding:0 9px;border-radius:99px;background:var(--cd);color:var(--sub);font-size:11.5px;font-weight:600;border:1px solid var(--bd)}
 
 .dv{padding:8px 16px;background:var(--bg);color:var(--sub);font-size:12px;font-weight:500}
 .em{text-align:center;color:var(--sub);padding:40px 16px}.em p{margin:8px 0 0}
@@ -187,6 +173,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .btn.pr{background:var(--ac);color:#fff}.btn.dg{background:var(--no);color:#fff}
 .ii{text-align:start;padding:10px 12px;border-radius:12px;background:var(--bg);display:grid;gap:2px;min-width:0}.ii b{font-size:13px;font-weight:500;word-break:break-all}
 .pc{margin-top:12px;padding:14px;border-radius:16px;text-align:center;color:#fff;background:var(--ok);transition:.3s}.pc b{display:block;font-size:26px}
+.pc.neg{background:var(--no)}
 .lr{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--bd)}.lr b{flex:1;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ln{color:var(--sub);width:22px;flex:none}.g{color:var(--ok)}
 .mini{padding:6px 12px;border-radius:10px;background:var(--acs);color:var(--ac);font-weight:500;font-size:12.5px;white-space:nowrap}
 .s2{font-size:12px;color:var(--sub);margin:16px 0 8px;font-weight:500}
@@ -274,13 +261,29 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .noteBox b.w{color:var(--wn)}
 .noteBox b.d{color:var(--no)}
 
+/* ═══════ الربح المتوقع ═══════ */
+.expRow{width:100%;text-align:start;padding:12px 4px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px;background:none;color:var(--tx);transition:background .15s}
+.expRow:last-child{border-bottom:0}
+.expRow:active{background:var(--bg)}
+.expRow .info{flex:1;min-width:0}
+.expRow .info b{display:block;font-weight:600;font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.expRow .info small{display:block;color:var(--sub);font-size:11.5px;margin-top:3px}
+.expRow .ep-val{font-weight:700;font-size:13px;flex:none;padding:5px 11px;border-radius:9px;background:var(--bg);color:var(--sub)}
+.expRow .ep-val.g{color:var(--ok);background:color-mix(in srgb,var(--ok) 12%,transparent)}
+.expRow .ep-val.r{color:var(--no);background:color-mix(in srgb,var(--no) 12%,transparent)}
+.expNote{font-size:11px;color:var(--sub);text-align:center;margin-top:8px;line-height:1.6}
+
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
 <header class="hd"><div class="w hi">
 <div class="lg"><span class="mk" id="mkIcon"></span><div><h1>إدارة المعاملات</h1><small id="sub"></small></div></div>
-<div class="hb"><button class="ib" id="bPv" aria-label="إخفاء البيانات"><i data-ic="eye"></i></button><button class="ib" id="bSet" aria-label="الإعدادات"><i data-ic="set"></i></button></div>
+<div class="hb">
+<button class="ib" id="bExp" aria-label="الربح المتوقع"><i data-ic="trending"></i></button>
+<button class="ib" id="bPv" aria-label="إخفاء البيانات"><i data-ic="eye"></i></button>
+<button class="ib" id="bSet" aria-label="الإعدادات"><i data-ic="set"></i></button>
+</div>
 </div></header>
 <div class="w">
 
@@ -535,6 +538,35 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="kbdRow"><small>الإعدادات</small><span class="kbd">Ctrl + ,</span></div>
 </div></div>
 
+<!-- ===== EXPECTED PROFIT LIST ===== -->
+<div class="bg" id="expL"><div class="sh">
+<div class="th"><h2>الربح المتوقع</h2><button class="ib" data-x="expL" aria-label="إغلاق"><i data-ic="x"></i></button></div>
+<div class="pc" id="expTotal">إجمالي المكسب المتوقع<b id="expTotalP">0.00</b></div>
+<div id="expListB" style="max-height:50vh;overflow:auto;margin-top:14px"></div>
+<div class="ac2"><button class="btn pr" id="expShare"><i data-ic="share"></i>مشاركة القائمة</button></div>
+<div class="expNote">المكسب المتوقع = (سعر الدولار × الدولار المستلم) − (سعر الشراء + قيمة الشحن)</div>
+</div></div>
+
+<!-- ===== EXPECTED PROFIT DETAIL ===== -->
+<div class="bg" id="expD"><div class="sh">
+<div class="th"><h2 id="expN"></h2><button class="ib" data-x="expD" aria-label="إغلاق"><i data-ic="x"></i></button></div>
+<div id="expInfo" style="font-size:11.5px;color:var(--sub);letter-spacing:.5px;margin-bottom:10px"></div>
+<div class="g2">
+<div class="f"><label>سعر الشراء</label><input type="number" step="any" inputmode="decimal" id="exp_buy"></div>
+<div class="f"><label>قيمة الشحن</label><input type="number" step="any" inputmode="decimal" id="exp_charge"></div>
+<div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="exp_dollar"></div>
+<div class="f"><label>الدولار المستلم من المصرف</label><input type="number" step="any" inputmode="decimal" id="exp_net"></div>
+</div>
+<div class="preview">
+<h4>المعاينة المباشرة</h4>
+<div class="pvRow"><span>التكلفة (شراء + شحن)</span><span id="expCost">0.00</span></div>
+<div class="pvRow"><span>الإيراد (دولار × سعر الدولار)</span><span id="expRev">0.00</span></div>
+<div class="pvTotal"><span>المكسب المتوقع</span><b id="expProfit">0.00</b></div>
+<div class="expNote" id="expHalfNote" style="display:none">معاملة بالنصف: المكسب مقسوم على 2</div>
+</div>
+<div class="ac2"><button class="btn pr" id="expSave"><i data-ic="check"></i>حفظ</button></div>
+</div></div>
+
 <!-- ===== ASK ===== -->
 <div class="bg mid" id="ask"><div class="sh"><h2 id="aT"></h2><p id="aM"></p>
 <div class="ac2"><button class="btn" data-x="ask">تراجع</button><button class="btn dg" id="aOk"></button></div></div></div>
@@ -554,23 +586,13 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 const $ = i => document.getElementById(i);
 const KEY='app2026_pro_db',TK='app2026_theme',SK='app2026_settings_v2',SNAPK='app2026_snapshots_v1';
 
-/* ============ منع الزوم بالكامل ============ */
+/* ============ منع الزوم (بدون تعطيل اللمسات السريعة) ============ */
 (function(){
   ['gesturestart','gesturechange','gestureend'].forEach(evt=>{
     document.addEventListener(evt, e => e.preventDefault(), {passive:false});
   });
   document.addEventListener('touchstart', e => {
     if (e.touches.length > 1) e.preventDefault();
-  }, {passive:false});
-  let lastTouch = 0;
-  document.addEventListener('touchend', e => {
-    const now = Date.now();
-    if (now - lastTouch <= 320){
-      if (!e.target.closest('input,textarea,select,[contenteditable]')){
-        e.preventDefault();
-      }
-    }
-    lastTouch = now;
   }, {passive:false});
   document.addEventListener('wheel', e => {
     if (e.ctrlKey) e.preventDefault();
@@ -614,7 +636,8 @@ const I = {
   more:'M12 6v.01|M12 12v.01|M12 18v.01',
   move:'M5 9l-3 3 3 3|M9 5l3-3 3 3|M15 19l-3 3-3-3|M19 9l3 3-3 3|M2 12h20|M12 2v20',
   phone:'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z',
-  info:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20|M12 16v-4|M12 8h.01'
+  info:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20|M12 16v-4|M12 8h.01',
+  trending:'M22 7l-8.5 8.5-5-5L2 17|M16 7h6v6'
 };
 const ic=(n,s=19)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${(I[n]||'').split('|').map(d=>`<path d="${d}"/>`).join('')}</svg>`;
 document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic,+e.dataset.s||19));
@@ -682,7 +705,6 @@ if(!Array.isArray(S.collapsed))S.collapsed=[];
 if(!Array.isArray(S.recent))S.recent=[];
 if(typeof S.hideData!=='boolean')S.hideData=false;
 
-/* ═══════ ترقية تلقائية للترتيب الافتراضي = الأقدم حجزاً ═══════ */
 if(!S._v || S._v < 4){
   if(!S.sortBy || S.sortBy === 'doneFirst' || S.sortBy === 'bookingNew'){
     S.sortBy = 'booking';
@@ -742,6 +764,8 @@ tx.forEach(t=>{
   if(typeof t.notes!=='string')t.notes='';
   if(typeof t.rowColor!=='string')t.rowColor='#ffffff';
   if(!t.clientId)t.clientId=nextClientId(t.year);
+  if(typeof t.expectDollarPrice === 'undefined') t.expectDollarPrice = '';
+  if(typeof t.expectNetDollars  === 'undefined') t.expectNetDollars  = '';
 });
 function nextClientId(y){
   const nums=tx.map(t=>t.clientId).filter(Boolean).map(id=>{const m=String(id).match(/^C-(\d+)-(\d+)$/);return m&&+m[1]===y?+m[2]:0;});
@@ -756,7 +780,6 @@ const calc=t=>{
   return t.isHalf?(f-c)/2:f-c-b;
 };
 
-/* ═══════ مهلة الحجز = 30 يوم بانتظار شركة الصرافة ═══════ */
 const GRACE_DAYS = 30;
 const MS_DAY = 86400000;
 
@@ -783,6 +806,129 @@ const smartColor=t=>{
   if(t.cancelled)return 'var(--sub)';
   if(t.done)return calc(t)>=0?'var(--ok)':'var(--no)';
   return 'var(--ac)';
+};
+
+/* ============ EXPECTED PROFIT ============ */
+const expectCost = t => num(t.isHalf ? 0 : t.buyPrice) + num(t.chargePrice);
+const expectRev  = t => num(t.expectDollarPrice) * num(t.expectNetDollars);
+const expectProfit = t => {
+  const p = expectRev(t) - expectCost(t);
+  return t.isHalf ? p / 2 : p;
+};
+let expCur = -1;
+
+function renderExpectList(){
+  const Y = selYear();
+  const rows = tx.map((t, i) => ({ t, i }))
+    .filter(({ t }) => +t.year === Y && !t.cancelled && !t.done);
+  const HP = S.hideProfit || S.hideData;
+  let total = 0;
+
+  if (!rows.length){
+    $('expListB').innerHTML = `<div class="em">${ic('inbox',40)}
+      <p>لا توجد معاملات غير مبيعة</p>
+      <small style="display:block;margin-top:8px;color:var(--sub);font-size:11.5px">افتح معاملة جارية ← اضغط الأيقونة ← أدخل سعر الدولار والدولار المستلم</small></div>`;
+    $('expTotalP').textContent = '0.00';
+    $('expTotal').classList.remove('neg');
+    return;
+  }
+
+  $('expListB').innerHTML = rows.map(({ t, i }) => {
+    const p = expectProfit(t);
+    total += p;
+    const hasData = num(t.expectDollarPrice) > 0 && num(t.expectNetDollars) > 0;
+    const nameDisp = S.hideData ? DOTS : esc(t.name || '-');
+    const clr = !HP && p < 0 ? 'r' : 'g';
+    const sub = hasData
+      ? (S.hideData ? '••••' : `شحن ${fmt(num(t.chargePrice))} • $${fmt(num(t.expectDollarPrice))} × ${fmt(num(t.expectNetDollars))}`)
+      : 'لم تُدخل بيانات الدولار بعد';
+    return `<button class="expRow" data-ei="${i}">
+      <div class="info"><b>${nameDisp}</b><small>${sub}</small></div>
+      <span class="ep-val ${HP ? '' : clr}">${HP ? '•••••' : fmt(p)}</span>
+    </button>`;
+  }).join('');
+
+  $('expTotalP').textContent = HP ? DOTS : fmt(total);
+  $('expTotal').classList.toggle('neg', !HP && total < 0);
+}
+
+function openExpectList(){
+  expCur = -1;
+  renderExpectList();
+  openM('expL');
+}
+
+function openExpectDetail(i){
+  expCur = i;
+  const t = tx[i];
+  if (!t) return;
+  $('expN').textContent = S.hideData ? 'تفاصيل المكسب' : (t.name || 'تفاصيل المكسب');
+  $('expInfo').textContent = (!S.hideData && t.clientId) ? ('رمز العميل: ' + t.clientId) : '';
+  $('exp_buy').value = t.isHalf ? '' : (t.buyPrice || '');
+  $('exp_buy').disabled = !!t.isHalf;
+  $('exp_charge').value = t.chargePrice || '';
+  $('exp_dollar').value = t.expectDollarPrice || '';
+  $('exp_net').value = t.expectNetDollars || '';
+  $('expHalfNote').style.display = t.isHalf ? 'block' : 'none';
+  updateExpectPreview();
+  openM('expD');
+}
+
+function updateExpectPreview(){
+  const t = tx[expCur];
+  if (!t) return;
+  const b  = num($('exp_buy').value);
+  const c  = num($('exp_charge').value);
+  const dp = num($('exp_dollar').value);
+  const nd = num($('exp_net').value);
+  const cost  = b + c;
+  const rev   = dp * nd;
+  const total = rev - cost;
+  const p = t.isHalf ? total / 2 : total;
+  const HP = S.hideProfit || S.hideData;
+
+  $('expCost').textContent = HP ? DOTS : fmt(cost);
+  $('expRev').textContent  = HP ? DOTS : fmt(rev);
+  const el = $('expProfit');
+  el.textContent = HP ? DOTS : fmt(p);
+  el.classList.toggle('neg', !HP && p < 0);
+}
+
+$('bExp').onclick = () => { hp(15); openExpectList(); };
+['exp_buy','exp_charge','exp_dollar','exp_net'].forEach(k =>
+  $(k).addEventListener('input', updateExpectPreview)
+);
+$('expListB').onclick = e => {
+  const b = e.target.closest('[data-ei]');
+  if (!b) return;
+  hp(12);
+  openExpectDetail(+b.dataset.ei);
+};
+$('expSave').onclick = () => {
+  const t = tx[expCur];
+  if (!t) return;
+  if (!t.isHalf) t.buyPrice = $('exp_buy').value;
+  t.chargePrice = $('exp_charge').value;
+  t.expectDollarPrice = $('exp_dollar').value;
+  t.expectNetDollars  = $('exp_net').value;
+  save();
+  closeM('expD');
+  if ($('expL').classList.contains('on')) renderExpectList();
+  toast('تم حفظ بيانات المكسب المتوقع');
+};
+$('expShare').onclick = () => {
+  const Y = selYear();
+  const rows = tx.map((t,i)=>({t,i})).filter(({t})=>+t.year===Y&&!t.cancelled&&!t.done);
+  if(!rows.length){toast('لا توجد بيانات','i');return;}
+  let total = 0;
+  let txt = 'الربح المتوقع — '+dispNum(Y)+'\n\n';
+  rows.forEach(({t},k) => {
+    const p = expectProfit(t);
+    total += p;
+    txt += (k+1)+'- '+(S.hideData?'••••':(t.name||'-'))+' : '+(S.hideProfit||S.hideData?'••••':fmt(p))+'\n';
+  });
+  txt += '\nالإجمالي: '+(S.hideProfit||S.hideData?'••••':fmt(total));
+  share(txt, 'الربح المتوقع');
 };
 
 /* ============ SNAPSHOTS ============ */
@@ -1047,6 +1193,7 @@ function stages(t){
 /* ============ RING ============ */
 function ring(t){
   if(t.cancelled)return `<div class="ring"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="none" stroke="var(--bd)" stroke-width="3"/></svg><div class="rt" style="color:var(--sub)">0</div></div>`;
+  if(S.hideData)return `<div class="ring"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="none" stroke="var(--bd)" stroke-width="3"/></svg><div class="rt">•</div></div>`;
   const yearTotal=tx.filter(x=>+x.year===+t.year&&!x.cancelled).reduce((s,x)=>s+Math.max(0,calc(x)),0);
   const own=Math.max(0,calc(t));
   const pct=yearTotal>0?own/yearTotal:0;
@@ -1057,7 +1204,7 @@ function ring(t){
       <circle cx="17" cy="17" r="14" fill="none" stroke="var(--bd)" stroke-width="3"/>
       <circle cx="17" cy="17" r="14" fill="none" stroke="var(--rc)" stroke-width="3" stroke-linecap="round" stroke-dasharray="${dash} ${C.toFixed(1)}"/>
     </svg>
-    <div class="rt">${S.hideData?'•':Math.round(pct*100)}</div>
+    <div class="rt">${Math.round(pct*100)}</div>
   </div>`;
 }
 
@@ -1076,7 +1223,6 @@ function card(r,n){
 
   const nameDisp = H ? DOTS : (esc(t.name)||'-');
 
-  /* ─────── السطر الوصفي: إدخال (أخضر) • حجز (أخضر) • الحالة ─────── */
   let meta = '';
   if(H){
     meta = '<i>••••••</i>';
@@ -1123,8 +1269,12 @@ function card(r,n){
   if(t.clientId)m+=`<span class="tag" style="font-family:monospace;font-size:11px">${H?'••••••':esc(t.clientId)}</span>`;
 
   const moreBtn=`<button class="more-btn" data-a="more" ${k} aria-label="خيارات">${ic('more',20)}</button>`;
-  const acts=c?`<button class="ab ac" data-a="rest" ${k}>${ic('undo',17)}تفعيل المعاملة</button>`
-    :`<button class="ab${t.done?'':' ac'}" data-a="sale" ${k}>${t.done?ic('undo',17)+'تراجع عن الإتمام':ic('check',17)+'إتمام البيع'}</button><button class="ab" data-a="book" ${k}>${ic('cal',17)}${t.done?'منتهي':t.bookingDate?'تم الحجز':'حجز موعد'}</button>`;
+  const bookBtn = t.done
+    ? `<button class="ab" disabled style="opacity:.5;pointer-events:none">${ic('cal',17)}منتهي</button>`
+    : `<button class="ab" data-a="book" ${k}>${ic('cal',17)}${t.bookingDate?'تم الحجز':'حجز موعد'}</button>`;
+  const acts=c
+    ? `<button class="ab ac" data-a="rest" ${k}>${ic('undo',17)}تفعيل المعاملة</button>`
+    : `<button class="ab${t.done?'':' ac'}" data-a="sale" ${k}>${t.done?ic('undo',17)+'تراجع عن الإتمام':ic('check',17)+'إتمام البيع'}</button>${bookBtn}`;
 
   return `<div class="c${c?' x':''}${collapsed?' col':''}" style="--rc:${rc}" ${idAttr}>
     <div class="inner">
@@ -1191,10 +1341,8 @@ function render(){
   const {active,done,cancelled}=computeRows();
   let n=0,h='';
 
-  /* 1) المعاملات الجارية (الأساسية) */
   h += active.map(r=>card(r,++n)).join('');
 
-  /* 2) قسم المعاملات المكتملة — يظهر أسفل الجارية */
   if(done.length){
     h += `<div class="sec-h">
       <span class="sec-t">${ic('check',14)} المعاملات المكتملة</span>
@@ -1203,7 +1351,6 @@ function render(){
     ${done.map(r=>card(r,++n)).join('')}`;
   }
 
-  /* 3) قسم المعاملات الملغية */
   if(cancelled.length){
     h += `<div class="sec-h">
       <span class="sec-t">${ic('ban',14)} المعاملات الملغية</span>
@@ -1301,7 +1448,7 @@ function toggleFold(i){
 }
 
 /* ============================================================
-   AUTOCOMPLETE — تعبئة تلقائية من العملاء السابقين
+   AUTOCOMPLETE
    ============================================================ */
 let clientIndex = [];
 
@@ -1465,8 +1612,9 @@ function updatePreview(){
   $('pvCharge').textContent=c>0?fmt(c):'—';
   $('pvSell').textContent=s>0?fmt(f):'—';
   const el=$('pvProfit');
-  el.textContent=S.hideProfit?'•••••':fmt(p);
-  el.classList.toggle('neg',!S.hideProfit&&p<0);
+  const HP = S.hideProfit || S.hideData;
+  el.textContent=HP?DOTS:fmt(p);
+  el.classList.toggle('neg',!HP&&p<0);
 }
 function form(i=-1){
   edit=i;
@@ -1502,8 +1650,7 @@ $('fSave').onclick=()=>{
   const o=edit>-1?tx[edit]:null;
   const spRaw=String(v('sellPrice')).trim();
   const sp=parseFloat(spRaw)||0;
-  let done=!!(o&&o.done);
-  if(spRaw!==''){ done = sp>0; }
+  const done = spRaw !== '' && sp > 0;
   const y=parseInt(v('year'),10)||selYear();
   const d=Object.assign({},o||{},Object.fromEntries(F.map(k=>[k,k==='name'?v(k).trim():v(k)])),{
     id:o?o.id:uid(),
@@ -1515,6 +1662,10 @@ $('fSave').onclick=()=>{
     cancelled:o?!!o.cancelled:false,
     bookingDate:o?(o.bookingDate||''):''
   });
+  // إذا تغيّرت السنة، أعد توليد clientId
+  if(o && +o.year !== +y){
+    d.clientId = nextClientId(y);
+  }
   if(d.isHalf)d.buyPrice='';
   if(o)tx[edit]=d;else tx.push(d);
   if(!o){S.year=y;saveS();}
@@ -1590,15 +1741,18 @@ function details(i){
   S.recent.unshift(t.id);
   S.recent=S.recent.slice(0,10);
   saveS();
-  $('dN').textContent=t.name||'تفاصيل المعاملة';
-  $('dId').textContent=t.clientId?'رمز العميل: '+t.clientId:'';
+  const H = S.hideData;
+  $('dN').textContent = H ? DOTS : (t.name||'تفاصيل المعاملة');
+  $('dId').textContent = (H||!t.clientId) ? '' : ('رمز العميل: '+t.clientId);
   $('dI').innerHTML=[
     ['رقم الهاتف',t.phone],['الحساب',t.account],['الرقم الوطني',t.nationalId],
     ['جواز السفر',t.passport],['IBAN',t.iban],['تاريخ الإدخال',t.date],
     ['تاريخ الحجز',t.bookingDate||'-']
   ].map(([l,v])=>{
-    const val=v||'-';
-    return `<button class="ii" data-cp="${esc(val)}"><small>${l}</small><b>${esc(val)}</b></button>`;
+    const realVal = v||'-';
+    const shownVal = H?'••••••':realVal;
+    const cpAttr = H?'':esc(realVal);
+    return `<button class="ii" data-cp="${cpAttr}"><small>${l}</small><b>${esc(shownVal)}</b></button>`;
   }).join('');
   $('d_buy').value=t.buyPrice||'';
   $('d_charge').value=t.chargePrice||'';
@@ -1617,7 +1771,8 @@ function dp(){
   const b=num($('d_buy').value),c=num($('d_charge').value),s=num($('d_sell').value),d=num($('d_disc').value);
   const f=s-s*d/100;
   const p=$('d_half').checked?(f-c)/2:f-c-b;
-  $('dP').textContent=(S.hideProfit||S.hideData)?'•••••':p.toFixed(2);
+  const HP = S.hideProfit || S.hideData;
+  $('dP').textContent=HP?'•••••':p.toFixed(2);
   $('dPc').style.background=p>=0?'var(--ok)':'var(--no)';
 }
 function dh(){
@@ -1638,11 +1793,14 @@ $('dSave').onclick=()=>{
   t.discount=$('d_disc').value;
   t.notes=$('d_notes').value;
   const y=parseInt($('d_year').value,10);
-  if(y>=2000&&y<=2100)t.year=y;
+  if(y>=2000&&y<=2100 && +t.year !== +y){
+    t.year=y;
+    t.clientId = nextClientId(y);
+  }
   t.isHalf=$('d_half').checked;
   if(t.isHalf)t.buyPrice='';
   const sp=parseFloat(spRaw)||0;
-  if(spRaw!=='') t.done = sp>0;
+  t.done = spRaw !== '' && sp > 0;
   save();render();toast('تم حفظ التعديلات بنجاح');closeM('det');
 };
 $('dDup').onclick=()=>{
@@ -1650,16 +1808,19 @@ $('dDup').onclick=()=>{
   const c=Object.assign({},t,{
     id:uid(),clientId:nextClientId(t.year),
     date:new Date().toLocaleDateString('en-GB'),
-    done:false,cancelled:false,bookingDate:'',sellPrice:'',notes:'',rowColor:'#ffffff'
+    done:false,cancelled:false,bookingDate:'',sellPrice:'',notes:'',rowColor:'#ffffff',
+    expectDollarPrice:'',expectNetDollars:''
   });
   tx.push(c);save();closeM('det');render();toast('تم نسخ المعاملة');
 };
 
 /* ============ BOOKING ============ */
 function book(i){
+  const t = tx[i];
+  if(!t || t.done){toast('المعاملة مكتملة','i');return;}
   cur=i;
-  $('bk_d').value=tx[i].bookingDate||'';
-  $('bk_c').style.display=tx[i].bookingDate?'':'none';
+  $('bk_d').value=t.bookingDate||'';
+  $('bk_c').style.display=t.bookingDate?'':'none';
   openM('bk');
 }
 $('bk_s').onclick=()=>{
@@ -1680,7 +1841,7 @@ let moreIdx=-1;
 function openMore(i){
   moreIdx=i;
   const t=tx[i];if(!t)return;
-  $('moreT').textContent=t.name||'خيارات';
+  $('moreT').textContent = S.hideData ? 'خيارات' : (t.name||'خيارات');
   const items=[
     ['edit','edit','تعديل البيانات'],
     ['share','share','مشاركة البيانات'],
@@ -1713,7 +1874,8 @@ function copyTx(i){
   const c=Object.assign({},t,{
     id:uid(),clientId:nextClientId(t.year),
     date:new Date().toLocaleDateString('en-GB'),
-    done:false,cancelled:false,bookingDate:'',sellPrice:'',notes:'',rowColor:'#ffffff'
+    done:false,cancelled:false,bookingDate:'',sellPrice:'',notes:'',rowColor:'#ffffff',
+    expectDollarPrice:'',expectNetDollars:''
   });
   tx.push(c);save();render();toast('تم نسخ المعاملة');
 }
@@ -1725,11 +1887,12 @@ function openMove(i){
   moveIdx=i;
   const t=tx[i];if(!t)return;
   const initial=(t.name||'?').trim().charAt(0);
+  const H = S.hideData;
   $('moveCard').innerHTML=`
-    <span class="av">${esc(initial)}</span>
+    <span class="av">${H?'?':esc(initial)}</span>
     <div class="info">
-      <b>${esc(t.name||'-')}</b>
-      <small>${esc(t.clientId||'')}</small>
+      <b>${H?DOTS:esc(t.name||'-')}</b>
+      <small>${H?'':esc(t.clientId||'')}</small>
     </div>`;
   updateMoveButtons();
   openM('moveM');
@@ -1751,7 +1914,9 @@ function moveOne(dir){
   if(np<0||np>=vis.length)return;
   const j=vis[np];
   const tmp=tx[moveIdx];tx[moveIdx]=tx[j];tx[j]=tmp;
+  moveIdx=j;
   save();hp(10);
+  render();
   updateMoveButtons();
 }
 $('moveUp').onclick=()=>moveOne(-1);
@@ -1761,7 +1926,8 @@ $('moveDone').onclick=()=>{closeM('moveM');moveIdx=-1;render();toast('تم ال�
 /* ============ DELETE / RESTORE / SHARE ============ */
 function del(i){
   const t=tx[i];if(!t)return;
-  ask('تأكيد الحذف','هل تريد حذف «'+(t.name||'')+'» نهائياً؟','حذف',()=>{
+  const msg = S.hideData ? 'هل تريد حذف هذه المعاملة نهائياً؟' : ('هل تريد حذف «'+(t.name||'')+'» نهائياً؟');
+  ask('تأكيد الحذف',msg,'حذف',()=>{
     const removed=tx.splice(i,1)[0];
     save();render();
     toastAct('تم حذف المعاملة','تراجع',()=>{
@@ -1779,13 +1945,14 @@ function restore(i){
 }
 function shareTx(i){
   const t=tx[i];
+  const H = S.hideData;
   const lines=[
-    'الاسم: '+(t.name||'-'),
-    'تليفون: '+(t.phone||'-'),
-    'حساب: '+(t.account||'-'),
-    'IBAN: '+(t.iban||'-'),
-    'رقم وطني: '+(t.nationalId||'-'),
-    'جواز السفر: '+(t.passport||'-'),
+    'الاسم: '+(H?'••••':(t.name||'-')),
+    'تليفون: '+(H?'••••':(t.phone||'-')),
+    'حساب: '+(H?'••••':(t.account||'-')),
+    'IBAN: '+(H?'••••':(t.iban||'-')),
+    'رقم وطني: '+(H?'••••':(t.nationalId||'-')),
+    'جواز السفر: '+(H?'••••':(t.passport||'-')),
     'السنة: '+(t.year||'-'),
     'تاريخ الإدخال: '+(t.date||'-'),
     'تاريخ الحجز: '+(t.bookingDate||'-'),
@@ -1995,6 +2162,30 @@ $('bEx').onclick=()=>{
   }catch(e){toast('تعذر التصدير','e');}
 };
 $('bIm').onclick=()=>$('fi').click();
+
+// إسناد clientId فريد لمجموعة بيانات مستوردة
+function ensureClientIds(data){
+  const yearsSet = new Set(data.map(t => +t.year || 0).filter(y => y > 0));
+  yearsSet.forEach(y => {
+    let max = 0;
+    data.forEach(t => {
+      if (+t.year !== y) return;
+      const m = String(t.clientId || '').match(/^C-(\d+)-(\d+)$/);
+      if (m && +m[1] === y) max = Math.max(max, +m[2]);
+    });
+    data.forEach(t => {
+      if (+t.year !== y) return;
+      if (!t.clientId || !/^C-\d+-\d+$/.test(t.clientId)) {
+        max++;
+        t.clientId = `C-${y}-${String(max).padStart(3,'0')}`;
+      } else {
+        const m = t.clientId.match(/^C-(\d+)-(\d+)$/);
+        if (m && +m[1] === y) max = Math.max(max, +m[2]);
+      }
+    });
+  });
+}
+
 $('fi').onchange=e=>{
   const f=e.target.files[0];e.target.value='';if(!f)return;
   if(typeof XLSX==='undefined'){toast('مكتبة Excel غير متاحة','e');return;}
@@ -2014,9 +2205,12 @@ $('fi').onchange=e=>{
         year:parseInt(o.year,10)||curYear,
         date:o.date||new Date().toLocaleDateString('en-GB'),
         done:bo(o.done),cancelled:bo(o.cancelled),isHalf:bo(o.isHalf),
-        bookingDate:o.bookingDate||'',rowColor:o.rowColor||'#ffffff'
+        bookingDate:o.bookingDate||'',rowColor:o.rowColor||'#ffffff',
+        clientId:o.clientId||'',
+        expectDollarPrice: o.expectDollarPrice || '',
+        expectNetDollars:  o.expectNetDollars  || ''
       }));
-      data.forEach(t=>t.clientId=nextClientId(t.year));
+      ensureClientIds(data);
       closeM('set');
       ask('استيراد نسخة','سيتم استبدال البيانات الحالية بـ '+data.length+' معاملة من الملف. سيتم حفظ نسخة تلقائية أولاً.','استيراد',()=>{
         createSnapshot('قبل استيراد Excel',true);
@@ -2063,10 +2257,12 @@ $('fj').onchange=e=>{
       incoming.forEach(t=>{
         if(!t.id) t.id = uid();
         if(!t.year){let y=curYear;const m=String(t.date||'').match(/(\d{4})/);if(m)y=+m[1];t.year=y;}
-        if(!t.clientId) t.clientId = nextClientId(t.year);
         if(typeof t.notes!=='string') t.notes='';
         if(typeof t.rowColor!=='string') t.rowColor='#ffffff';
+        if(typeof t.expectDollarPrice === 'undefined') t.expectDollarPrice = '';
+        if(typeof t.expectNetDollars  === 'undefined') t.expectNetDollars  = '';
       });
+      ensureClientIds(incoming);
       closeM('set');
       ask('استيراد نسخة JSON',
           'سيتم استبدال البيانات الحالية بـ '+incoming.length+' معاملة. سيتم حفظ نسخة تلقائية أولاً.',
@@ -2074,6 +2270,19 @@ $('fj').onchange=e=>{
         createSnapshot('قبل استيراد JSON', true);
         tx = incoming;
         if(Array.isArray(data.extraYears)) S.extraYears = data.extraYears.slice();
+        if(Array.isArray(data.snaps)){
+          const cleanSnaps = data.snaps.filter(s => s && typeof s === 'object' && Array.isArray(s.tx));
+          if(cleanSnaps.length){
+            snaps = cleanSnaps;
+            saveSnaps();
+            updateSnapCount();
+          }
+        }
+        if(data.settings && typeof data.settings === 'object'){
+          if(typeof data.settings.goal === 'number') S.goal = data.settings.goal;
+          if(data.settings.numerals === 'arabic' || data.settings.numerals === 'western') S.numerals = data.settings.numerals;
+          if(typeof data.settings.sortBy === 'string' && (data.settings.sortBy === 'none' || SO[data.settings.sortBy])) S.sortBy = data.settings.sortBy;
+        }
         S.year = null;
         saveS(); save(); render();
         toast('تم الاستيراد بنجاح');
@@ -2084,22 +2293,25 @@ $('fj').onchange=e=>{
 };
 
 $('bWipe').onclick=()=>{
-  ask('حذف كل البيانات','سيتم حذف جميع المعاملات والسنوات نهائياً. سيتم حفظ نسخة تلقائية قبل الحذف.','نعم، احذف الكل',()=>{
-    const snap=createSnapshot('قبل حذف كل البيانات',true);
-    doWipe(snap);
+  ask('حذف كل البيانات','سيتم حذف جميع المعاملات والسنوات وكل النسخ الاحتياطية نهائياً. (يمكن التراجع لفترة قصيرة فقط)','نعم، احذف الكل',()=>{
+    const undoSnap = {
+      tx: JSON.parse(JSON.stringify(tx)),
+      extraYears: S.extraYears.slice(),
+      year: S.year
+    };
+    tx=[];S.extraYears=[];S.year=null;S.recent=[];
+    snaps=[];
+    try{localStorage.removeItem(SNAPK);}catch(e){}
+    updateSnapCount();
+    save();saveS();closeM('set');render();
+    toastAct('تم حذف كل البيانات','تراجع',()=>{
+      tx=undoSnap.tx;
+      S.extraYears=undoSnap.extraYears;
+      if(undoSnap.year)S.year=undoSnap.year;
+      save();saveS();render();toast('تم استرجاع البيانات');
+    });
   });
 };
-function doWipe(snap){
-  tx=[];S.extraYears=[];S.year=null;S.recent=[];
-  save();saveS();closeM('set');render();
-  toastAct('تم حذف كل البيانات','تراجع',()=>{
-    if(!snap)return;
-    tx=JSON.parse(JSON.stringify(snap.tx));
-    S.extraYears=snap.extraYears.slice();
-    if(snap.year)S.year=snap.year;
-    save();saveS();render();toast('تم استرجاع البيانات');
-  });
-}
 
 /* ============ GLOBAL EVENTS ============ */
 document.addEventListener('click',e=>{
@@ -2127,18 +2339,21 @@ document.addEventListener('keydown',e=>{
     document.querySelectorAll('.bg.on').forEach(b=>b.classList.remove('on'));
     return;
   }
+  if(e.key==='s'&&(e.ctrlKey||e.metaKey)){
+    e.preventDefault();
+    if($('form').classList.contains('on'))$('fSave').click();
+    else if($('det').classList.contains('on'))$('dSave').click();
+    return;
+  }
+  if(e.key===','&&(e.ctrlKey||e.metaKey)){e.preventDefault();$('bSet').click();return;}
+  if(e.key==='d'&&(e.ctrlKey||e.metaKey)){e.preventDefault();th.m=th.m==='dark'?'light':'dark';applyTheme();return;}
   if(inField)return;
+  // منع الاختصارات البسيطة إذا كانت نافذة مفتوحة
+  if(document.querySelector('.bg.on'))return;
   if(e.key==='n'||e.key==='N'){e.preventDefault();form();}
   else if(e.key==='/'){e.preventDefault();$('q').focus();}
   else if(e.key==='p'||e.key==='P'){$('pEye').click();}
   else if(e.key==='h'||e.key==='H'){$('bPv').click();}
-  else if(e.key===','&&(e.ctrlKey||e.metaKey)){e.preventDefault();$('bSet').click();}
-  else if(e.key==='d'&&(e.ctrlKey||e.metaKey)){e.preventDefault();th.m=th.m==='dark'?'light':'dark';applyTheme();}
-  else if(e.key==='s'&&(e.ctrlKey||e.metaKey)){
-    e.preventDefault();
-    if($('form').classList.contains('on'))$('fSave').click();
-    else if($('det').classList.contains('on'))$('dSave').click();
-  }
 });
 
 /* ============ BOOKING REMINDERS + BADGE ============ */
@@ -2151,7 +2366,10 @@ function checkN(){
     const b=new Date(t.bookingDate+'T00:00:00');
     if(isNaN(b.getTime()))return;
     b.setHours(0,0,0,0);
-    if(b.getTime()===tm.getTime())setTimeout(()=>toast('تنبيه: حجز '+(t.name||'')+' غداً!','i'),700);
+    if(b.getTime()===tm.getTime()){
+      const who = S.hideData ? 'عميل' : (t.name||'');
+      setTimeout(()=>toast('تنبيه: حجز '+who+' غداً!','i'),700);
+    }
     else if(b.getTime()===today.getTime())bookingToday++;
     const info=bookingInfo(t);
     if(!info)return;
