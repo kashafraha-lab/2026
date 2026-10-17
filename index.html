@@ -221,7 +221,6 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .hm .hmc.l4{background:var(--ac)}
 .hmLegend{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--sub);justify-content:flex-end;margin-top:-4px}
 .hmLegend .sw{width:12px;height:12px;border-radius:3px;box-shadow:none!important;background:var(--bd)}
-.hmLegend .sw::after{display:none}
 .hmLegend .sw.l1{background:color-mix(in srgb,var(--ac) 22%,var(--bg))}
 .hmLegend .sw.l2{background:color-mix(in srgb,var(--ac) 45%,var(--bg))}
 .hmLegend .sw.l3{background:color-mix(in srgb,var(--ac) 70%,var(--bg))}
@@ -261,17 +260,6 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .noteBox b{font-weight:600}
 .noteBox b.w{color:var(--wn)}
 .noteBox b.d{color:var(--no)}
-
-.expRow{display:flex;align-items:center;gap:10px;padding:12px 10px;border-bottom:1px solid var(--bd);cursor:pointer;transition:background .12s}
-.expRow:last-child{border-bottom:0}
-.expRow:active{background:var(--bg)}
-.expRow .info{flex:1;min-width:0}
-.expRow .info b{display:block;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.expRow .info small{display:block;font-size:11.5px;color:var(--sub);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.expRow .profit{font-weight:700;font-size:14px;flex:none;padding:4px 10px;border-radius:8px;background:var(--bg)}
-.expRow .profit.g{color:var(--ok)}
-.expRow .profit.r{color:var(--no)}
-.expRow .profit.n{color:var(--sub)}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
@@ -372,6 +360,8 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="f"><label>سعر بيع المعاملة</label><input type="number" step="any" inputmode="decimal" id="f_sellPrice"></div>
 <div class="f"><label>الخصم %</label><input type="number" step="any" inputmode="decimal" id="f_discount"></div>
 <div class="f"><label>سعر البيع بالدولار</label><input type="number" step="any" inputmode="decimal" id="f_sellPriceUSD"></div>
+<div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="f_dollarRate"></div>
+<div class="f"><label>الدولار المستلم</label><input type="number" step="any" inputmode="decimal" id="f_dollarsReceived"></div>
 <div class="f"><label>السنة</label><input type="number" inputmode="numeric" id="f_year"></div>
 <div class="f w2"><label>ملاحظات</label><textarea id="f_notes" rows="2"></textarea></div>
 </div>
@@ -398,6 +388,9 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="f"><label>سعر البيع</label><input type="number" step="any" inputmode="decimal" id="d_sell"></div>
 <div class="f"><label>الخصم %</label><input type="number" step="any" inputmode="decimal" id="d_disc"></div>
 <div class="f"><label>سعر البيع بالدولار</label><input type="number" step="any" inputmode="decimal" id="d_sellUSD"></div>
+<div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="d_dollarRate"></div>
+<div class="f"><label>الدولار المستلم</label><input type="number" step="any" inputmode="decimal" id="d_dollarsReceived"></div>
+<div class="f"><label>المكسب المتوقع (تلقائي)</label><input type="text" id="d_expProfit" readonly style="background:var(--bg);font-weight:600"></div>
 </div>
 <label class="tg"><span>معاملة بالنصف</span><input type="checkbox" id="d_half"><i class="sw"></i></label>
 <div class="pc" id="dPc">صافي الربح<b id="dP">0.00</b></div>
@@ -541,12 +534,8 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <!-- ===== EXPECTED PROFIT LIST ===== -->
 <div class="bg" id="expM"><div class="sh">
 <div class="th"><h2>الربح المتوقع</h2><button class="ib" data-x="expM" aria-label="إغلاق"><i data-ic="x"></i></button></div>
-<div class="noteBox" style="margin-top:0;margin-bottom:10px">
-  <i data-ic="info" data-s="16"></i>
-  <div>هذا الحساب <b>منفصل تمامًا</b> عن ربح المعاملة الأساسي:<br><b>المكسب = (دولار كاش × سعر الدولار) − سعر الشحن</b><br>مثال: 2,500 × 10.41 − 13,000 = 13,025</div>
-</div>
 <label class="tg"><span>تضمين المعاملات المكتملة</span><input type="checkbox" id="expShowDone"><i class="sw"></i></label>
-<div id="expList" style="max-height:46vh;overflow-y:auto"></div>
+<div id="expList" style="max-height:48vh;overflow-y:auto"></div>
 <div class="pc" id="expTotal">إجمالي الربح المتوقع<b id="expTotalVal">0.00</b></div>
 </div></div>
 
@@ -555,14 +544,15 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="th"><h2 id="expDN">—</h2><button class="ib" data-x="expD" aria-label="إغلاق"><i data-ic="x"></i></button></div>
 <label class="tg"><span>معاملة بالنصف</span><input type="checkbox" id="expD_half"><i class="sw"></i></label>
 <div class="g2">
-<div class="f"><label>دولار كاش</label><input type="number" step="any" inputmode="decimal" id="expD_cash" placeholder="مثال: 2500"></div>
-<div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="expD_rate" placeholder="مثال: 10.41"></div>
-<div class="f w2"><label>سعر الشحن (بالدينار)</label><input type="number" step="any" inputmode="decimal" id="expD_shipping" placeholder="مثال: 13000"></div>
+<div class="f"><label id="expD_buyLbl">سعر الشراء</label><input type="number" step="any" inputmode="decimal" id="expD_buy"></div>
+<div class="f"><label>قيمة الشحن</label><input type="number" step="any" inputmode="decimal" id="expD_charge"></div>
+<div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="expD_rate"></div>
+<div class="f"><label>الدولار المستلم</label><input type="number" step="any" inputmode="decimal" id="expD_received"></div>
 </div>
 <div class="preview">
 <h4>الحساب المتوقع</h4>
-<div class="pvRow"><span>دولار كاش × سعر الدولار</span><span id="expD_value">—</span></div>
-<div class="pvRow"><span>سعر الشحن</span><span id="expD_ship">—</span></div>
+<div class="pvRow"><span>إجمالي التكلفة</span><span id="expD_cost">—</span></div>
+<div class="pvRow"><span>القيمة المستلمة</span><span id="expD_value">—</span></div>
 <div class="pvTotal"><span>المكسب المتوقع</span><b id="expD_profit">0.00</b></div>
 <div id="expFormula" style="font-size:11px;color:var(--sub);margin-top:8px;text-align:center"></div>
 </div>
@@ -759,46 +749,34 @@ tx.forEach(t=>{
   if(typeof t.notes!=='string')t.notes='';
   if(typeof t.rowColor!=='string')t.rowColor='#ffffff';
   if(!t.clientId)t.clientId=nextClientId(t.year);
-  // ترحيل حقول الربح المتوقع - منفصلة تمامًا
-  if(typeof t.expHalf!=='boolean') t.expHalf = false;
-  if(t.dollarsCash === undefined) t.dollarsCash = t.dollarsReceived ?? '';
-  if(t.expShipping === undefined) t.expShipping = t.expCharge ?? '';
-  delete t.dollarsReceived;
-  delete t.expCharge;
-  delete t.expBuy;
 });
-function nextClientId(y, arr){
-  const list = arr || tx;
-  const nums = list.map(t=>t.clientId).filter(Boolean).map(id=>{
-    const m=String(id).match(/^C-(\d+)-(\d+)$/);
-    return m && +m[1] === +y ? +m[2] : 0;
-  });
-  const max = nums.length ? Math.max(...nums) : 0;
+function nextClientId(y){
+  const nums=tx.map(t=>t.clientId).filter(Boolean).map(id=>{const m=String(id).match(/^C-(\d+)-(\d+)$/);return m&&+m[1]===y?+m[2]:0;});
+  const max=nums.length?Math.max(...nums):0;
   return `C-${y}-${String(max+1).padStart(3,'0')}`;
 }
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(tx));return true;}catch(e){toast('تعذر حفظ البيانات، الذاكرة ممتلئة','e');return false;}};
 
-/* ═══════ الربح الأساسي — معادلة أصلية غير معدلة ═══════ */
 const calc=t=>{
   const b=num(t.buyPrice),c=num(t.chargePrice),s=num(t.sellPrice),d=num(t.discount);
   const f=s-s*d/100;
-  return t.isHalf?(f-c)/2:f-c-b;
+  return t.isHalf?(f-c-b)/2:f-c-b;
 };
 
-/* ═══════ الربح المتوقع — منفصل تمامًا ═══════ */
+/* ═══════ حساب الربح المتوقع عبر المصرف ═══════ */
 const expCalc = (t) => {
-  const cash     = num(t.dollarsCash);
-  const rate     = num(t.dollarRate);
-  const shipping = num(t.expShipping);
-  if (cash <= 0 || rate <= 0) {
-    return {valid:false, cash, rate, value:0, shipping, profit:0};
-  }
-  const value  = cash * rate;
-  const profit = t.expHalf ? (value - shipping)/2 : (value - shipping);
-  return {valid:true, cash, rate, value, shipping, profit};
+  const buy = num(t.buyPrice);
+  const charge = num(t.chargePrice);
+  const rate = num(t.dollarRate);
+  const received = num(t.dollarsReceived);
+  if (rate <= 0 || received <= 0) return {valid:false, value:0, cost:0, profit:0};
+  const value = received * rate;
+  const cost = buy + charge;
+  const profit = t.isHalf ? (value - cost) / 2 : value - cost;
+  return {valid:true, value, cost, profit};
 };
 
-/* ═══════ مهلة الحجز ═══════ */
+/* ═══════ مهلة الحجز = 30 يوم بانتظار شركة الصرافة ═══════ */
 const GRACE_DAYS = 30;
 const MS_DAY = 86400000;
 
@@ -859,14 +837,7 @@ function restoreSnapshot(id){
   ask('استعادة النسخة',`سيتم استبدال البيانات الحالية (${tx.length} معاملة) ببيانات هذه النسخة (${s.tx.length} معاملة). سيتم حفظ نسخة تلقائية أولاً.`,'استعادة',()=>{
     createSnapshot('قبل استعادة: '+s.name,true);
     tx=JSON.parse(JSON.stringify(s.tx));
-    tx.forEach(t=>{
-      if(!t.id)t.id=uid();
-      if(!t.clientId)t.clientId=nextClientId(t.year);
-      if(typeof t.expHalf!=='boolean')t.expHalf=false;
-      if(t.dollarsCash===undefined) t.dollarsCash = t.dollarsReceived ?? '';
-      if(t.expShipping===undefined) t.expShipping = t.expCharge ?? '';
-      delete t.dollarsReceived; delete t.expCharge; delete t.expBuy;
-    });
+    tx.forEach(t=>{if(!t.id)t.id=uid();if(!t.clientId)t.clientId=nextClientId(t.year);});
     S.extraYears=Array.isArray(s.extraYears)?s.extraYears.slice():[];
     S.year=null;saveS();save();closeM('snaps');render();
     toast('تم استعادة النسخة بنجاح');
@@ -1016,7 +987,7 @@ function computeRows(){
   return {active, done, cancelled};
 }
 
-/* ============ STATS (لا علاقة للربح المتوقع) ============ */
+/* ============ STATS ============ */
 function stats(){
   const Y=selYear();
   let P=0,P2=0,B=0,pe=0,dn=0,cn=0,bk=0,n=0;
@@ -1024,12 +995,10 @@ function stats(){
     if(+t.year!==Y)return;
     n++;
     if(t.cancelled){cn++;return;}
-    // لا نحسب ربحًا للمعاملات الجارية التي لم يتم بيعها بعد
-    const hasSale = t.done || num(t.sellPrice) > 0;
-    if (hasSale) P += calc(t);
-    B += num(t.buyPrice);
-    if(t.done){dn++; P2 += calc(t);}
-    else{pe++; if(t.bookingDate) bk++;}
+    P+=calc(t);
+    B+=num(t.buyPrice);
+    if(t.done){dn++;P2+=calc(t);}
+    else{pe++;if(t.bookingDate)bk++;}
   });
   const H = S.hideData;
   const HP = S.hideProfit || H;
@@ -1089,7 +1058,7 @@ function stages(t){
 /* ============ RING ============ */
 function ring(t){
   if(t.cancelled)return `<div class="ring"><svg width="34" height="34" viewBox="0 0 34 34"><circle cx="17" cy="17" r="14" fill="none" stroke="var(--bd)" stroke-width="3"/></svg><div class="rt" style="color:var(--sub)">0</div></div>`;
-  const yearTotal=tx.filter(x=>+x.year===+t.year&&!x.cancelled&&(x.done||num(x.sellPrice)>0)).reduce((s,x)=>s+Math.max(0,calc(x)),0);
+  const yearTotal=tx.filter(x=>+x.year===+t.year&&!x.cancelled).reduce((s,x)=>s+Math.max(0,calc(x)),0);
   const own=Math.max(0,calc(t));
   const pct=yearTotal>0?own/yearTotal:0;
   const C=2*Math.PI*14;
@@ -1115,6 +1084,7 @@ function card(r,n){
   const HP=S.hideProfit || H;
 
   const pill=c?'<span class="pill gr">ملغية</span>':t.done?`<span class="pill ok">${ic('check',13)}مكتملة</span>`:`<span class="pill wn">${ic('clock',13)}جارية</span>`;
+
   const nameDisp = H ? DOTS : (esc(t.name)||'-');
 
   let meta = '';
@@ -1122,14 +1092,20 @@ function card(r,n){
     meta = '<i>••••••</i>';
   } else {
     const parts = [];
-    if(t.date){parts.push(`<i class="meta-date">${ic('note',11)}إدخال ${esc(t.date)}</i>`);}
+    if(t.date){
+      parts.push(`<i class="meta-date">${ic('note',11)}إدخال ${esc(t.date)}</i>`);
+    }
     if(t.bookingDate){
       parts.push(`<i class="meta-date">${ic('cal',11)}حجز ${esc(t.bookingDate)}</i>`);
       const bi = bookingInfo(t);
       if(bi){
-        if(bi.status === 'future'){parts.push(`<i class="meta-status f">موعد حجز قادم</i>`);}
-        else if(bi.status === 'overdue'){parts.push(`<i class="meta-status d">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);}
-        else {parts.push(`<i class="meta-status w">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);}
+        if(bi.status === 'future'){
+          parts.push(`<i class="meta-status f">موعد حجز قادم</i>`);
+        } else if(bi.status === 'overdue'){
+          parts.push(`<i class="meta-status d">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);
+        } else {
+          parts.push(`<i class="meta-status w">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);
+        }
       }
     }
     meta = parts.join('');
@@ -1266,7 +1242,6 @@ function render(){
   const filtered=!!$('q').value.trim()||S.flt!=='all'||S.month!=='all';
   $('hint').textContent=(!SO[S.sortBy]&&total>1)?'اضغط مطولاً على أي بطاقة لنقلها':(filtered?'':'');
   stats();
-  if($('expM').classList.contains('on')) renderExp();
   const em=$('emAdd');
   if(em)em.onclick=()=>form();
 }
@@ -1446,18 +1421,17 @@ function attachSuggestion(inputId, target){
 }
 
 /* ============ FORM ============ */
-const F=['name','phone','account','nationalId','passport','iban','buyPrice','chargePrice','sellPrice','sellPriceUSD','discount','notes'];
+const F=['name','phone','account','nationalId','passport','iban','buyPrice','chargePrice','sellPrice','sellPriceUSD','discount','dollarRate','dollarsReceived','notes'];
+const fh=()=>{updatePreview();};
 let edit=-1;let formDirty=false;
-F.concat(['year']).forEach(k=>{
-  const el=$('f_'+k);if(el)el.addEventListener('input',()=>{formDirty=true;updatePreview();});
-});
+F.concat(['year']).forEach(k=>{$('f_'+k).addEventListener('input',()=>{formDirty=true;updatePreview();});});
 $('f_half').addEventListener('change',()=>{formDirty=true;updatePreview();});
 
 function updatePreview(){
   const b=num($('f_buyPrice').value),c=num($('f_chargePrice').value),s=num($('f_sellPrice').value),d=num($('f_discount').value);
   const half=$('f_half').checked;
   const f=s-s*d/100;
-  const p=half?(f-c)/2:f-c-b;
+  const p=half?(f-c-b)/2:f-c-b;
   $('pvBuy').textContent=(b>0)?fmt(b):'—';
   $('pvCharge').textContent=c>0?fmt(c):'—';
   $('pvSell').textContent=s>0?fmt(f):'—';
@@ -1471,6 +1445,7 @@ function form(i=-1){
   F.forEach(k=>{$('f_'+k).value=k==='discount'?(t.discount||'0'):(t[k]??'');});
   $('f_year').value=t.year||selYear();
   $('f_half').checked=!!t.isHalf;
+  fh();
   formDirty=false;updatePreview();
   closeSuggestions();
   if (i === -1) rebuildClientIndex();
@@ -1511,7 +1486,6 @@ $('fSave').onclick=()=>{
     cancelled:o?!!o.cancelled:false,
     bookingDate:o?(o.bookingDate||''):''
   });
-  if(typeof d.expHalf!=='boolean') d.expHalf = false;
   if(o)tx[edit]=d;else tx.push(d);
   if(!o){S.year=y;saveS();}
   save();formDirty=false;closeM('form');render();
@@ -1601,6 +1575,8 @@ function details(i){
   $('d_sell').value=t.sellPrice||'';
   $('d_sellUSD').value=t.sellPriceUSD||'';
   $('d_disc').value=t.discount||'0';
+  $('d_dollarRate').value=t.dollarRate||'';
+  $('d_dollarsReceived').value=t.dollarsReceived||'';
   $('d_notes').value=t.notes||'';
   $('d_year').value=t.year||selYear();
   $('d_half').checked=!!t.isHalf;
@@ -1613,13 +1589,27 @@ function dp(){
   const b=num($('d_buy').value),c=num($('d_charge').value),s=num($('d_sell').value),d=num($('d_disc').value);
   const half=$('d_half').checked;
   const f=s-s*d/100;
-  const p=half?(f-c)/2:f-c-b;
+  const p=half?(f-c-b)/2:f-c-b;
   const H=S.hideProfit||S.hideData;
   $('dP').textContent = H ? '•••••' : p.toFixed(2);
   $('dPc').style.background = p>=0?'var(--ok)':'var(--no)';
+
+  const rate=num($('d_dollarRate').value), received=num($('d_dollarsReceived').value);
+  const expEl = $('d_expProfit');
+  if(expEl){
+    if(rate>0 && received>0){
+      const val = received*rate;
+      const exp = half ? (val-c-b)/2 : val-c-b;
+      expEl.value = H ? '•••••' : ((exp>=0?'+':'')+exp.toFixed(2));
+      expEl.style.color = exp>=0 ? 'var(--ok)' : 'var(--no)';
+    } else {
+      expEl.value = '—';
+      expEl.style.color = '';
+    }
+  }
 }
 function dh(){ dp(); }
-['d_buy','d_charge','d_sell','d_disc'].forEach(k=>$(k).oninput=dp);
+['d_buy','d_charge','d_sell','d_disc','d_dollarRate','d_dollarsReceived'].forEach(k=>$(k).oninput=dp);
 $('d_half').onchange=dh;
 $('dSave').onclick=()=>{
   const t=tx[cur];if(!t)return;
@@ -1629,6 +1619,8 @@ $('dSave').onclick=()=>{
   t.sellPrice=spRaw;
   t.sellPriceUSD=$('d_sellUSD').value;
   t.discount=$('d_disc').value;
+  t.dollarRate=$('d_dollarRate').value;
+  t.dollarsReceived=$('d_dollarsReceived').value;
   t.notes=$('d_notes').value;
   const y=parseInt($('d_year').value,10);
   if(y>=2000&&y<=2100)t.year=y;
@@ -1644,8 +1636,6 @@ $('dDup').onclick=()=>{
     date:new Date().toLocaleDateString('en-GB'),
     done:false,cancelled:false,bookingDate:'',sellPrice:'',notes:'',rowColor:'#ffffff'
   });
-  delete c.dollarRate; delete c.dollarsCash; delete c.expShipping; delete c.expHalf;
-  c.expHalf = false;
   tx.push(c);save();closeM('det');render();toast('تم نسخ المعاملة');
 };
 
@@ -1709,8 +1699,6 @@ function copyTx(i){
     date:new Date().toLocaleDateString('en-GB'),
     done:false,cancelled:false,bookingDate:'',sellPrice:'',notes:'',rowColor:'#ffffff'
   });
-  delete c.dollarRate; delete c.dollarsCash; delete c.expShipping; delete c.expHalf;
-  c.expHalf = false;
   tx.push(c);save();render();toast('تم نسخ المعاملة');
 }
 
@@ -1747,7 +1735,6 @@ function moveOne(dir){
   if(np<0||np>=vis.length)return;
   const j=vis[np];
   const tmp=tx[moveIdx];tx[moveIdx]=tx[j];tx[j]=tmp;
-  moveIdx = j;
   save();hp(10);
   updateMoveButtons();
 }
@@ -1788,22 +1775,13 @@ function shareTx(i){
     'تاريخ الحجز: '+(t.bookingDate||'-'),
     'الحالة: '+(t.cancelled?'ملغية':t.done?'مكتملة':'جارية')
   ];
-  const exp = expCalc(t);
-  if(exp.valid){
-    lines.push('');
-    lines.push('--- الربح المتوقع (منفصل) ---');
-    lines.push('دولار كاش: '+(t.dollarsCash||'-'));
-    lines.push('سعر الدولار: '+(t.dollarRate||'-'));
-    lines.push('سعر الشحن: '+(t.expShipping||'-'));
-    lines.push('المكسب المتوقع: '+fmt(exp.profit));
-  }
+  if(t.dollarRate)lines.push('سعر الدولار: '+t.dollarRate);
+  if(t.dollarsReceived)lines.push('الدولار المستلم: '+t.dollarsReceived);
   share(lines.join('\n'),'بيانات العميل');
 }
 
 /* ============ LIST CLICK ============ */
-let suppressClick = false;
 $('list').onclick=e=>{
-  if(suppressClick){suppressClick=false;return;}
   const b=e.target.closest('[data-a]');if(!b)return;
   const i=+b.dataset.k;
   const act=b.dataset.a;
@@ -1836,12 +1814,7 @@ $('list').addEventListener('touchstart',e=>{
     if(!lpCard)return;
     const id=lpCard.dataset.id;
     const i=tx.findIndex(t=>t.id===id);
-    if(i>=0){
-      hp([15,30,15]);
-      suppressClick=true;
-      setTimeout(()=>suppressClick=false,500);
-      openMove(i);
-    }
+    if(i>=0){hp([15,30,15]);openMove(i);}
     lpCard=null;
   },550);
 },{passive:true});
@@ -1911,7 +1884,7 @@ function showList(type){
 $('lB').onclick=e=>{const b=e.target.closest('[data-r]');if(b)restore(+b.dataset.r);};
 $('lS').onclick=()=>{hp(30);share(shareTxt,$('lT').textContent);};
 
-/* ============ STATS MODAL (لا ربح متوقع) ============ */
+/* ============ STATS MODAL ============ */
 $('bStat').onclick=()=>{
   closeM('set');
   const Y=selYear();
@@ -1925,9 +1898,7 @@ $('bStat').onclick=()=>{
     if(+t.year!==Y)return;
     curN++;
     if(t.cancelled){curCanc++;return;}
-    const hasSale = t.done || num(t.sellPrice) > 0;
-    if (hasSale) curP += calc(t);
-    curB += num(t.buyPrice);
+    curP+=calc(t);curB+=num(t.buyPrice);
     if(t.done){curDone++;curP2+=calc(t);}else curPend++;
   });
   html+=`<div class="s2">ملخص سنة ${dispNum(Y)}</div>
@@ -1958,9 +1929,7 @@ $('bStat').onclick=()=>{
       if(+t.year!==y)return;
       n++;
       if(t.cancelled){cn++;return;}
-      const hasSale = t.done || num(t.sellPrice) > 0;
-      if (hasSale) P += calc(t);
-      B+=num(t.buyPrice);
+      P+=calc(t);B+=num(t.buyPrice);
       if(t.done){dn++;P2+=calc(t);}else pe++;
     });
     gP+=P;gB+=B;gN+=n;gP2+=P2;
@@ -2028,17 +1997,13 @@ $('fi').onchange=e=>{
         buyPrice:o.buyPrice||'',chargePrice:o.chargePrice||'',sellPrice:o.sellPrice||'',
         sellPriceUSD:o.sellPriceUSD||'',
         discount:o.discount||'0',notes:o.notes||'',
+        dollarRate:o.dollarRate||'',dollarsReceived:o.dollarsReceived||'',
         year:parseInt(o.year,10)||curYear,
         date:o.date||new Date().toLocaleDateString('en-GB'),
         done:bo(o.done),cancelled:bo(o.cancelled),isHalf:bo(o.isHalf),
-        bookingDate:o.bookingDate||'',rowColor:o.rowColor||'#ffffff',
-        // حقول الربح المتوقع (منفصلة)
-        dollarRate: o.dollarRate || '',
-        dollarsCash: o.dollarsCash || o.dollarsReceived || '',
-        expShipping: o.expShipping || o.expCharge || '',
-        expHalf: bo(o.expHalf)
+        bookingDate:o.bookingDate||'',rowColor:o.rowColor||'#ffffff'
       }));
-      data.forEach(t=>t.clientId=nextClientId(t.year, data));
+      data.forEach(t=>t.clientId=nextClientId(t.year));
       closeM('set');
       ask('استيراد نسخة','سيتم استبدال البيانات الحالية بـ '+data.length+' معاملة من الملف. سيتم حفظ نسخة تلقائية أولاً.','استيراد',()=>{
         createSnapshot('قبل استيراد Excel',true);
@@ -2084,13 +2049,9 @@ $('fj').onchange=e=>{
       incoming.forEach(t=>{
         if(!t.id) t.id = uid();
         if(!t.year){let y=curYear;const m=String(t.date||'').match(/(\d{4})/);if(m)y=+m[1];t.year=y;}
-        if(!t.clientId) t.clientId = nextClientId(t.year, incoming);
+        if(!t.clientId) t.clientId = nextClientId(t.year);
         if(typeof t.notes!=='string') t.notes='';
         if(typeof t.rowColor!=='string') t.rowColor='#ffffff';
-        if(typeof t.expHalf!=='boolean') t.expHalf=false;
-        if(t.dollarsCash===undefined) t.dollarsCash = t.dollarsReceived ?? '';
-        if(t.expShipping===undefined) t.expShipping = t.expCharge ?? '';
-        delete t.dollarsReceived; delete t.expCharge; delete t.expBuy;
       });
       closeM('set');
       ask('استيراد نسخة JSON',
@@ -2127,7 +2088,7 @@ function doWipe(snap){
 }
 
 /* ═══════════════════════════════════════════════════════
-   EXPECTED PROFIT (منفصل تمامًا عن الحسابات الأساسية)
+   EXPECTED PROFIT (NEW)
    ═══════════════════════════════════════════════════════ */
 let curExpId = null;
 
@@ -2187,25 +2148,27 @@ function renderExp(){
 }
 
 function expRow({t, r}){
-  const H  = S.hideData;
+  const H = S.hideData;
   const HP = H || S.hideProfit;
   const name = H ? DOTS : esc(t.name || '-');
   let sub;
   if (r.valid) {
-    sub = H ? '••••' : `${fmt(r.cash)}×${fmt(r.rate)} = ${fmt(r.value)} • شحن ${fmt(r.shipping)}`;
+    sub = H ? '••••' : `التكلفة: ${fmt(r.cost)} • المستلم: ${fmt(r.value)}`;
   } else {
-    sub = 'أدخل دولار كاش وسعر الدولار';
+    sub = 'أدخل سعر الدولار والدولار المستلم';
   }
   const profit = r.valid
     ? (HP ? '••••' : ((r.profit >= 0 ? '+' : '') + fmt(r.profit)))
     : '—';
-  const cls = r.valid ? (r.profit >= 0 ? 'g' : 'r') : 'n';
-  return `<div class="expRow" data-exp-id="${t.id}">
+  const color = r.valid ? (r.profit >= 0 ? 'var(--ok)' : 'var(--no)') : 'var(--sub)';
+  return `<div class="row" data-exp-id="${t.id}" style="cursor:pointer">
     <div class="info">
       <b>${name}</b>
       <small>${sub}</small>
     </div>
-    <div class="profit ${cls}">${profit}</div>
+    <div class="acts">
+      <b style="color:${color};font-size:14px;font-weight:600">${profit}</b>
+    </div>
   </div>`;
 }
 
@@ -2214,49 +2177,55 @@ function openExpD(id){
   if (!t) return;
   curExpId = id;
   $('expDN').textContent = t.name || 'تفاصيل متوقعة';
-  $('expD_half').checked = !!t.expHalf;
-  $('expD_cash').value     = t.dollarsCash ?? '';
-  $('expD_rate').value     = t.dollarRate ?? '';
-  $('expD_shipping').value = t.expShipping ?? '';
+  $('expD_half').checked = !!t.isHalf;
+  $('expD_buy').value = t.buyPrice || '';
+  $('expD_charge').value = t.chargePrice || '';
+  $('expD_rate').value = t.dollarRate || '';
+  $('expD_received').value = t.dollarsReceived || '';
+  $('expD_buyLbl').textContent = t.isHalf ? 'المبلغ المدفوع' : 'سعر الشراء';
   calcExpPreview();
   openM('expD');
 }
 
 function calcExpPreview(){
-  const half     = $('expD_half').checked;
-  const cash     = num($('expD_cash').value);
-  const rate     = num($('expD_rate').value);
-  const shipping = num($('expD_shipping').value);
+  const half = $('expD_half').checked;
+  const buy = num($('expD_buy').value);
+  const charge = num($('expD_charge').value);
+  const rate = num($('expD_rate').value);
+  const received = num($('expD_received').value);
 
-  const value  = cash * rate;
-  const profit = half ? (value - shipping)/2 : (value - shipping);
-  const H      = S.hideProfit || S.hideData;
-  const valid  = cash > 0 && rate > 0;
+  $('expD_buyLbl').textContent = half ? 'المبلغ المدفوع' : 'سعر الشراء';
 
+  const value = rate * received;
+  const cost = buy + charge;
+  const profit = half ? (value - cost) / 2 : value - cost;
+  const H = S.hideProfit || S.hideData;
+  const valid = rate > 0 && received > 0;
+
+  $('expD_cost').textContent = valid && !H ? fmt(cost) : '—';
   $('expD_value').textContent = valid && !H ? fmt(value) : '—';
-  $('expD_ship').textContent  = !H ? fmt(shipping) : '—';
 
   const pe = $('expD_profit');
-  if (!valid)     { pe.textContent = '—';      pe.className = ''; }
-  else if (H)     { pe.textContent = '•••••';  pe.className = ''; }
+  if (!valid) { pe.textContent = '—'; pe.className = ''; }
+  else if (H) { pe.textContent = '•••••'; pe.className = ''; }
   else {
     pe.textContent = (profit >= 0 ? '+' : '') + fmt(profit);
-    pe.className   = profit >= 0 ? '' : 'neg';
+    pe.className = profit >= 0 ? '' : 'neg';
   }
 
   $('expFormula').textContent = half
-    ? 'الحساب: (دولار كاش × السعر − الشحن) ÷ 2'
-    : 'الحساب: (دولار كاش × السعر) − الشحن';
+    ? 'الحساب: (القيمة المستلمة − المبلغ المدفوع − الشحن) ÷ 2'
+    : 'الحساب: القيمة المستلمة − سعر الشراء − الشحن';
 }
 
 function saveExpD(){
   const t = tx.find(x => x.id === curExpId);
   if (!t) { toast('المعاملة غير موجودة', 'e'); return; }
-  t.expHalf      = $('expD_half').checked;
-  t.dollarsCash  = $('expD_cash').value;
-  t.dollarRate   = $('expD_rate').value;
-  t.expShipping  = $('expD_shipping').value;
-  delete t.dollarsReceived; delete t.expCharge; delete t.expBuy;
+  t.isHalf = $('expD_half').checked;
+  t.buyPrice = $('expD_buy').value;
+  t.chargePrice = $('expD_charge').value;
+  t.dollarRate = $('expD_rate').value;
+  t.dollarsReceived = $('expD_received').value;
   save();
   closeM('expD');
   render();
@@ -2271,7 +2240,7 @@ $('expList').onclick = e => {
   if (row) openExpD(row.dataset.expId);
 };
 $('expD_half').onchange = calcExpPreview;
-['expD_cash','expD_rate','expD_shipping'].forEach(k => $(k).addEventListener('input', calcExpPreview));
+['expD_buy','expD_charge','expD_rate','expD_received'].forEach(k => $(k).addEventListener('input', calcExpPreview));
 $('expD_save').onclick = saveExpD;
 
 /* ============ GLOBAL EVENTS ============ */
@@ -2292,22 +2261,11 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{
   const inField=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
-  // اختصارات Ctrl تعمل حتى داخل الحقول
-  if(e.ctrlKey||e.metaKey){
-    if(e.key==='s'||e.key==='S'){
-      e.preventDefault();
-      if($('form').classList.contains('on'))$('fSave').click();
-      else if($('det').classList.contains('on'))$('dSave').click();
-      else if($('expD').classList.contains('on'))$('expD_save').click();
-      return;
-    }
-    if(e.key===','){e.preventDefault();$('bSet').click();return;}
-    if(e.key==='d'||e.key==='D'){e.preventDefault();th.m=th.m==='dark'?'light':'dark';applyTheme();return;}
-  }
   if(e.key==='Escape'){
-    const anySugg=$('suggName').classList.contains('on')||$('suggPhone').classList.contains('on');
-    if(anySugg){closeSuggestions();return;}
-    if($('form').classList.contains('on')){closeFormSafe(false);return;}
+    const anySugg = $('suggName').classList.contains('on') || $('suggPhone').classList.contains('on');
+    if (anySugg){ closeSuggestions(); return; }
+    const openForm=document.getElementById('form').classList.contains('on');
+    if(openForm){closeFormSafe(false);return;}
     document.querySelectorAll('.bg.on').forEach(b=>b.classList.remove('on'));
     return;
   }
@@ -2316,6 +2274,14 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='/'){e.preventDefault();$('q').focus();}
   else if(e.key==='p'||e.key==='P'){$('pEye').click();}
   else if(e.key==='h'||e.key==='H'){$('bPv').click();}
+  else if(e.key===','&&(e.ctrlKey||e.metaKey)){e.preventDefault();$('bSet').click();}
+  else if(e.key==='d'&&(e.ctrlKey||e.metaKey)){e.preventDefault();th.m=th.m==='dark'?'light':'dark';applyTheme();}
+  else if(e.key==='s'&&(e.ctrlKey||e.metaKey)){
+    e.preventDefault();
+    if($('form').classList.contains('on'))$('fSave').click();
+    else if($('det').classList.contains('on'))$('dSave').click();
+    else if($('expD').classList.contains('on'))$('expD_save').click();
+  }
 });
 
 /* ============ BOOKING REMINDERS + BADGE ============ */
