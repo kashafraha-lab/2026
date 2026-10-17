@@ -547,12 +547,13 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="pc" id="expTotal">إجمالي الربح المتوقع<b id="expTotalVal">0.00</b></div>
 </div></div>
 
-<!-- ===== EXPECTED PROFIT DETAIL (للمعاملات فقط — لا يعدل tx) ===== -->
+<!-- ===== EXPECTED PROFIT DETAIL ===== -->
 <div class="bg" id="expD"><div class="sh">
 <div class="th"><h2 id="expDN">—</h2><button class="ib" data-x="expD" aria-label="إغلاق"><i data-ic="x"></i></button></div>
+<label class="tg"><span>معاملة بالنصف (للربح المتوقع فقط)</span><input type="checkbox" id="expD_half"><i class="sw"></i></label>
 <div class="g2">
-  <div class="f"><label>سعر الشراء (ثابت من المعاملة)</label><input id="expD_buy" readonly style="background:var(--bg);cursor:not-allowed;opacity:.75"></div>
-  <div class="f"><label>قيمة الشحن (ثابت من المعاملة)</label><input id="expD_charge" readonly style="background:var(--bg);cursor:not-allowed;opacity:.75"></div>
+  <div class="f"><label>سعر الشراء (ثابت)</label><input id="expD_buy" readonly style="background:var(--bg);cursor:not-allowed;opacity:.75"></div>
+  <div class="f"><label>قيمة الشحن (ثابت)</label><input id="expD_charge" readonly style="background:var(--bg);cursor:not-allowed;opacity:.75"></div>
   <div class="f"><label>💵 دولار كاش</label><input type="number" step="any" inputmode="decimal" id="expD_cashUSD" placeholder="مثال: 2900"></div>
   <div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="expD_rate" placeholder="مثال: 10.08"></div>
 </div>
@@ -566,12 +567,12 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 </div>
 <div class="noteBox">
   <i data-ic="info" data-s="16"></i>
-  <div>هذه الحسابات <b class="g">لا تؤثر</b> على "الربح بعد الشراء" في الواجهة الرئيسية. سعر الشراء والشحن مأخوذان من المعاملة الأصلية ولا يمكن تعديلهما من هنا.</div>
+  <div>هذه الحسابات <b class="g">لا تؤثر</b> على "الربح بعد الشراء" في الواجهة الرئيسية.</div>
 </div>
-<div class="ac2"><button class="btn pr" id="expD_save"><i data-ic="check"></i>حفظ دولار كاش</button></div>
+<div class="ac2"><button class="btn pr" id="expD_save"><i data-ic="check"></i>حفظ</button></div>
 </div></div>
 
-<!-- ===== ADD/EDIT EXPECTED DEAL (صفقة مبدئية مستقلة) ===== -->
+<!-- ===== ADD/EDIT EXPECTED DEAL ===== -->
 <div class="bg" id="expF"><div class="sh">
 <div class="th"><h2 id="expFT">صفقة مبدئية</h2><button class="ib" data-x="expF" aria-label="إغلاق"><i data-ic="x"></i></button></div>
 <div class="g2">
@@ -810,18 +811,20 @@ const calc=t=>{
   return t.isHalf?(f-c-b)/2:f-c-b;
 };
 
-/* ═══════ حساب الربح المتوقع — يقرأ cashUSD أولاً ═══════ */
+/* ═══════ حساب الربح المتوقع — يقرأ cashUSD و expIsHalf ═══════ */
 const expCalc = (t) => {
   const cashUSD = num(t.cashUSD) || num(t.dollarsReceived);
   const rate = num(t.dollarRate);
   const buy = num(t.buyPrice);
   const charge = num(t.chargePrice);
   const cost = buy + charge;
+  const isHalf = (t.expIsHalf !== undefined) ? t.expIsHalf : !!t.isHalf;
+  
   if (rate <= 0 || cashUSD <= 0) {
     return {valid:false, cashUSD, rate, value:0, cost, profit:0};
   }
   const value = cashUSD * rate;
-  const profit = t.isHalf ? (value - cost) / 2 : value - cost;
+  const profit = isHalf ? (value - cost) / 2 : value - cost;
   return {valid:true, cashUSD, rate, value, cost, profit};
 };
 
@@ -1036,7 +1039,7 @@ function computeRows(){
   return {active, done, cancelled};
 }
 
-/* ============ STATS ============ */
+/* ============ STATS (تم إصلاح الرقم بالسالب) ============ */
 function stats(){
   const Y=selYear();
   let P=0,P2=0,B=0,pe=0,dn=0,cn=0,bk=0,n=0;
@@ -1044,7 +1047,12 @@ function stats(){
     if(+t.year!==Y)return;
     n++;
     if(t.cancelled){cn++;return;}
-    P+=calc(t);
+    
+    // ✅ التعديل هنا: لا يتم حساب الربح (أو الخصم) إلا إذا تم البيع أو الإتمام
+    if(t.done || num(t.sellPrice) > 0) {
+        P += calc(t);
+    }
+    
     B+=num(t.buyPrice);
     if(t.done){dn++;P2+=calc(t);}
     else{pe++;if(t.bookingDate)bk++;}
@@ -1947,7 +1955,13 @@ $('bStat').onclick=()=>{
     if(+t.year!==Y)return;
     curN++;
     if(t.cancelled){curCanc++;return;}
-    curP+=calc(t);curB+=num(t.buyPrice);
+    
+    // ✅ التعديل هنا أيضاً
+    if(t.done || num(t.sellPrice) > 0) {
+        curP+=calc(t);
+    }
+    
+    curB+=num(t.buyPrice);
     if(t.done){curDone++;curP2+=calc(t);}else curPend++;
   });
   html+=`<div class="s2">ملخص سنة ${dispNum(Y)}</div>
@@ -1978,7 +1992,13 @@ $('bStat').onclick=()=>{
       if(+t.year!==y)return;
       n++;
       if(t.cancelled){cn++;return;}
-      P+=calc(t);B+=num(t.buyPrice);
+      
+      // ✅ التعديل هنا
+      if(t.done || num(t.sellPrice) > 0) {
+          P+=calc(t);
+      }
+      
+      B+=num(t.buyPrice);
       if(t.done){dn++;P2+=calc(t);}else pe++;
     });
     gP+=P;gB+=B;gN+=n;gP2+=P2;
@@ -2251,7 +2271,7 @@ function expRow(item){
   </div>`;
 }
 
-/* ═══ تفاصيل ربح متوقع لمعاملة أساسية — لا يعدل tx ═══ */
+/* ═══ تفاصيل ربح متوقع لمعاملة أساسية ═══ */
 function openExpD(id){
   const t = tx.find(x => x.id === id);
   if (!t) return;
@@ -2261,6 +2281,7 @@ function openExpD(id){
   $('expD_charge').value = t.chargePrice || '';
   $('expD_cashUSD').value = num(t.cashUSD) || num(t.dollarsReceived) || '';
   $('expD_rate').value = t.dollarRate || '';
+  $('expD_half').checked = (t.expIsHalf !== undefined) ? t.expIsHalf : !!t.isHalf;
   calcExpPreview();
   openM('expD');
 }
@@ -2272,7 +2293,7 @@ function calcExpPreview(){
   const charge = num($('expD_charge').value);
   const cashUSD = num($('expD_cashUSD').value);
   const rate = num($('expD_rate').value);
-  const half = !!t.isHalf;  // ← من المعاملة، غير قابل للتعديل هنا
+  const half = $('expD_half').checked; // ✅ تم إرجاع الخيار
 
   const amount = cashUSD * rate;
   const cost = buy + charge;
@@ -2297,19 +2318,19 @@ function calcExpPreview(){
     : 'الحساب: (دولار كاش × السعر) − الشراء − الشحن';
 }
 
-/* ⚠️ حفظ expD: يحفظ فقط cashUSD وdollarRate — لا يلمس buyPrice/chargePrice/sellPrice/isHalf/done */
+/* ⚠️ حفظ expD: يحفظ cashUSD وdollarRate وexpIsHalf فقط */
 function saveExpD(){
   const t = tx.find(x => x.id === curExpId);
   if (!t) { toast('المعاملة غير موجودة', 'e'); return; }
   t.cashUSD = $('expD_cashUSD').value;
   t.dollarRate = $('expD_rate').value;
-  t.dollarsReceived = $('expD_cashUSD').value; // توافق للخلف
-  // ⚠️ لا نلمس أي حقل يؤثر على calc()
+  t.dollarsReceived = $('expD_cashUSD').value;
+  t.expIsHalf = $('expD_half').checked; // ✅ حفظ مستقل لا يؤثر على tx.isHalf
   save();
   closeM('expD');
-  render();      // إعادة رسم (لن يتغير الربح بعد الشراء)
+  render();      
   renderExp();
-  toast('تم حفظ دولار كاش — لن يؤثر على الربح بعد الشراء');
+  toast('تم حفظ دولار كاش للربح المتوقع');
 }
 
 /* ═══ صفقة مبدئية (مستقلة تماماً) ═══ */
@@ -2396,6 +2417,7 @@ $('expList').onclick = e => {
   if (row) openExpD(row.dataset.expId);
 };
 $('expAddDeal').onclick = () => openDealForm(null);
+$('expD_half').addEventListener('change', calcExpPreview);
 $('expD_cashUSD').addEventListener('input', calcExpPreview);
 $('expD_rate').addEventListener('input', calcExpPreview);
 $('expD_save').onclick = saveExpD;
