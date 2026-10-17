@@ -20,7 +20,6 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{touch-action:manipulation;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;font:400 14px/1.55 'Readex Pro',system-ui,Tahoma,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:120px;overflow-x:hidden}
-/* ✅ منع تمرير الخلفية عند فتح النوافذ */
 body.modal-open { overflow: hidden; touch-action: none; }
 
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none;padding:0}
@@ -535,23 +534,24 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 
 <!-- ===== EXPECTED PROFIT LIST ===== -->
 <div class="bg" id="expM"><div class="sh">
-<div class="th"><h2>الربح المتوقع</h2><button class="ib" data-x="expM" aria-label="إغلاق"><i data-ic="x"></i></button></div>
+<div class="th">
+  <h2>الربح المتوقع</h2>
+  <div style="display:flex;gap:8px">
+    <button class="ib" id="expShareBtn" style="color:var(--ac)" title="مشاركة القائمة"><i data-ic="share"></i></button>
+    <button class="ib" data-x="expM" aria-label="إغلاق"><i data-ic="x"></i></button>
+  </div>
+</div>
 
 <!-- الإجمالي في الأعلى -->
 <div class="pc" id="expTotal" style="margin-top:0;margin-bottom:14px;border-radius:16px">إجمالي الربح المتوقع<b id="expTotalVal">0.00</b></div>
 
 <label class="tg"><span>تضمين المعاملات المكتملة</span><input type="checkbox" id="expShowDone"><i class="sw"></i></label>
-<div class="noteBox" style="margin-top:10px;margin-bottom:10px">
-  <i data-ic="info" data-s="16"></i>
-  <div>الصفقات المبدئية وتعديلات دولار كاش <b class="g">مستقلة تماماً</b> ولا تؤثر على "الربح بعد الشراء" في الواجهة الرئيسية.</div>
-</div>
 
-<div id="expList" style="max-height:42vh;overflow-y:auto;background:var(--cd);border:1px solid var(--bd);border-radius:16px;margin-bottom:14px"></div>
+<div id="expList" style="max-height:45vh;overflow-y:auto;background:var(--cd);border:1px solid var(--bd);border-radius:16px;margin-bottom:14px"></div>
 
-<!-- الأزرار في الأسفل -->
+<!-- زر الإضافة في الأسفل -->
 <div class="ac2" style="margin-top:0">
-  <button class="btn" id="expShareBtn"><i data-ic="share"></i>مشاركة القائمة</button>
-  <button class="btn pr" id="expAddDeal"><i data-ic="plus"></i>إضافة صفقة مبدئية</button>
+  <button class="btn pr" id="expAddDeal" style="width:100%"><i data-ic="plus"></i>إضافة صفقة مبدئية</button>
 </div>
 
 </div></div>
@@ -584,7 +584,10 @@ label{font-size:12px;color:var(--sub);font-weight:500}
   <i data-ic="info" data-s="16"></i>
   <div>تعديل الشراء أو الشحن هنا <b class="g">لا يؤثر</b> على الواجهة الرئيسية أو "الربح بعد الشراء".</div>
 </div>
-<div class="ac2"><button class="btn pr" id="expD_save"><i data-ic="check"></i>حفظ التغييرات</button></div>
+<div class="ac2">
+  <button class="btn" id="expD_share"><i data-ic="share"></i>مشاركة</button>
+  <button class="btn pr" id="expD_save"><i data-ic="check"></i>حفظ</button>
+</div>
 </div></div>
 
 <!-- ===== ADD/EDIT EXPECTED DEAL ===== -->
@@ -606,6 +609,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
   <div class="pvTotal"><span>المكسب المتوقع</span><b id="expF_profit">0.00</b></div>
 </div>
 <div class="ac2">
+  <button class="btn" id="expF_share"><i data-ic="share"></i>مشاركة</button>
   <button class="btn pr" id="expF_save"><i data-ic="check"></i>حفظ الصفقة</button>
   <button class="btn dg" id="expF_del" style="display:none"><i data-ic="trash"></i>حذف</button>
 </div>
@@ -2251,7 +2255,7 @@ function expRow(item){
   
   let sub;
   if (r.valid) {
-    sub = H ? '••••' : `القيمة: ${fmt(r.value)} دينار (${fmt(r.cashUSD)}$ × ${fmt(r.rate)}) • التكلفة: ${fmt(r.cost)}`;
+    sub = H ? '••••' : `دولار كاش: ${fmt(r.cashUSD)} × ${fmt(r.rate)} = ${fmt(r.value)}` + (r.cost > 0 ? ` • التكلفة: ${fmt(r.cost)}` : '');
   } else {
     sub = 'أدخل دولار كاش وسعر الدولار';
   }
@@ -2265,9 +2269,8 @@ function expRow(item){
       <b style="display:flex;align-items:center;gap:6px;font-size:14px">${name} ${badge}</b>
       <small style="margin-top:4px;font-size:11.5px;color:var(--sub);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${sub}</small>
     </div>
-    <div class="acts" style="display:flex;align-items:center;gap:10px">
+    <div class="acts" style="display:flex;align-items:center">
       <b style="color:${color};font-size:15px;font-weight:700">${profit}</b>
-      <button class="mini" data-share-exp="${t.id}" data-share-kind="${kind}" style="padding:6px;border-radius:8px">${ic('share',16)}</button>
     </div>
   </div>`;
 }
@@ -2336,6 +2339,16 @@ function saveExpD(){
   renderExp();
   toast('تم حفظ التغييرات للربح المتوقع');
 }
+
+$('expD_share').onclick = () => {
+  const t = tx.find(x => x.id === curExpId);
+  if(!t) return;
+  const r = expCalc(t);
+  if(!r.valid) { toast('لا توجد بيانات صالحة للمشاركة', 'e'); return; }
+  const halfStr = $('expD_half').checked ? ' (بالنصف)' : '';
+  const txt = `العميل: ${t.name}\nدولار كاش: ${r.cashUSD}$\nسعر الدولار: ${r.rate}\nالقيمة: ${r.value.toFixed(2)} دينار\nالتكلفة: ${r.cost.toFixed(2)}\nالربح المتوقع${halfStr}: ${r.profit.toFixed(2)}`;
+  share(txt, 'الربح المتوقع');
+};
 
 /* ═══ صفقة مبدئية (مستقلة تماماً) ═══ */
 function openDealForm(id){
@@ -2411,31 +2424,25 @@ function deleteDeal(){
   });
 }
 
+$('expF_share').onclick = () => {
+  const cashUSD = num($('expF_cashUSD').value);
+  const rate = num($('expF_rate').value);
+  const buy = num($('expF_buy').value);
+  const charge = num($('expF_charge').value);
+  if(cashUSD <= 0 || rate <= 0) { toast('لا توجد بيانات صالحة للمشاركة', 'e'); return; }
+  const value = cashUSD * rate;
+  const cost = buy + charge;
+  const half = $('expF_half').checked;
+  const profit = half ? (value - cost)/2 : value - cost;
+  const halfStr = half ? ' (بالنصف)' : '';
+  const txt = `العميل: ${$('expF_name').value.trim() || 'بدون اسم'}\nدولار كاش: ${cashUSD}$\nسعر الدولار: ${rate}\nالقيمة: ${value.toFixed(2)} دينار\nالتكلفة: ${cost.toFixed(2)}\nالربح المتوقع${halfStr}: ${profit.toFixed(2)}`;
+  share(txt, 'الربح المتوقع');
+};
+
 /* ═══ الأحداث ═══ */
 $('bExp').onclick = () => { hp(); openExp(); };
 $('expShowDone').onchange = e => { S.showDoneInExp = e.target.checked; saveS(); renderExp(); };
 $('expList').onclick = e => {
-  const shareBtn = e.target.closest('[data-share-exp]');
-  if (shareBtn) {
-    const id = shareBtn.dataset.shareExp;
-    const kind = shareBtn.dataset.shareKind;
-    let t, r;
-    if(kind === 'deal') {
-      t = expectedDeals.find(x => x.id === id);
-      r = expCalc(t);
-    } else {
-      t = tx.find(x => x.id === id);
-      r = expCalc(t);
-    }
-    if(t && r && r.valid) {
-      const txt = `العميل: ${t.name}\nدولار كاش: ${r.cashUSD}$\nسعر الدولار: ${r.rate}\nالقيمة: ${r.value.toFixed(2)} دينار\nالتكلفة: ${r.cost.toFixed(2)}\nالربح المتوقع: ${r.profit.toFixed(2)}`;
-      share(txt, 'الربح المتوقع');
-    } else {
-      toast('لا توجد بيانات صالحة للمشاركة', 'e');
-    }
-    return;
-  }
-  
   const dealRow = e.target.closest('[data-deal-id]');
   if (dealRow) { openDealForm(dealRow.dataset.dealId); return; }
   const row = e.target.closest('[data-exp-id]');
