@@ -260,6 +260,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 .noteBox b{font-weight:600}
 .noteBox b.w{color:var(--wn)}
 .noteBox b.d{color:var(--no)}
+.noteBox b.g{color:var(--ok)}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
@@ -535,28 +536,63 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="bg" id="expM"><div class="sh">
 <div class="th"><h2>الربح المتوقع</h2><button class="ib" data-x="expM" aria-label="إغلاق"><i data-ic="x"></i></button></div>
 <label class="tg"><span>تضمين المعاملات المكتملة</span><input type="checkbox" id="expShowDone"><i class="sw"></i></label>
+<div class="ac2" style="margin-top:0;margin-bottom:10px">
+  <button class="btn pr" id="expAddDeal"><i data-ic="plus"></i>إضافة صفقة مبدئية</button>
+</div>
+<div class="noteBox" style="margin-top:0;margin-bottom:10px">
+  <i data-ic="info" data-s="16"></i>
+  <div>الصفقات المبدئية <b class="g">مستقلة تماماً</b> عن معاملاتك الأساسية، ولا تؤثر على "الربح بعد الشراء" في الأعلى.</div>
+</div>
 <div id="expList" style="max-height:48vh;overflow-y:auto"></div>
 <div class="pc" id="expTotal">إجمالي الربح المتوقع<b id="expTotalVal">0.00</b></div>
 </div></div>
 
-<!-- ===== EXPECTED PROFIT DETAIL ===== -->
+<!-- ===== EXPECTED PROFIT DETAIL (للمعاملات فقط — لا يعدل tx) ===== -->
 <div class="bg" id="expD"><div class="sh">
 <div class="th"><h2 id="expDN">—</h2><button class="ib" data-x="expD" aria-label="إغلاق"><i data-ic="x"></i></button></div>
-<label class="tg"><span>معاملة بالنصف</span><input type="checkbox" id="expD_half"><i class="sw"></i></label>
 <div class="g2">
-<div class="f"><label id="expD_buyLbl">سعر الشراء</label><input type="number" step="any" inputmode="decimal" id="expD_buy"></div>
-<div class="f"><label>قيمة الشحن</label><input type="number" step="any" inputmode="decimal" id="expD_charge"></div>
-<div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="expD_rate"></div>
-<div class="f"><label>الدولار المستلم</label><input type="number" step="any" inputmode="decimal" id="expD_received"></div>
+  <div class="f"><label>سعر الشراء (ثابت من المعاملة)</label><input id="expD_buy" readonly style="background:var(--bg);cursor:not-allowed;opacity:.75"></div>
+  <div class="f"><label>قيمة الشحن (ثابت من المعاملة)</label><input id="expD_charge" readonly style="background:var(--bg);cursor:not-allowed;opacity:.75"></div>
+  <div class="f"><label>💵 دولار كاش</label><input type="number" step="any" inputmode="decimal" id="expD_cashUSD" placeholder="مثال: 2900"></div>
+  <div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="expD_rate" placeholder="مثال: 10.08"></div>
 </div>
 <div class="preview">
-<h4>الحساب المتوقع</h4>
-<div class="pvRow"><span>إجمالي التكلفة</span><span id="expD_cost">—</span></div>
-<div class="pvRow"><span>القيمة المستلمة</span><span id="expD_value">—</span></div>
-<div class="pvTotal"><span>المكسب المتوقع</span><b id="expD_profit">0.00</b></div>
-<div id="expFormula" style="font-size:11px;color:var(--sub);margin-top:8px;text-align:center"></div>
+  <h4>حساب دولار كاش</h4>
+  <div class="pvRow"><span>💵 دولار كاش × سعر الدولار</span><span id="expD_cashCalc">—</span></div>
+  <div class="pvRow"><span>إجمالي التكلفة (شراء + شحن)</span><span id="expD_cost">—</span></div>
+  <div class="pvRow"><span>القيمة المستلمة</span><span id="expD_value">—</span></div>
+  <div class="pvTotal"><span>المكسب المتوقع</span><b id="expD_profit">0.00</b></div>
+  <div id="expFormula" style="font-size:11px;color:var(--sub);margin-top:8px;text-align:center"></div>
 </div>
-<div class="ac2"><button class="btn pr" id="expD_save"><i data-ic="check"></i>حفظ</button></div>
+<div class="noteBox">
+  <i data-ic="info" data-s="16"></i>
+  <div>هذه الحسابات <b class="g">لا تؤثر</b> على "الربح بعد الشراء" في الواجهة الرئيسية. سعر الشراء والشحن مأخوذان من المعاملة الأصلية ولا يمكن تعديلهما من هنا.</div>
+</div>
+<div class="ac2"><button class="btn pr" id="expD_save"><i data-ic="check"></i>حفظ دولار كاش</button></div>
+</div></div>
+
+<!-- ===== ADD/EDIT EXPECTED DEAL (صفقة مبدئية مستقلة) ===== -->
+<div class="bg" id="expF"><div class="sh">
+<div class="th"><h2 id="expFT">صفقة مبدئية</h2><button class="ib" data-x="expF" aria-label="إغلاق"><i data-ic="x"></i></button></div>
+<div class="g2">
+  <div class="f w2"><label>اسم العميل</label><input id="expF_name" autocomplete="off" placeholder="مثال: أحمد محمد"></div>
+  <div class="f"><label>💵 دولار كاش</label><input type="number" step="any" inputmode="decimal" id="expF_cashUSD" placeholder="مثال: 2900"></div>
+  <div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="expF_rate" placeholder="مثال: 10.08"></div>
+  <div class="f"><label id="expF_buyLbl">سعر الشراء</label><input type="number" step="any" inputmode="decimal" id="expF_buy"></div>
+  <div class="f"><label>قيمة الشحن</label><input type="number" step="any" inputmode="decimal" id="expF_charge"></div>
+  <div class="f"><label>السنة</label><input type="number" inputmode="numeric" id="expF_year"></div>
+</div>
+<label class="tg"><span>معاملة بالنصف</span><input type="checkbox" id="expF_half"><i class="sw"></i></label>
+<div class="preview">
+  <h4>معاينة</h4>
+  <div class="pvRow"><span>💵 دولار كاش × سعر الدولار</span><span id="expF_cashCalc">—</span></div>
+  <div class="pvRow"><span>التكلفة (شراء + شحن)</span><span id="expF_cost">—</span></div>
+  <div class="pvTotal"><span>المكسب المتوقع</span><b id="expF_profit">0.00</b></div>
+</div>
+<div class="ac2">
+  <button class="btn pr" id="expF_save"><i data-ic="check"></i>حفظ الصفقة</button>
+  <button class="btn dg" id="expF_del" style="display:none"><i data-ic="trash"></i>حذف</button>
+</div>
 </div></div>
 
 <!-- ===== ASK ===== -->
@@ -576,7 +612,7 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <script>
 "use strict";
 const $ = i => document.getElementById(i);
-const KEY='app2026_pro_db',TK='app2026_theme',SK='app2026_settings_v2',SNAPK='app2026_snapshots_v1';
+const KEY='app2026_pro_db',TK='app2026_theme',SK='app2026_settings_v2',SNAPK='app2026_snapshots_v1',EXPKEY='app2026_expected_v1';
 
 /* ============ منع الزوم ============ */
 (function(){
@@ -621,7 +657,8 @@ const I = {
   more:'M12 6v.01|M12 12v.01|M12 18v.01',
   move:'M5 9l-3 3 3 3|M9 5l3-3 3 3|M15 19l-3 3-3-3|M19 9l3 3-3 3|M2 12h20|M12 2v20',
   phone:'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z',
-  info:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20|M12 16v-4|M12 8h.01'
+  info:'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20|M12 16v-4|M12 8h.01',
+  star:'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z'
 };
 const ic=(n,s=19)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${(I[n]||'').split('|').map(d=>`<path d="${d}"/>`).join('')}</svg>`;
 document.querySelectorAll('[data-ic]').forEach(e=>e.innerHTML=ic(e.dataset.ic,+e.dataset.s||19));
@@ -757,23 +794,35 @@ function nextClientId(y){
 }
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(tx));return true;}catch(e){toast('تعذر حفظ البيانات، الذاكرة ممتلئة','e');return false;}};
 
+/* ============ الربح المتوقع (مستقل تماماً) ============ */
+let expectedDeals=[];
+try{const raw=JSON.parse(localStorage.getItem(EXPKEY)||'[]');if(Array.isArray(raw))expectedDeals=raw;}catch(e){}
+expectedDeals=expectedDeals.filter(d=>d&&typeof d==='object');
+expectedDeals.forEach(d=>{
+  if(!d.id)d.id='exp_'+uid();
+  if(!d.year)d.year=curYear;
+});
+const saveExp=()=>{try{localStorage.setItem(EXPKEY,JSON.stringify(expectedDeals));return true;}catch(e){toast('تعذر حفظ الربح المتوقع','e');return false;}};
+
 const calc=t=>{
   const b=num(t.buyPrice),c=num(t.chargePrice),s=num(t.sellPrice),d=num(t.discount);
   const f=s-s*d/100;
   return t.isHalf?(f-c-b)/2:f-c-b;
 };
 
-/* ═══════ حساب الربح المتوقع عبر المصرف ═══════ */
+/* ═══════ حساب الربح المتوقع — يقرأ cashUSD أولاً ═══════ */
 const expCalc = (t) => {
+  const cashUSD = num(t.cashUSD) || num(t.dollarsReceived);
+  const rate = num(t.dollarRate);
   const buy = num(t.buyPrice);
   const charge = num(t.chargePrice);
-  const rate = num(t.dollarRate);
-  const received = num(t.dollarsReceived);
-  if (rate <= 0 || received <= 0) return {valid:false, value:0, cost:0, profit:0};
-  const value = received * rate;
   const cost = buy + charge;
+  if (rate <= 0 || cashUSD <= 0) {
+    return {valid:false, cashUSD, rate, value:0, cost, profit:0};
+  }
+  const value = cashUSD * rate;
   const profit = t.isHalf ? (value - cost) / 2 : value - cost;
-  return {valid:true, value, cost, profit};
+  return {valid:true, cashUSD, rate, value, cost, profit};
 };
 
 /* ═══════ مهلة الحجز = 30 يوم بانتظار شركة الصرافة ═══════ */
@@ -2018,9 +2067,10 @@ $('fi').onchange=e=>{
 $('bJsonEx').onclick=()=>{
   try{
     const payload = {
-      app:'app2026_pro_db', v:2,
+      app:'app2026_pro_db', v:3,
       exported: new Date().toISOString(),
       tx,
+      expectedDeals,
       extraYears: S.extraYears,
       year: S.year,
       settings: {goal:S.goal, numerals:S.numerals, sortBy:S.sortBy},
@@ -2053,15 +2103,17 @@ $('fj').onchange=e=>{
         if(typeof t.notes!=='string') t.notes='';
         if(typeof t.rowColor!=='string') t.rowColor='#ffffff';
       });
+      const incomingDeals = Array.isArray(data.expectedDeals) ? data.expectedDeals : [];
       closeM('set');
       ask('استيراد نسخة JSON',
           'سيتم استبدال البيانات الحالية بـ '+incoming.length+' معاملة. سيتم حفظ نسخة تلقائية أولاً.',
           'استيراد', ()=>{
         createSnapshot('قبل استيراد JSON', true);
         tx = incoming;
+        expectedDeals = incomingDeals.map(d => Object.assign({id:'exp_'+uid()}, d));
         if(Array.isArray(data.extraYears)) S.extraYears = data.extraYears.slice();
         S.year = null;
-        saveS(); save(); render();
+        saveS(); save(); saveExp(); render();
         toast('تم الاستيراد بنجاح');
       }, 0);
     }catch(x){toast('الملف غير صالح','e');}
@@ -2070,27 +2122,32 @@ $('fj').onchange=e=>{
 };
 
 $('bWipe').onclick=()=>{
-  ask('حذف كل البيانات','سيتم حذف جميع المعاملات والسنوات نهائياً. سيتم حفظ نسخة تلقائية قبل الحذف.','نعم، احذف الكل',()=>{
+  ask('حذف كل البيانات','سيتم حذف جميع المعاملات والسنوات والصفقات المبدئية نهائياً. سيتم حفظ نسخة تلقائية قبل الحذف.','نعم، احذف الكل',()=>{
     const snap=createSnapshot('قبل حذف كل البيانات',true);
     doWipe(snap);
   });
 };
 function doWipe(snap){
   tx=[];S.extraYears=[];S.year=null;S.recent=[];
-  save();saveS();closeM('set');render();
+  const dealsBackup = expectedDeals.slice();
+  expectedDeals=[];
+  save();saveExp();saveS();closeM('set');render();
   toastAct('تم حذف كل البيانات','تراجع',()=>{
-    if(!snap)return;
-    tx=JSON.parse(JSON.stringify(snap.tx));
-    S.extraYears=snap.extraYears.slice();
-    if(snap.year)S.year=snap.year;
-    save();saveS();render();toast('تم استرجاع البيانات');
+    if(snap){
+      tx=JSON.parse(JSON.stringify(snap.tx));
+      S.extraYears=snap.extraYears.slice();
+      if(snap.year)S.year=snap.year;
+    }
+    expectedDeals = dealsBackup;
+    save();saveExp();saveS();render();toast('تم استرجاع البيانات');
   });
 }
 
 /* ═══════════════════════════════════════════════════════
-   EXPECTED PROFIT (NEW)
+   EXPECTED PROFIT (مستقل تماماً)
    ═══════════════════════════════════════════════════════ */
 let curExpId = null;
+let curDealId = null;
 
 function openExp(){
   $('expShowDone').checked = !!S.showDoneInExp;
@@ -2102,19 +2159,29 @@ function renderExp(){
   const Y = selYear();
   const pending = [];
   const done = [];
-  let totalP = 0, totalD = 0;
+  const deals = [];
+  let totalP = 0, totalD = 0, totalDeals = 0;
 
+  // معاملات أساسية
   tx.forEach((t, i) => {
     if (+t.year !== Y) return;
     if (t.cancelled) return;
     const r = expCalc(t);
     if (t.done) {
-      done.push({t, i, r});
+      done.push({kind:'tx', t, i, r});
       if (r.valid) totalD += r.profit;
     } else {
-      pending.push({t, i, r});
+      pending.push({kind:'tx', t, i, r});
       if (r.valid) totalP += r.profit;
     }
+  });
+
+  // صفقات مبدئية
+  expectedDeals.forEach(d => {
+    if (+d.year !== Y) return;
+    const r = expCalc(d);
+    deals.push({kind:'deal', t:d, r});
+    if (r.valid) totalDeals += r.profit;
   });
 
   const sortByProfit = (a,b) => {
@@ -2125,8 +2192,14 @@ function renderExp(){
   };
   pending.sort(sortByProfit);
   done.sort(sortByProfit);
+  deals.sort(sortByProfit);
 
   let html = '';
+
+  if (deals.length) {
+    html += `<div class="sec-h"><span class="sec-t">${ic('star',14)} صفقات مبدئية</span><span class="sec-badge">${dispNum(deals.length)}</span></div>`;
+    html += deals.map(d => expRow(d)).join('');
+  }
 
   if (pending.length) {
     html += `<div class="sec-h"><span class="sec-t">${ic('clock',14)} الجارية</span><span class="sec-badge">${dispNum(pending.length)}</span></div>`;
@@ -2140,30 +2213,36 @@ function renderExp(){
 
   $('expList').innerHTML = html || '<div class="em">لا توجد معاملات لهذه السنة</div>';
 
-  const total = totalP + (S.showDoneInExp ? totalD : 0);
+  const total = totalP + totalDeals + (S.showDoneInExp ? totalD : 0);
   const H = S.hideProfit || S.hideData;
   const val = $('expTotalVal');
   val.textContent = H ? '•••••' : ((total >= 0 ? '+' : '') + fmt(total));
   $('expTotal').style.background = total >= 0 ? 'var(--ok)' : 'var(--no)';
 }
 
-function expRow({t, r}){
+function expRow(item){
+  const {kind, t, r} = item;
   const H = S.hideData;
   const HP = H || S.hideProfit;
   const name = H ? DOTS : esc(t.name || '-');
   let sub;
   if (r.valid) {
-    sub = H ? '••••' : `التكلفة: ${fmt(r.cost)} • المستلم: ${fmt(r.value)}`;
+    sub = H ? '••••' : `دولار كاش: ${fmt(r.cashUSD)} × ${fmt(r.rate)} = ${fmt(r.value)}`;
+    if (num(t.buyPrice) > 0 || num(t.chargePrice) > 0) {
+      sub += ` • التكلفة: ${fmt(r.cost)}`;
+    }
   } else {
-    sub = 'أدخل سعر الدولار والدولار المستلم';
+    sub = 'أدخل دولار كاش وسعر الدولار';
   }
   const profit = r.valid
     ? (HP ? '••••' : ((r.profit >= 0 ? '+' : '') + fmt(r.profit)))
     : '—';
   const color = r.valid ? (r.profit >= 0 ? 'var(--ok)' : 'var(--no)') : 'var(--sub)';
-  return `<div class="row" data-exp-id="${t.id}" style="cursor:pointer">
+  const attr = kind === 'deal' ? `data-deal-id="${t.id}"` : `data-exp-id="${t.id}"`;
+  const badge = kind === 'deal' ? '<span class="tag" style="background:var(--acs);color:var(--ac)">مبدئي</span>' : '';
+  return `<div class="row" ${attr} style="cursor:pointer">
     <div class="info">
-      <b>${name}</b>
+      <b>${name} ${badge}</b>
       <small>${sub}</small>
     </div>
     <div class="acts">
@@ -2172,38 +2251,38 @@ function expRow({t, r}){
   </div>`;
 }
 
+/* ═══ تفاصيل ربح متوقع لمعاملة أساسية — لا يعدل tx ═══ */
 function openExpD(id){
   const t = tx.find(x => x.id === id);
   if (!t) return;
   curExpId = id;
   $('expDN').textContent = t.name || 'تفاصيل متوقعة';
-  $('expD_half').checked = !!t.isHalf;
   $('expD_buy').value = t.buyPrice || '';
   $('expD_charge').value = t.chargePrice || '';
+  $('expD_cashUSD').value = num(t.cashUSD) || num(t.dollarsReceived) || '';
   $('expD_rate').value = t.dollarRate || '';
-  $('expD_received').value = t.dollarsReceived || '';
-  $('expD_buyLbl').textContent = t.isHalf ? 'المبلغ المدفوع' : 'سعر الشراء';
   calcExpPreview();
   openM('expD');
 }
 
 function calcExpPreview(){
-  const half = $('expD_half').checked;
+  const t = tx.find(x => x.id === curExpId);
+  if (!t) return;
   const buy = num($('expD_buy').value);
   const charge = num($('expD_charge').value);
+  const cashUSD = num($('expD_cashUSD').value);
   const rate = num($('expD_rate').value);
-  const received = num($('expD_received').value);
+  const half = !!t.isHalf;  // ← من المعاملة، غير قابل للتعديل هنا
 
-  $('expD_buyLbl').textContent = half ? 'المبلغ المدفوع' : 'سعر الشراء';
-
-  const value = rate * received;
+  const amount = cashUSD * rate;
   const cost = buy + charge;
-  const profit = half ? (value - cost) / 2 : value - cost;
+  const profit = half ? (amount - cost) / 2 : amount - cost;
   const H = S.hideProfit || S.hideData;
-  const valid = rate > 0 && received > 0;
+  const valid = cashUSD > 0 && rate > 0;
 
-  $('expD_cost').textContent = valid && !H ? fmt(cost) : '—';
-  $('expD_value').textContent = valid && !H ? fmt(value) : '—';
+  $('expD_cashCalc').textContent = valid && !H ? `${fmt(cashUSD)} × ${fmt(rate)} = ${fmt(amount)}` : '—';
+  $('expD_cost').textContent = !H ? fmt(cost) : '—';
+  $('expD_value').textContent = valid && !H ? fmt(amount) : '—';
 
   const pe = $('expD_profit');
   if (!valid) { pe.textContent = '—'; pe.className = ''; }
@@ -2214,34 +2293,116 @@ function calcExpPreview(){
   }
 
   $('expFormula').textContent = half
-    ? 'الحساب: (القيمة المستلمة − المبلغ المدفوع − الشحن) ÷ 2'
-    : 'الحساب: القيمة المستلمة − سعر الشراء − الشحن';
+    ? 'الحساب (بالنصف): ((دولار كاش × السعر) − الشراء − الشحن) ÷ 2'
+    : 'الحساب: (دولار كاش × السعر) − الشراء − الشحن';
 }
 
+/* ⚠️ حفظ expD: يحفظ فقط cashUSD وdollarRate — لا يلمس buyPrice/chargePrice/sellPrice/isHalf/done */
 function saveExpD(){
   const t = tx.find(x => x.id === curExpId);
   if (!t) { toast('المعاملة غير موجودة', 'e'); return; }
-  t.isHalf = $('expD_half').checked;
-  t.buyPrice = $('expD_buy').value;
-  t.chargePrice = $('expD_charge').value;
+  t.cashUSD = $('expD_cashUSD').value;
   t.dollarRate = $('expD_rate').value;
-  t.dollarsReceived = $('expD_received').value;
+  t.dollarsReceived = $('expD_cashUSD').value; // توافق للخلف
+  // ⚠️ لا نلمس أي حقل يؤثر على calc()
   save();
   closeM('expD');
-  render();
+  render();      // إعادة رسم (لن يتغير الربح بعد الشراء)
   renderExp();
-  toast('تم حفظ الربح المتوقع');
+  toast('تم حفظ دولار كاش — لن يؤثر على الربح بعد الشراء');
 }
 
+/* ═══ صفقة مبدئية (مستقلة تماماً) ═══ */
+function openDealForm(id){
+  curDealId = id || null;
+  const d = id ? expectedDeals.find(x => x.id === id) : null;
+  $('expFT').textContent = id ? 'تعديل صفقة مبدئية' : 'صفقة مبدئية جديدة';
+  $('expF_name').value = d ? (d.name || '') : '';
+  $('expF_cashUSD').value = d ? (num(d.cashUSD) || '') : '';
+  $('expF_rate').value = d ? (num(d.dollarRate) || '') : '';
+  $('expF_buy').value = d ? (num(d.buyPrice) || '') : '';
+  $('expF_charge').value = d ? (num(d.chargePrice) || '') : '';
+  $('expF_year').value = d ? d.year : selYear();
+  $('expF_half').checked = d ? !!d.isHalf : false;
+  $('expF_buyLbl').textContent = (d && d.isHalf) ? 'المبلغ المدفوع' : 'سعر الشراء';
+  $('expF_del').style.display = id ? '' : 'none';
+  calcDealPreview();
+  openM('expF');
+}
+
+function calcDealPreview(){
+  const half = $('expF_half').checked;
+  const buy = num($('expF_buy').value);
+  const charge = num($('expF_charge').value);
+  const cashUSD = num($('expF_cashUSD').value);
+  const rate = num($('expF_rate').value);
+  $('expF_buyLbl').textContent = half ? 'المبلغ المدفوع' : 'سعر الشراء';
+  const amount = cashUSD * rate;
+  const cost = buy + charge;
+  const profit = half ? (amount - cost) / 2 : amount - cost;
+  const H = S.hideProfit || S.hideData;
+  const valid = cashUSD > 0 && rate > 0;
+  $('expF_cashCalc').textContent = valid && !H ? `${fmt(cashUSD)} × ${fmt(rate)} = ${fmt(amount)}` : '—';
+  $('expF_cost').textContent = !H ? fmt(cost) : '—';
+  const p = $('expF_profit');
+  if (!valid) { p.textContent = '—'; p.className = ''; }
+  else if (H) { p.textContent = '•••••'; p.className = ''; }
+  else { p.textContent = (profit >= 0 ? '+' : '') + fmt(profit); p.className = profit >= 0 ? '' : 'neg'; }
+}
+
+function saveDeal(){
+  const name = $('expF_name').value.trim();
+  if (!name) { toast('اسم العميل مطلوب', 'e'); $('expF_name').focus(); return; }
+  const y = parseInt($('expF_year').value, 10) || selYear();
+  const data = {
+    name,
+    cashUSD: $('expF_cashUSD').value,
+    dollarRate: $('expF_rate').value,
+    buyPrice: $('expF_buy').value,
+    chargePrice: $('expF_charge').value,
+    isHalf: $('expF_half').checked,
+    year: y
+  };
+  if (curDealId) {
+    const d = expectedDeals.find(x => x.id === curDealId);
+    if (d) Object.assign(d, data);
+  } else {
+    expectedDeals.push(Object.assign({id:'exp_'+uid()}, data));
+  }
+  saveExp();
+  closeM('expF');
+  renderExp();
+  toast(curDealId ? 'تم تعديل الصفقة المبدئية' : 'تمت إضافة الصفقة المبدئية');
+}
+
+function deleteDeal(){
+  if (!curDealId) return;
+  ask('حذف صفقة مبدئية', 'هل تريد حذف هذه الصفقة نهائياً؟', 'حذف', () => {
+    expectedDeals = expectedDeals.filter(x => x.id !== curDealId);
+    saveExp();
+    closeM('expF');
+    renderExp();
+    toast('تم حذف الصفقة المبدئية', 'e');
+  });
+}
+
+/* ═══ الأحداث ═══ */
 $('bExp').onclick = () => { hp(); openExp(); };
 $('expShowDone').onchange = e => { S.showDoneInExp = e.target.checked; saveS(); renderExp(); };
 $('expList').onclick = e => {
+  const dealRow = e.target.closest('[data-deal-id]');
+  if (dealRow) { openDealForm(dealRow.dataset.dealId); return; }
   const row = e.target.closest('[data-exp-id]');
   if (row) openExpD(row.dataset.expId);
 };
-$('expD_half').onchange = calcExpPreview;
-['expD_buy','expD_charge','expD_rate','expD_received'].forEach(k => $(k).addEventListener('input', calcExpPreview));
+$('expAddDeal').onclick = () => openDealForm(null);
+$('expD_cashUSD').addEventListener('input', calcExpPreview);
+$('expD_rate').addEventListener('input', calcExpPreview);
 $('expD_save').onclick = saveExpD;
+$('expF_half').onchange = calcDealPreview;
+['expF_cashUSD','expF_rate','expF_buy','expF_charge'].forEach(k => $(k).addEventListener('input', calcDealPreview));
+$('expF_save').onclick = saveDeal;
+$('expF_del').onclick = deleteDeal;
 
 /* ============ GLOBAL EVENTS ============ */
 document.addEventListener('click',e=>{
@@ -2281,6 +2442,7 @@ document.addEventListener('keydown',e=>{
     if($('form').classList.contains('on'))$('fSave').click();
     else if($('det').classList.contains('on'))$('dSave').click();
     else if($('expD').classList.contains('on'))$('expD_save').click();
+    else if($('expF').classList.contains('on'))$('expF_save').click();
   }
 });
 
