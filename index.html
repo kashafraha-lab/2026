@@ -20,6 +20,9 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{touch-action:manipulation;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;font:400 14px/1.55 'Readex Pro',system-ui,Tahoma,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:120px;overflow-x:hidden}
+/* ✅ منع تمرير الخلفية عند فتح النوافذ */
+body.modal-open { overflow: hidden; touch-action: none; }
+
 button,input,select,textarea{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none;padding:0}
 i{display:inline-flex;font-style:normal}small{color:var(--sub);font-size:12px}
 .w{max-width:720px;margin:auto;padding:0 14px}
@@ -153,8 +156,9 @@ h1{font-size:17px;margin:0;line-height:1.3;font-weight:600}
 .fab{position:fixed;inset-inline:0;bottom:calc(env(safe-area-inset-bottom) + 18px);z-index:30;display:flex;align-items:center;justify-content:center;gap:8px;height:54px;width:max-content;margin-inline:auto;padding:0 26px;border-radius:99px;color:#fff;font-weight:600;background:var(--ac);box-shadow:0 10px 26px color-mix(in srgb,var(--ac) 42%,transparent);transition:transform .12s;-webkit-user-select:none;user-select:none}
 .fab:active{transform:scale(.95)}
 
-.bg{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background:rgba(8,8,24,.5);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}.bg.on{display:flex}
-.sh{width:100%;max-width:520px;max-height:92vh;overflow:auto;background:var(--cd);border-radius:28px 28px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));animation:up .28s cubic-bezier(.2,.9,.3,1)}
+.bg{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background:rgba(8,8,24,.5);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);overscroll-behavior:contain;touch-action:none}
+.bg.on{display:flex}
+.sh{width:100%;max-width:520px;max-height:92vh;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;background:var(--cd);border-radius:28px 28px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom));animation:up .28s cubic-bezier(.2,.9,.3,1)}
 @keyframes up{from{transform:translateY(50px);opacity:0}}
 @media(min-width:600px){.bg{align-items:center}.sh{border-radius:28px}}
 .mid .sh{max-width:340px;width:90%;border-radius:28px;text-align:center}.mid h2{margin:0 0 6px}.mid p{margin:0 0 6px;color:var(--sub)}
@@ -535,16 +539,16 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <!-- ===== EXPECTED PROFIT LIST ===== -->
 <div class="bg" id="expM"><div class="sh">
 <div class="th"><h2>الربح المتوقع</h2><button class="ib" data-x="expM" aria-label="إغلاق"><i data-ic="x"></i></button></div>
-<label class="tg"><span>تضمين المعاملات المكتملة</span><input type="checkbox" id="expShowDone"><i class="sw"></i></label>
 <div class="ac2" style="margin-top:0;margin-bottom:10px">
   <button class="btn pr" id="expAddDeal"><i data-ic="plus"></i>إضافة صفقة مبدئية</button>
 </div>
+<label class="tg"><span>تضمين المعاملات المكتملة</span><input type="checkbox" id="expShowDone"><i class="sw"></i></label>
 <div class="noteBox" style="margin-top:0;margin-bottom:10px">
   <i data-ic="info" data-s="16"></i>
-  <div>الصفقات المبدئية <b class="g">مستقلة تماماً</b> عن معاملاتك الأساسية، ولا تؤثر على "الربح بعد الشراء" في الأعلى.</div>
+  <div>الصفقات المبدئية وتعديلات دولار كاش <b class="g">مستقلة تماماً</b> ولا تؤثر على "الربح بعد الشراء" في الواجهة الرئيسية.</div>
 </div>
-<div id="expList" style="max-height:48vh;overflow-y:auto"></div>
-<div class="pc" id="expTotal">إجمالي الربح المتوقع<b id="expTotalVal">0.00</b></div>
+<div id="expList" style="max-height:45vh;overflow-y:auto;background:var(--cd);border:1px solid var(--bd);border-radius:16px;margin-bottom:14px"></div>
+<div class="pc" id="expTotal" style="border-radius:16px">إجمالي الربح المتوقع<b id="expTotalVal">0.00</b></div>
 </div></div>
 
 <!-- ===== EXPECTED PROFIT DETAIL ===== -->
@@ -552,8 +556,16 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 <div class="th"><h2 id="expDN">—</h2><button class="ib" data-x="expD" aria-label="إغلاق"><i data-ic="x"></i></button></div>
 <label class="tg"><span>معاملة بالنصف (للربح المتوقع فقط)</span><input type="checkbox" id="expD_half"><i class="sw"></i></label>
 <div class="g2">
-  <div class="f"><label>سعر الشراء (ثابت)</label><input id="expD_buy" readonly style="background:var(--bg);cursor:not-allowed;opacity:.75"></div>
-  <div class="f"><label>قيمة الشحن (ثابت)</label><input id="expD_charge" readonly style="background:var(--bg);cursor:not-allowed;opacity:.75"></div>
+  <div class="f">
+    <label>سعر الشراء</label>
+    <input type="number" step="any" inputmode="decimal" id="expD_buy" placeholder="أدخل المبلغ">
+    <small style="font-size:10px;color:var(--sub);margin-top:2px">اتركه فارغاً لاستخدام قيمة المعاملة</small>
+  </div>
+  <div class="f">
+    <label>قيمة الشحن</label>
+    <input type="number" step="any" inputmode="decimal" id="expD_charge" placeholder="أدخل المبلغ">
+    <small style="font-size:10px;color:var(--sub);margin-top:2px">اتركه فارغاً لاستخدام قيمة المعاملة</small>
+  </div>
   <div class="f"><label>💵 دولار كاش</label><input type="number" step="any" inputmode="decimal" id="expD_cashUSD" placeholder="مثال: 2900"></div>
   <div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="expD_rate" placeholder="مثال: 10.08"></div>
 </div>
@@ -567,9 +579,9 @@ label{font-size:12px;color:var(--sub);font-weight:500}
 </div>
 <div class="noteBox">
   <i data-ic="info" data-s="16"></i>
-  <div>هذه الحسابات <b class="g">لا تؤثر</b> على "الربح بعد الشراء" في الواجهة الرئيسية.</div>
+  <div>تعديل الشراء أو الشحن هنا <b class="g">لا يؤثر</b> على الواجهة الرئيسية أو "الربح بعد الشراء".</div>
 </div>
-<div class="ac2"><button class="btn pr" id="expD_save"><i data-ic="check"></i>حفظ</button></div>
+<div class="ac2"><button class="btn pr" id="expD_save"><i data-ic="check"></i>حفظ التغييرات</button></div>
 </div></div>
 
 <!-- ===== ADD/EDIT EXPECTED DEAL ===== -->
@@ -670,11 +682,21 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const num=v=>{const n=parseFloat(v);return isFinite(n)?n:0;};
 const curYear=new Date().getFullYear();
 const hp=(m=0)=>{try{navigator.vibrate&&navigator.vibrate(m);}catch(e){}};
-const openM=id=>$(id).classList.add('on');
-const closeM=id=>$(id).classList.remove('on');
 const uid=()=>'tx_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
 const toAr=s=>String(s).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
 const DOTS='•••••';
+
+/* ✅ إدارة فتح وإغلاق النوافذ لمنع التمرير في الخلفية */
+const openM = id => {
+    $(id).classList.add('on'); 
+    document.body.classList.add('modal-open'); 
+};
+const closeM = id => {
+    $(id).classList.remove('on'); 
+    if (document.querySelectorAll('.bg.on').length === 0) {
+        document.body.classList.remove('modal-open'); 
+    }
+};
 
 let S={year:null,hideProfit:true,hideData:false,extraYears:[],sortBy:'booking',flt:'all',month:'all',numerals:'western',goal:0,collapsed:[],recent:[],showDoneInExp:false};
 
@@ -811,12 +833,17 @@ const calc=t=>{
   return t.isHalf?(f-c-b)/2:f-c-b;
 };
 
-/* ═══════ حساب الربح المتوقع — يقرأ cashUSD و expIsHalf ═══════ */
+/* ═══════ حساب الربح المتوقع (يقرأ الحقول المستقلة أولاً) ═══════ */
 const expCalc = (t) => {
   const cashUSD = num(t.cashUSD) || num(t.dollarsReceived);
   const rate = num(t.dollarRate);
-  const buy = num(t.buyPrice);
-  const charge = num(t.chargePrice);
+  
+  const hasCustomBuy = t.expBuyPrice !== undefined && t.expBuyPrice !== null && t.expBuyPrice !== '';
+  const hasCustomCharge = t.expChargePrice !== undefined && t.expChargePrice !== null && t.expChargePrice !== '';
+  
+  const buy = hasCustomBuy ? num(t.expBuyPrice) : num(t.buyPrice);
+  const charge = hasCustomCharge ? num(t.expChargePrice) : num(t.chargePrice);
+  
   const cost = buy + charge;
   const isHalf = (t.expIsHalf !== undefined) ? t.expIsHalf : !!t.isHalf;
   
@@ -1039,7 +1066,7 @@ function computeRows(){
   return {active, done, cancelled};
 }
 
-/* ============ STATS (تم إصلاح الرقم بالسالب) ============ */
+/* ============ STATS ============ */
 function stats(){
   const Y=selYear();
   let P=0,P2=0,B=0,pe=0,dn=0,cn=0,bk=0,n=0;
@@ -1048,7 +1075,6 @@ function stats(){
     n++;
     if(t.cancelled){cn++;return;}
     
-    // ✅ التعديل هنا: لا يتم حساب الربح (أو الخصم) إلا إذا تم البيع أو الإتمام
     if(t.done || num(t.sellPrice) > 0) {
         P += calc(t);
     }
@@ -1956,7 +1982,6 @@ $('bStat').onclick=()=>{
     curN++;
     if(t.cancelled){curCanc++;return;}
     
-    // ✅ التعديل هنا أيضاً
     if(t.done || num(t.sellPrice) > 0) {
         curP+=calc(t);
     }
@@ -1993,7 +2018,6 @@ $('bStat').onclick=()=>{
       n++;
       if(t.cancelled){cn++;return;}
       
-      // ✅ التعديل هنا
       if(t.done || num(t.sellPrice) > 0) {
           P+=calc(t);
       }
@@ -2245,28 +2269,34 @@ function expRow(item){
   const H = S.hideData;
   const HP = H || S.hideProfit;
   const name = H ? DOTS : esc(t.name || '-');
+  
+  const isCustom = (t.expBuyPrice !== undefined && t.expBuyPrice !== '') || (t.expChargePrice !== undefined && t.expChargePrice !== '') || (t.cashUSD !== undefined && t.cashUSD !== '');
+  const badge = kind === 'deal' 
+    ? '<span class="pill" style="background:var(--acs);color:var(--ac);font-size:10px;padding:2px 6px">مبدئي</span>' 
+    : (isCustom ? '<span class="pill" style="background:var(--wn);color:#fff;font-size:10px;padding:2px 6px">معدل</span>' : '');
+  
   let sub;
   if (r.valid) {
     sub = H ? '••••' : `دولار كاش: ${fmt(r.cashUSD)} × ${fmt(r.rate)} = ${fmt(r.value)}`;
-    if (num(t.buyPrice) > 0 || num(t.chargePrice) > 0) {
+    if (r.cost > 0) {
       sub += ` • التكلفة: ${fmt(r.cost)}`;
     }
   } else {
     sub = 'أدخل دولار كاش وسعر الدولار';
   }
-  const profit = r.valid
-    ? (HP ? '••••' : ((r.profit >= 0 ? '+' : '') + fmt(r.profit)))
-    : '—';
+  
+  const profit = r.valid ? (HP ? '••••' : ((r.profit >= 0 ? '+' : '') + fmt(r.profit))) : '—';
   const color = r.valid ? (r.profit >= 0 ? 'var(--ok)' : 'var(--no)') : 'var(--sub)';
   const attr = kind === 'deal' ? `data-deal-id="${t.id}"` : `data-exp-id="${t.id}"`;
-  const badge = kind === 'deal' ? '<span class="tag" style="background:var(--acs);color:var(--ac)">مبدئي</span>' : '';
-  return `<div class="row" ${attr} style="cursor:pointer">
+  
+  return `<div class="row" ${attr} style="cursor:pointer;padding:12px 14px;margin:0;border-bottom:1px solid var(--bd);align-items:center">
     <div class="info">
-      <b>${name} ${badge}</b>
-      <small>${sub}</small>
+      <b style="display:flex;align-items:center;gap:6px">${name} ${badge}</b>
+      <small style="margin-top:4px">${sub}</small>
     </div>
-    <div class="acts">
-      <b style="color:${color};font-size:14px;font-weight:600">${profit}</b>
+    <div class="acts" style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <b style="color:${color};font-size:15px;font-weight:700">${profit}</b>
+      <span style="font-size:10px;color:var(--sub)">${kind==='deal'?'صفقة':''}</span>
     </div>
   </div>`;
 }
@@ -2277,8 +2307,8 @@ function openExpD(id){
   if (!t) return;
   curExpId = id;
   $('expDN').textContent = t.name || 'تفاصيل متوقعة';
-  $('expD_buy').value = t.buyPrice || '';
-  $('expD_charge').value = t.chargePrice || '';
+  $('expD_buy').value = t.expBuyPrice !== undefined ? t.expBuyPrice : (t.buyPrice || '');
+  $('expD_charge').value = t.expChargePrice !== undefined ? t.expChargePrice : (t.chargePrice || '');
   $('expD_cashUSD').value = num(t.cashUSD) || num(t.dollarsReceived) || '';
   $('expD_rate').value = t.dollarRate || '';
   $('expD_half').checked = (t.expIsHalf !== undefined) ? t.expIsHalf : !!t.isHalf;
@@ -2293,7 +2323,7 @@ function calcExpPreview(){
   const charge = num($('expD_charge').value);
   const cashUSD = num($('expD_cashUSD').value);
   const rate = num($('expD_rate').value);
-  const half = $('expD_half').checked; // ✅ تم إرجاع الخيار
+  const half = $('expD_half').checked;
 
   const amount = cashUSD * rate;
   const cost = buy + charge;
@@ -2318,19 +2348,23 @@ function calcExpPreview(){
     : 'الحساب: (دولار كاش × السعر) − الشراء − الشحن';
 }
 
-/* ⚠️ حفظ expD: يحفظ cashUSD وdollarRate وexpIsHalf فقط */
+/* ✅ حفظ expD: يحفظ في حقول مستقلة لا تؤثر على tx الأساسي */
 function saveExpD(){
   const t = tx.find(x => x.id === curExpId);
   if (!t) { toast('المعاملة غير موجودة', 'e'); return; }
+  
+  t.expBuyPrice = $('expD_buy').value;
+  t.expChargePrice = $('expD_charge').value;
   t.cashUSD = $('expD_cashUSD').value;
   t.dollarRate = $('expD_rate').value;
   t.dollarsReceived = $('expD_cashUSD').value;
-  t.expIsHalf = $('expD_half').checked; // ✅ حفظ مستقل لا يؤثر على tx.isHalf
+  t.expIsHalf = $('expD_half').checked;
+  
   save();
   closeM('expD');
   render();      
   renderExp();
-  toast('تم حفظ دولار كاش للربح المتوقع');
+  toast('تم حفظ التغييرات (بدون تأثير على الأساسي)');
 }
 
 /* ═══ صفقة مبدئية (مستقلة تماماً) ═══ */
@@ -2418,8 +2452,7 @@ $('expList').onclick = e => {
 };
 $('expAddDeal').onclick = () => openDealForm(null);
 $('expD_half').addEventListener('change', calcExpPreview);
-$('expD_cashUSD').addEventListener('input', calcExpPreview);
-$('expD_rate').addEventListener('input', calcExpPreview);
+['expD_buy','expD_charge','expD_cashUSD','expD_rate'].forEach(k => $(k).addEventListener('input', calcExpPreview));
 $('expD_save').onclick = saveExpD;
 $('expF_half').onchange = calcDealPreview;
 ['expF_cashUSD','expF_rate','expF_buy','expF_charge'].forEach(k => $(k).addEventListener('input', calcDealPreview));
