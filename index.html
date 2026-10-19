@@ -635,6 +635,7 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 <div class="bg" id="bk"><div class="sh"><div class="handle"></div>
 <div class="th"><h2>موعد الحجز</h2><button class="ib" data-x="bk" aria-label="إغلاق"><i data-ic="x"></i></button></div>
 <div class="f"><label>تاريخ الحجز</label><input type="date" id="bk_d"></div>
+<div class="f" id="bk_ex" style="display:none"><label>تاريخ اختيار شركة الصرافة</label><input type="date" id="bk_exd"></div>
 <div class="noteBox" id="bkNote">
   <i data-ic="clock" data-s="16"></i>
   <div>يبقى الحجز <b class="w">بانتظار اختيار شركة صرافة</b> لمدة <b>30 يوم</b>. بعد انقضاء المهلة يتحول النص إلى <b class="d">الأحمر</b> مع تنبيه.</div>
@@ -1536,7 +1537,8 @@ function card(r,n){
     const parts=[];
     if(t.date)parts.push(`<i class="meta-date">${ic('note',11)}إدخال ${esc(t.date)}</i>`);
     if(t.bookingDate){
-      parts.push(`<i class="meta-date">${ic('cal',11)}حجز ${esc(t.bookingDate)}</i>`);
+      parts.push(`<i class="meta-date">${ic('cal',11)}تاريخ الحجز ${esc(t.bookingDate)}</i>`);
+      if(t.exchangeDate)parts.push(`<i class="meta-date">${ic('cal',11)}تاريخ اختيار شركة الصرافة ${esc(t.exchangeDate)}</i>`);
       const bi=bookingInfo(t);
       if(bi){
         if(bi.status==='future')parts.push('<i class="meta-status f">موعد حجز قادم</i>');
@@ -2099,7 +2101,7 @@ function details(i){
   $('dI').innerHTML=[
     ['رقم الهاتف',t.phone],['الحساب',t.account],['الرقم الوطني',t.nationalId],
     ['جواز السفر',t.passport],['IBAN',t.iban],['تاريخ الإدخال',t.date],
-    ['تاريخ الحجز',t.bookingDate||'-']
+    ['تاريخ الحجز',t.bookingDate||'-'],['تاريخ اختيار شركة الصرافة',t.exchangeDate||'-']
   ].map(([l,v])=>{const val=v||'-';return `<button class="ii" data-cp="${esc(val)}"><small>${l}</small><b>${esc(val)}</b></button>`;}).join('');
   $('d_buy').value=t.buyPrice||'';
   $('d_charge').value=t.chargePrice||'';
@@ -2162,18 +2164,27 @@ $('dDup').onclick=()=>{
 function book(i){
   cur=i;
   $('bk_d').value=tx[i].bookingDate||'';
+  $('bk_exd').value=tx[i].exchangeDate||'';
+  $('bk_ex').style.display=tx[i].bookingDate?'':'none';
   $('bk_c').style.display=tx[i].bookingDate?'':'none';
   openM('bk');
 }
+/* بعد اختيار تاريخ الحجز يظهر خيار تاريخ اختيار شركة الصرافة */
+$('bk_d').addEventListener('change',()=>{
+  $('bk_ex').style.display=$('bk_d').value?'':'none';
+  if(!$('bk_d').value)$('bk_exd').value='';
+});
 $('bk_s').onclick=()=>{
   if(cur>-1&&tx[cur]){
     tx[cur].bookingDate=$('bk_d').value;
+    tx[cur].exchangeDate=$('bk_exd').value;
     save();toast('تم حفظ التاريخ بنجاح');closeM('bk');render();
   }
 };
 $('bk_c').onclick=()=>{
   if(cur>-1&&tx[cur]){
     tx[cur].bookingDate='';
+    tx[cur].exchangeDate='';
     save();toast('تم إلغاء الحجز بنجاح','i');closeM('bk');render();
   }
 };
@@ -2557,7 +2568,7 @@ $('fi').onchange=e=>{
         year:parseInt(o.year,10)||curYear,
         date:o.date||new Date().toLocaleDateString('en-GB'),
         done:bo(o.done),cancelled:bo(o.cancelled),isHalf:bo(o.isHalf),
-        bookingDate:o.bookingDate||'',rowColor:o.rowColor||'#ffffff'
+        bookingDate:o.bookingDate||'',exchangeDate:o.exchangeDate||'',rowColor:o.rowColor||'#ffffff'
       }));
       data.forEach(t=>t.clientId=nextClientId(t.year));
       closeM('set');
