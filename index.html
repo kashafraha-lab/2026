@@ -74,7 +74,7 @@ h1{font-size:18px;margin:0;line-height:1.25;font-weight:800;letter-spacing:-.2px
 /* ===== SUMMARY CARD ===== */
 .sm{position:relative;background:var(--cd);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--bd);border-radius:28px;overflow:hidden;margin:2px 0 16px;box-shadow:var(--sh)}
 .sm:before{content:"";position:absolute;inset:0;border-radius:28px;padding:1.5px;background:linear-gradient(135deg,color-mix(in srgb,var(--ac) 50%,transparent),transparent 38%,color-mix(in srgb,var(--ac) 18%,transparent));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:4}
-.eye-mini{position:absolute;top:14px;inset-inline-start:14px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--sub);background:var(--bg);border:1px solid var(--bd);z-index:3;transition:transform .12s,color .15s}
+.eye-mini{position:absolute;top:14px;inset-inline-start:14px;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--sub);background:var(--bg);border:1px solid var(--bd);z-index:5;transition:transform .12s,color .15s}
 .eye-mini:hover{color:var(--ac)}
 .eye-mini:active{transform:scale(.88)}
 .pfw{position:relative;display:flex;align-items:flex-start;gap:14px;padding:52px 20px 18px}
@@ -196,15 +196,18 @@ h1{font-size:18px;margin:0;line-height:1.25;font-weight:800;letter-spacing:-.2px
 @keyframes fabPulse{0%,100%{box-shadow:var(--glow)}50%{box-shadow:0 10px 34px color-mix(in srgb,var(--ac) 55%,transparent)}}
 .fab:active{transform:scale(.94)}
 @media(hover:hover){.c:hover{background:color-mix(in srgb,var(--bg) 45%,transparent)}}
-.selbar{position:fixed;inset-inline:0;bottom:calc(env(safe-area-inset-bottom) + 14px);z-index:35;width:min(94vw,640px);margin-inline:auto;background:color-mix(in srgb,var(--cd2) 94%,transparent);border:1px solid var(--bd);border-radius:24px;box-shadow:0 22px 52px rgba(10,10,40,.3);display:none;align-items:center;gap:5px;padding:9px 11px;backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5)}
-.selbar.on{display:flex;animation:barIn .32s cubic-bezier(.2,.9,.3,1) both}
-@keyframes barIn{from{opacity:0;transform:translateY(26px) scale(.95)}}
-.selbar .cnt{flex:none;display:inline-flex;align-items:center;justify-content:center;min-width:40px;height:42px;padding:0 13px;border-radius:14px;background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 68%,#000));color:#fff;font-weight:900;font-size:15px;box-shadow:0 6px 16px color-mix(in srgb,var(--ac) 34%,transparent)}
-.selbar .sep{width:1px;align-self:stretch;margin:8px 3px;background:var(--bd);flex:none}
-.selbar button{flex:1;min-width:54px;height:54px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;font-weight:800;color:var(--sub);transition:transform .12s,background .15s,color .15s}
-.selbar button:active{transform:scale(.88)}
-.selbar button.pr{background:var(--acs);color:var(--ac)}
-.selbar button.dg{background:color-mix(in srgb,var(--no) 11%,transparent);color:var(--no)}
+/* شريط الإجراءات السياقي (داخل الهيدر) */
+.selhd{display:none;align-items:center;gap:10px;width:100%;animation:selIn .25s both}
+@keyframes selIn{from{opacity:0;transform:translateY(-6px)}}
+.hd.sel .selhd{display:flex}
+.hd.sel .lg,.hd.sel .hb{display:none}
+.hd.sel{background:color-mix(in srgb,var(--acs) 55%,var(--bg))}
+.selcnt{display:flex;flex-direction:column;line-height:1.15;min-width:44px}
+.selcnt b{font-size:19px;font-weight:900;color:var(--ac)}
+.selcnt small{font-size:10px;font-weight:700}
+.selacts{display:flex;gap:7px;margin-inline-start:auto}
+.ib.ac{background:linear-gradient(135deg,var(--ac),color-mix(in srgb,var(--ac) 70%,#000));color:#fff;border-color:transparent;box-shadow:var(--glow)}
+.ib.dgr{color:var(--no)}
 
 /* ===== MODALS ===== */
 .bg{position:fixed;inset:0;z-index:50;display:none;align-items:flex-end;justify-content:center;background:rgba(8,10,28,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);overscroll-behavior:contain;touch-action:none}
@@ -366,6 +369,16 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 <button class="ib" id="bLock" aria-label="قفل التطبيق" style="display:none"><i data-ic="lock"></i></button>
 <button class="ib" id="bSet" aria-label="الإعدادات"><i data-ic="set"></i></button>
 </div>
+<div class="selhd" id="selhd">
+  <button class="ib dgr" id="selX" aria-label="إغلاق التحديد" title="إغلاق (Esc)"><i data-ic="x" data-s="20"></i></button>
+  <div class="selcnt"><b id="selCnt">0</b><small>محدد</small></div>
+  <div class="selacts">
+    <button class="ib" id="selAll" aria-label="تحديد الكل" title="تحديد الكل"><i data-ic="check" data-s="19"></i></button>
+    <button class="ib ac" id="selDone" aria-label="إتمام البيع" title="إتمام البيع"><i data-ic="check" data-s="19"></i></button>
+    <button class="ib" id="selCancel" aria-label="إلغاء المعاملات" title="إلغاء"><i data-ic="ban" data-s="19"></i></button>
+    <button class="ib dgr" id="selDel" aria-label="حذف نهائي" title="حذف نهائي"><i data-ic="trash" data-s="19"></i></button>
+  </div>
+</div>
 </div></header>
 <div class="w">
 
@@ -431,17 +444,6 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 <main id="list"></main>
 </div>
 <button class="fab" id="bAdd"><i data-ic="plus" data-s="22"></i>معاملة جديدة</button>
-
-<div class="selbar" id="selbar">
-  <span class="cnt" id="selCnt">0</span>
-  <span class="sep"></span>
-  <button id="selAll"><i data-ic="check" data-s="20"></i>تحديد الكل</button>
-  <button id="selDone" class="pr"><i data-ic="check" data-s="20"></i>إتمام</button>
-  <button id="selCancel"><i data-ic="ban" data-s="20"></i>إلغاء</button>
-  <span class="sep"></span>
-  <button id="selDel" class="dg"><i data-ic="trash" data-s="20"></i>حذف</button>
-  <button id="selX"><i data-ic="x" data-s="20"></i>إغلاق</button>
-</div>
 
 <!-- ===== LOCK ===== -->
 <div class="lock" id="lock">
@@ -729,6 +731,7 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 <script>
 "use strict";
 const $=i=>document.getElementById(i);
+const LSK='app2026_lastbkp';
 const KEY='app2026_pro_db',TK='app2026_theme',SK='app2026_settings_v2',SNAPK='app2026_snapshots_v1',EXPKEY='app2026_expected_v1',PINK='app2026_pin_v1';
 
 /* ============ منع الزوم ============ */
@@ -1050,11 +1053,21 @@ function save(){
   }
 }
 function decryptAll(){if(lockKey())tx.forEach(decryptFromStore);}
+function backupReminder(){
+  try{
+    const last=+localStorage.getItem(LSK)||0;
+    if(Date.now()-last>7*86400000){
+      toastAct('مرت أكثر من 7 أيام بدون نسخة احتياطية','حفظ الآن',()=>{$('bSnapNew').click();});
+      localStorage.setItem(LSK,String(Date.now()));
+    }
+  }catch(e){}
+}
 function unlockAndRender(){
   decryptAll();
   normalizeTx();
   render();
   checkN();
+  backupReminder();
 }
 
 /* ============ EXPECTED DEALS ============ */
@@ -1128,7 +1141,7 @@ function createSnapshot(name,auto){
   const storeTx=k?tx.map(encryptForStore):tx;
   const s={id:'snap_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),name:name||('نسخة '+new Date().toLocaleString('en-GB')),ts:Date.now(),auto:!!auto,tx:JSON.parse(JSON.stringify(storeTx)),extraYears:S.extraYears.slice(),year:S.year};
   snaps.unshift(s);trimSnaps();
-  if(saveSnaps()){updateSnapCount();return s;}
+  if(saveSnaps()){updateSnapCount();try{localStorage.setItem(LSK,String(Date.now()));}catch(e){}return s;}
   snaps.shift();trimSnaps();
   if(saveSnaps()){updateSnapCount();return null;}
   snaps=[];try{localStorage.removeItem(SNAPK);}catch(e){}
@@ -1549,14 +1562,15 @@ function exitSel(){
   render();
 }
 function updateSelbar(){
-  $('selbar').classList.toggle('on',selMode);
-  $('selCnt').textContent=dispNum(selSet.size);
+  document.querySelector('.hd').classList.toggle('sel',selMode);
   $('bAdd').style.display=selMode?'none':'';
+  $('selCnt').textContent=dispNum(selSet.size);
   if(selMode){
     const{active,done,cancelled}=computeRows();
     const vis=active.concat(done,cancelled).length;
     const all=vis>0&&selSet.size===vis;
-    $('selAll').innerHTML=ic(all?'x':'check',20)+(all?'إلغاء التحديد':'تحديد الكل');
+    $('selAll').innerHTML=ic(all?'x':'check',19);
+    $('selAll').title=all?'إلغاء التحديد':'تحديد الكل';
   }
 }
 $('list').addEventListener('click',e=>{
@@ -2010,6 +2024,9 @@ function openMore(i){
   $('moreT').textContent=t.name||'خيارات';
   const items=[['edit','edit','تعديل البيانات'],['share','share','مشاركة البيانات'],['copy','copy','نسخ المعاملة'],['move','move','نقل في القائمة']];
   if(t.cancelled)items.unshift(['restore','undo','إعادة تفعيل المعاملة']);
+  const hasColor=/^#[0-9a-f]{6}$/i.test(t.rowColor||'')&&t.rowColor.toLowerCase()!=='#ffffff';
+  items.push(['color','star',hasColor?'تغيير اللون المميز':'تمييز بلون مخصص']);
+  if(hasColor)items.push(['uncolor','ban','إزالة التمييز']);
   items.push(['delete','trash','حذف نهائي',true]);
   $('moreItems').innerHTML=items.map(([a,icn,lbl,dg])=>`<button class="moreItem${dg?' dg':''}" data-mi="${a}">${ic(icn,20)}${lbl}</button>`).join('');
   openM('moreM');
@@ -2025,8 +2042,23 @@ $('moreItems').onclick=e=>{
   else if(a==='copy')copyTx(i);
   else if(a==='move')openMove(i);
   else if(a==='restore')restore(i);
+  else if(a==='color')openColorFor(i);
+  else if(a==='uncolor'){tx[i].rowColor='#ffffff';save();render();toast('تم إزالة التمييز','i');}
   else if(a==='delete')del(i);
 };
+let colorTarget=-1;
+function openColorFor(i){
+  colorTarget=i;
+  const cur=tx[i].rowColor;
+  $('pk').value=/^#[0-9a-f]{6}$/i.test(cur)?cur:'#6c5ce7';
+  setTimeout(()=>$('pk').click(),60);
+}
+$('pk').addEventListener('change',e=>{
+  if(colorTarget<0)return;
+  const t=tx[colorTarget];
+  if(t){t.rowColor=e.target.value;save();render();toast('تم تمييز المعاملة باللون');}
+  colorTarget=-1;
+});
 function copyTx(i){
   const t=tx[i];if(!t)return;
   const c=Object.assign({},t,{id:uid(),clientId:nextClientId(t.year),date:new Date().toLocaleDateString('en-GB'),done:false,cancelled:false,bookingDate:'',sellPrice:'',notes:'',rowColor:'#ffffff'});
