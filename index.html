@@ -454,6 +454,11 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 .sm{cursor:pointer;transition:box-shadow .25s,transform .16s ease}
 .sm:active{transform:scale(.985)}
 
+/* ===== نعومة إخفاء/ظهور زر الإضافة — انزلاق + تلاشي متزامنان ===== */
+.fab{transition:transform .42s cubic-bezier(.3,.7,.4,1),opacity .34s ease,filter .15s}
+.fab.hide{transform:translateY(calc(100% + 44px)) scale(.9);opacity:0;pointer-events:none;transition:transform .42s cubic-bezier(.3,.7,.4,1),opacity .34s ease}
+.fab:active{transform:scale(.94);transition-duration:.12s}
+
 </style>
 <base target="_blank">
 <base target="_blank">
@@ -758,7 +763,6 @@ label{font-size:12px;color:var(--sub);font-weight:700}
   </div>
 </div>
 <div class="pc" id="expTotal" style="margin-top:0;margin-bottom:14px;border-radius:17px">إجمالي الربح المتوقع<b id="expTotalVal">0.00</b></div>
-<label class="tg"><span>تضمين المعاملات المكتملة</span><input type="checkbox" id="expShowDone"><i class="sw"></i></label>
 <div id="expList" style="max-height:45vh;overflow-y:auto;background:var(--cd);border:1px solid var(--bd);border-radius:17px;margin-bottom:14px"></div>
 <div class="ac2" style="margin-top:0"><button class="btn pr" id="expAddDeal" style="width:100%"><i data-ic="plus"></i>إضافة صفقة مبدئية</button></div>
 </div></div>
@@ -2611,48 +2615,29 @@ $('fj').onchange=e=>{
 /* ============ EXPECTED PROFIT ============ */
 let curExpId=null,curDealId=null;
 function openExp(){
-  $('expShowDone').checked=!!S.showDoneInExp;
   renderExp();
   openM('expM');
 }
 function renderExp(){
   const Y=selYear();
-  const pending=[],done=[],deals=[];
-  let totalP=0,totalD=0,totalDeals=0;
-  tx.forEach((t,i)=>{
-    if(+t.year!==Y||t.cancelled)return;
-    const r=expCalc(t);
-    if(t.done){done.push({kind:'tx',t,i,r});if(r.valid)totalD+=r.profit;}
-    else{pending.push({kind:'tx',t,i,r});if(r.valid)totalP+=r.profit;}
-  });
-  expectedDeals.forEach(d=>{
-    if(+d.year!==Y)return;
-    const r=expCalc(d);
-    deals.push({kind:'deal',t:d,r});
-    if(r.valid)totalDeals+=r.profit;
-  });
-  const srt=(a,b)=>{
+  /* الربح المتوقع منفصل: صفقات مبدئية فقط، لا علاقة لها بالمعاملات الأساسية */
+  const deals=expectedDeals
+    .filter(d=>+d.year===Y)
+    .map(d=>({t:d,r:expCalc(d)}));
+  let total=0;
+  deals.forEach(o=>{if(o.r.valid)total+=o.r.profit;});
+  deals.sort((a,b)=>{
     if(!a.r.valid&&!b.r.valid)return 0;
     if(!a.r.valid)return 1;
     if(!b.r.valid)return -1;
     return b.r.profit-a.r.profit;
-  };
-  pending.sort(srt);done.sort(srt);deals.sort(srt);
+  });
   let html='';
   if(deals.length){
     html+=`<div class="sec-h"><span class="sec-t">${ic('star',14)} صفقات مبدئية</span><span class="sec-badge">${dispNum(deals.length)}</span></div>`;
     html+=deals.map(expRow).join('');
   }
-  if(pending.length){
-    html+=`<div class="sec-h"><span class="sec-t">${ic('clock',14)} الجارية</span><span class="sec-badge">${dispNum(pending.length)}</span></div>`;
-    html+=pending.map(expRow).join('');
-  }
-  if(S.showDoneInExp&&done.length){
-    html+=`<div class="sec-h"><span class="sec-t">${ic('check',14)} المكتملة</span><span class="sec-badge">${dispNum(done.length)}</span></div>`;
-    html+=done.map(expRow).join('');
-  }
-  $('expList').innerHTML=html||'<div class="em">لا توجد معاملات لهذه السنة</div>';
-  const total=totalP+totalDeals+(S.showDoneInExp?totalD:0);
+  $('expList').innerHTML=html||'<div class="em">'+ic('star',40)+'<p>لا توجد صفقات مبدئية لهذه السنة</p><p style="font-size:12px">أضف صفقة من الزر بالأسفل</p></div>';
   const H=S.hideProfit||S.hideData;
   const val=$('expTotalVal');
   val.textContent=H?'•••••':((total>=0?'+':'')+fmt(total));
@@ -2783,12 +2768,9 @@ $('expF_share').onclick=()=>{
   share(`العميل: ${$('expF_name').value.trim()||'بدون اسم'}\nدولار كاش: ${cashUSD}$\nسعر الدولار: ${rate}\nالقيمة: ${value.toFixed(2)} دينار\nالتكلفة: ${cost.toFixed(2)}\nالربح المتوقع${half?' (بالنصف)':''}: ${profit.toFixed(2)}`,'الربح المتوقع');
 };
 $('bExp').onclick=()=>{hp();openExp();};
-$('expShowDone').onchange=e=>{S.showDoneInExp=e.target.checked;saveS();renderExp();};
 $('expList').onclick=e=>{
   const dr=e.target.closest('[data-deal-id]');
-  if(dr){openDealForm(dr.dataset.dealId);return;}
-  const row=e.target.closest('[data-exp-id]');
-  if(row)openExpD(row.dataset.expId);
+  if(dr)openDealForm(dr.dataset.dealId);
 };
 $('expShareBtn').onclick=()=>{
   const Y=selYear();
@@ -2797,11 +2779,6 @@ $('expShareBtn').onclick=()=>{
     if(+d.year!==Y)return;
     const r=expCalc(d);
     if(r.valid){total+=r.profit;text+=`• ${d.name} (مبدئي): ${r.profit.toFixed(2)}\n`;}
-  });
-  tx.forEach(t=>{
-    if(+t.year!==Y||t.cancelled||t.done)return;
-    const r=expCalc(t);
-    if(r.valid){total+=r.profit;text+=`• ${t.name}: ${r.profit.toFixed(2)}\n`;}
   });
   text+=`\nإجمالي الربح المتوقع: ${total.toFixed(2)}`;
   share(text,'الربح المتوقع');
