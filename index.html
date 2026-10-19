@@ -1551,10 +1551,10 @@ function card(r,n){
   /* مرتبة حسب خطوات الحساب: التكلفة ثم الاستلام ثم الربح */
   if(!t.isHalf&&bP>0)m+=H?'<span class="tag">شراء •••••</span>':`<span class="tag">شراء ${fmt(bP)}</span>`;
   if(cP>0)m+=H?'<span class="tag">شحن •••••</span>':`<span class="tag">شحن ${fmt(cP)}</span>`;
-  if(!t.isHalf&&bP>0&&cP>0)m+=H?'<span class="tag">تكلفة •••••</span>':`<span class="tag" style="background:var(--acs);color:var(--ac);font-weight:700">تكلفة ${fmt(bP+cP)}</span>`;
-  if(uP>0)m+=H?'<span class="tag">دولار مستلم ••••</span>':`<span class="tag">دولار مستلم ${fmt(uP)}</span>`;
-  if(rP>0)m+=H?'<span class="tag">سعر الدولار ••••</span>':`<span class="tag">سعر الدولار ${fmt(rP)}</span>`;
-  if(uP>0&&rP>0)m+=H?'<span class="tag">المستلم •••••</span>':`<span class="tag" style="background:color-mix(in srgb,var(--ok) 13%,transparent);color:var(--ok);font-weight:700">المستلم ${fmt(uP*rP)}</span>`;
+  if(!t.isHalf&&bP>0&&cP>0)m+=H?'<span class="tag">تكلفة •••••</span>':`<span class="tag">تكلفة ${fmt(bP+cP)}</span>`;
+  if(uP>0)m+=H?'<span class="tag">دولار مستلم ••••</span>':`<span class="tag" style="background:color-mix(in srgb,var(--ok) 13%,transparent);color:var(--ok);font-weight:700">دولار مستلم ${fmt(uP)}</span>`;
+  if(rP>0)m+=H?'<span class="tag">سعر الدولار ••••</span>':`<span class="tag" style="background:color-mix(in srgb,var(--ok) 13%,transparent);color:var(--ok);font-weight:700">سعر الدولار ${fmt(rP)}</span>`;
+  if(uP>0&&rP>0)m+=H?'<span class="tag">دينار مستلم •••••</span>':`<span class="tag" style="background:color-mix(in srgb,var(--ok) 13%,transparent);color:var(--ok);font-weight:700">دينار مستلم ${fmt(uP*rP)}</span>`;
   if(t.done||num(t.sellPrice)>0||uP>0){
     const p=calcNet(t);
     m+=HP?'<span class="tag">ربح •••••</span>':`<span class="tag ${p>=0?'g':'r'}" style="font-weight:800">ربح ${p>=0?'+':''}${fmt(p)}</span>`;
@@ -3368,7 +3368,7 @@ try{render();}catch(e){}
         +tile('check','صافي الربح',M(sy.P2),sy.P2>=0?'var(--ok)':'var(--no)')
         +tile('chart','متوسط ربح المعاملة',M(sy.dn?sy.P2/sy.dn:0),'var(--ac)')
         +tile('cart','المشتريات',M2(sy.B),'var(--ac)')
-        +tile('inbox','معاملات • مكتملة/جارية',dispNum(sy.n)+' • '+dispNum(sy.dn)+'/'+dispNum(sy.pe),'var(--wn)',1)
+        +tile('inbox','إجمالي المعاملات — منها مكتملة '+dispNum(sy.dn)+' · جارية '+dispNum(sy.pe),dispNum(sy.n),'var(--wn)',1)
         +'</div>';
     });
     /* الإجمالي العام */
