@@ -2881,14 +2881,36 @@ document.addEventListener('pointerdown',function(e){
 /* 3) زر الإضافة: يختفي عند النزول ويظهر عند الصعود */
 (function(){
   var fab=$('bAdd');if(!fab)return;
-  var lastY=scrollY,ticking=false,hidden=false;
+  var hidden=false,lastY=scrollY,tick=false;
+  function setH(h){
+    if(h===hidden)return;
+    hidden=h;
+    if(h)fab.classList.add('hide');
+    else{hp(8);fab.classList.remove('hide');}
+  }
+  /* رد فوري أثناء سحب الإصبع: يختفي/يظهر في نفس لحظة الحركة */
+  var ty=null;
+  document.addEventListener('touchstart',function(e){
+    if(anyModalOpen()||$('lock').classList.contains('on')){ty=null;return;}
+    ty=e.touches[0].clientY;
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(ty===null)return;
+    var y=e.touches[0].clientY,dy=y-ty;ty=y;
+    if(scrollY<=0&&dy>0){setH(false);return;}
+    if(dy<-3)setH(true);       /* الإصبع يصعد = أقرأ للأسفل → اختفِ فوراً */
+    else if(dy>3)setH(false);  /* الإصبع ينزل = أعود للأعلى → اظهر فوراً */
+  },{passive:true});
+  ['touchend','touchcancel'].forEach(function(ev){document.addEventListener(ev,function(){ty=null;},{passive:true});});
+  /* دعم عجلة الفأرة ولوحات التتبع + ضمان الظهور عند القمة */
   addEventListener('scroll',function(){
     var y=scrollY;
-    if(ticking)return;ticking=true;
+    if(tick)return;tick=true;
     requestAnimationFrame(function(){
-      if(y>lastY+5&&y>140){if(!hidden){hidden=true;fab.classList.add('hide');}}
-      else if(y<lastY-3||y<=140){if(hidden){hidden=false;hp(8);fab.classList.remove('hide');}}
-      lastY=y;ticking=false;
+      if(y<=120)setH(false);
+      else if(y>lastY+8)setH(true);
+      else if(y<lastY-6)setH(false);
+      lastY=y;tick=false;
     });
   },{passive:true});
 })();
