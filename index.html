@@ -450,6 +450,7 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 </style>
 <base target="_blank">
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 <header class="hd"><div class="w hi">
@@ -575,11 +576,12 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 </div>
 <label class="tg"><span>معاملة بالنصف</span><input type="checkbox" id="f_half"><i class="sw"></i></label>
 <div class="preview" id="fPreview">
-<h4>معاينة مباشرة</h4>
-<div class="pvRow"><span>الشراء</span><span id="pvBuy">—</span></div>
-<div class="pvRow"><span>الشحن</span><span id="pvCharge">—</span></div>
-<div class="pvRow"><span>البيع (بعد الخصم)</span><span id="pvSell">—</span></div>
-<div class="pvTotal"><span>صافي الربح المتوقع</span><b id="pvProfit">0.00</b></div>
+<h4>خطوات إتمام البيع</h4>
+<div class="pvRow"><span>سعر شراء المعاملة</span><span id="pvBuy">—</span></div>
+<div class="pvRow"><span>قيمة شحن المعاملة</span><span id="pvCharge">—</span></div>
+<div class="pvRow"><span>التكلفة (شراء + شحن)</span><span id="pvCost">—</span></div>
+<div class="pvRow"><span>الدولار المستلم × سعر الدولار</span><span id="pvUsd">—</span></div>
+<div class="pvTotal"><span>صافي الربح</span><b id="pvProfit">0.00</b></div>
 </div>
 <div class="ac2"><button class="btn pr" id="fSave"></button><button class="btn" id="fCan"></button></div>
 </div></div>
@@ -1875,15 +1877,18 @@ let edit=-1,formDirty=false;
 F.concat(['year']).forEach(k=>{$('f_'+k).addEventListener('input',()=>{formDirty=true;$('f_'+k).classList.remove('err');updatePreview();});});
 $('f_half').addEventListener('change',()=>{formDirty=true;updatePreview();});
 function updatePreview(){
-  const b=num($('f_buyPrice').value),c=num($('f_chargePrice').value),s=num($('f_sellPrice').value),d=num($('f_discount').value);
+  const b=num($('f_buyPrice').value),c=num($('f_chargePrice').value);
+  const usd=num($('f_dollarsReceived').value),rate=num($('f_dollarRate').value);
   const half=$('f_half').checked;
-  const f=s-s*d/100;
-  const p=half?(f-c-b)/2:f-c-b;
+  const cost=b+c;
+  const received=usd*rate;
+  const p=half?(received-cost)/2:received-cost;
   $('pvBuy').textContent=b>0?fmt(b):'—';
   $('pvCharge').textContent=c>0?fmt(c):'—';
-  $('pvSell').textContent=s>0?fmt(f):'—';
+  $('pvCost').textContent=cost>0?fmt(cost):'—';
+  $('pvUsd').textContent=(usd>0&&rate>0)?(fmt(usd)+' × '+fmt(rate)+' = '+fmt(received)):'—';
   const el=$('pvProfit');
-  el.textContent=fmt(p);
+  el.textContent=(usd>0&&rate>0)?fmt(p):'—';
   el.classList.toggle('neg',p<0);
 }
 function validateForm(){
@@ -2888,37 +2893,9 @@ document.addEventListener('pointerdown',function(e){
   b.appendChild(s);
   setTimeout(function(){s.remove();b.style.overflow=oldOv;},560);
 },{passive:true});
-/* 3) زر الإضافة: يختفي عند النزول ويظهر عند الصعود */
+/* 3) زر الإضافة ثابت — لا يختفي عند التمرير */
 (function(){
   var fab=$('bAdd');if(!fab)return;
-  var hidden=false,lastY=scrollY;
-  function setH(h){
-    if(h===hidden)return;
-    hidden=h;
-    if(h)fab.classList.add('hide');
-    else{hp(8);fab.classList.remove('hide');}
-  }
-  var ty=null;
-  document.addEventListener('touchstart',function(e){
-    if(anyModalOpen()||$('lock').classList.contains('on')){ty=null;return;}
-    ty=e.touches[0].clientY;
-  },{passive:true});
-  document.addEventListener('touchmove',function(e){
-    if(ty===null)return;
-    var y=e.touches[0].clientY,dy=y-ty;ty=y;
-    if(scrollY<=0&&dy>0){setH(false);return;}   /* عند القمة */
-    if(dy<-4)setH(true);    /* إصبع يصعد = أنزل لمعاملات بالأسفل → اختفِ */
-    else if(dy>4)setH(false); /* إصبع ينزل = أعود لمعاملات بالأعلى → اظهر */
-  },{passive:true});
-  ['touchend','touchcancel'].forEach(function(ev){
-    document.addEventListener(ev,function(){ty=null;},{passive:true});
-  });
-  addEventListener('scroll',function(){
-    var y=scrollY,dy=y-lastY;lastY=y;
-    if(y<=0)setH(false);
-    else if(dy>6)setH(true);
-    else if(dy<-5)setH(false);
-  },{passive:true});
   fab.classList.remove('hide');
 })();
 /* 4) زر العودة للأعلى */
