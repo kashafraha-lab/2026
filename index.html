@@ -634,8 +634,8 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 <!-- ===== BOOKING ===== -->
 <div class="bg" id="bk"><div class="sh"><div class="handle"></div>
 <div class="th"><h2>موعد الحجز</h2><button class="ib" data-x="bk" aria-label="إغلاق"><i data-ic="x"></i></button></div>
-<div class="f"><label>تاريخ الحجز</label><input type="date" id="bk_d"></div>
-<div class="f" id="bk_ex" style="display:none"><label>تاريخ اختيار شركة الصرافة</label><input type="date" id="bk_exd"></div>
+<div class="f"><label>تم الحجز</label><input type="date" id="bk_d"></div>
+<div class="f" id="bk_ex" style="display:none"><label>تم اختيار شركة الصرافة</label><input type="date" id="bk_exd"></div>
 <div class="noteBox" id="bkNote">
   <i data-ic="clock" data-s="16"></i>
   <div>يبقى الحجز <b class="w">بانتظار اختيار شركة صرافة</b> لمدة <b>30 يوم</b>. بعد انقضاء المهلة يتحول النص إلى <b class="d">الأحمر</b> مع تنبيه.</div>
@@ -898,6 +898,7 @@ const hp=(m=0)=>{try{navigator.vibrate&&navigator.vibrate(m);}catch(e){}};
 const uid=()=>'tx_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
 const toAr=s=>String(s).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
 const DOTS='•••••';
+const dDisp=s=>{const p=String(s||'').split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s;};
 
 const openM=id=>{$(id).classList.add('on');document.body.classList.add('modal-open');};
 const closeM=id=>{$(id).classList.remove('on');if(!document.querySelector('.bg.on'))document.body.classList.remove('modal-open');};
@@ -1393,8 +1394,8 @@ const FL={
   done:r=>!!r.t.done,
   booked:r=>r.t.bookingDate&&!r.t.done&&!r.t.cancelled,
   todayBook:r=>r.t.bookingDate&&!r.t.done&&isToday(r.t.bookingDate),
-  waiting:r=>{const b=bookingInfo(r.t);return b&&b.status==='waiting';},
-  overdue:r=>{const b=bookingInfo(r.t);return b&&b.status==='overdue';}
+  waiting:r=>{const b=bookingInfo(r.t);return b&&b.status==='waiting'&&!r.t.exchangeDate;},
+  overdue:r=>{const b=bookingInfo(r.t);return b&&b.status==='overdue'&&!r.t.exchangeDate;}
 };
 function computeRows(){
   const Y=selYear();
@@ -1536,9 +1537,8 @@ function card(r,n){
   else{
     const parts=[];
     if(t.date)parts.push(`<i class="meta-date">${ic('note',11)}إدخال ${esc(t.date)}</i>`);
-    if(t.bookingDate){
-      parts.push(`<i class="meta-date">${ic('cal',11)}تاريخ الحجز ${esc(t.bookingDate)}</i>`);
-      if(t.exchangeDate)parts.push(`<i class="meta-date">${ic('cal',11)}تاريخ اختيار شركة الصرافة ${esc(t.exchangeDate)}</i>`);
+    if(t.bookingDate&&!t.exchangeDate){
+      /* إذا اختيرت شركة الصرافة تُلغى حالة الانتظار تلقائياً */
       const bi=bookingInfo(t);
       if(bi){
         if(bi.status==='future')parts.push('<i class="meta-status f">موعد حجز قادم</i>');
@@ -1550,6 +1550,8 @@ function card(r,n){
   }
   let m='';
   const bP=num(t.buyPrice),cP=num(t.chargePrice),uP=num(t.dollarsReceived),rP=num(t.dollarRate);
+  if(t.bookingDate)m+=H?'<span class="tag">تم الحجز ••••••</span>':`<span class="tag" style="background:color-mix(in srgb,var(--wn) 12%,transparent);color:var(--wn);font-weight:700">${ic('cal',12)}تم الحجز ${dDisp(t.bookingDate)}</span>`;
+  if(t.exchangeDate)m+=H?'<span class="tag">تم اختيار شركة صرافة ••••••</span>':`<span class="tag" style="background:color-mix(in srgb,var(--ok) 13%,transparent);color:var(--ok);font-weight:700">${ic('check',12)}تم اختيار شركة صرافة ${dDisp(t.exchangeDate)}</span>`;
   /* مرتبة حسب خطوات الحساب: التكلفة ثم الاستلام ثم الربح */
   if(!t.isHalf&&bP>0)m+=H?'<span class="tag">شراء •••••</span>':`<span class="tag">شراء ${fmt(bP)}</span>`;
   if(cP>0)m+=H?'<span class="tag">شحن •••••</span>':`<span class="tag">شحن ${fmt(cP)}</span>`;
@@ -2101,7 +2103,7 @@ function details(i){
   $('dI').innerHTML=[
     ['رقم الهاتف',t.phone],['الحساب',t.account],['الرقم الوطني',t.nationalId],
     ['جواز السفر',t.passport],['IBAN',t.iban],['تاريخ الإدخال',t.date],
-    ['تاريخ الحجز',t.bookingDate||'-'],['تاريخ اختيار شركة الصرافة',t.exchangeDate||'-']
+    ['تم الحجز',t.bookingDate?dDisp(t.bookingDate):'-'],['تم اختيار شركة صرافة',t.exchangeDate?dDisp(t.exchangeDate):'-']
   ].map(([l,v])=>{const val=v||'-';return `<button class="ii" data-cp="${esc(val)}"><small>${l}</small><b>${esc(val)}</b></button>`;}).join('');
   $('d_buy').value=t.buyPrice||'';
   $('d_charge').value=t.chargePrice||'';
@@ -2389,7 +2391,7 @@ function showList(type){
     }else if(type==='booked'){
       const bi=bookingInfo(t);
       let extra='';
-      if(bi&&(bi.status==='waiting'||bi.status==='overdue'))extra=' — مضي '+bi.passed+' يوم';
+      if(bi&&!t.exchangeDate&&(bi.status==='waiting'||bi.status==='overdue'))extra=' — مضي '+bi.passed+' يوم';
       pl='موعد: '+(H?'••••':t.bookingDate)+extra;
       inf=H?'••••':esc(t.bookingDate);
     }else if(type==='cancelled'){pl='ملغية';inf=`<button class="mini" data-r="${i}">استرجاع</button>`;}
@@ -2885,7 +2887,7 @@ function checkN(){
     if(b.getTime()===tm.getTime())setTimeout(()=>toast('تنبيه: حجز '+(t.name||'')+' غداً!','i'),700);
     else if(b.getTime()===today.getTime())bookingToday++;
     const info=bookingInfo(t);
-    if(!info)return;
+    if(!info||t.exchangeDate)return;
     if(info.status==='overdue')overdue++;
     else if(info.status==='waiting')waiting++;
   });
@@ -3231,7 +3233,7 @@ try{render();}catch(e){}
         if(bm.length===3&&+bm[0]===y&&+bm[1]===m+1){
           var bd=+bm[2];(booked[bd]=booked[bd]||[]).push(t);
           var bi=bookingInfo(t);
-          if(bi&&bi.status==='overdue'){(overB[bd]=overB[bd]||[]).push(t);}
+          if(bi&&bi.status==='overdue'&&!t.exchangeDate){(overB[bd]=overB[bd]||[]).push(t);}
         }
       }
     });
