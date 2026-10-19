@@ -441,9 +441,9 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 
 
 /* ===== v5: FAB scroll + hero stats ===== */
-.fab{transition:transform .34s cubic-bezier(.2,.8,.3,1),opacity .26s,filter .15s}
+.fab{transition:transform .4s cubic-bezier(.34,1.5,.5,1),opacity .24s,filter .15s;will-change:transform}
 .fab:active{transform:scale(.94);transition-duration:.12s}
-.fab.hide{transform:translateY(120px) scale(.75);opacity:0;pointer-events:none}
+.fab.hide{transform:translateY(140px) scale(.6);opacity:0;pointer-events:none;transition:transform .32s cubic-bezier(.6,0,.85,.4),opacity .18s}
 .sm{cursor:pointer;transition:box-shadow .25s,transform .16s ease}
 .sm:active{transform:scale(.985)}
 
@@ -1168,10 +1168,21 @@ expectedDeals=expectedDeals.filter(d=>d&&typeof d==='object');
 expectedDeals.forEach(d=>{if(!d.id)d.id='exp_'+uid();if(!d.year)d.year=curYear;});
 const saveExp=()=>{try{localStorage.setItem(EXPKEY,JSON.stringify(expectedDeals));return true;}catch(e){toast('تعذر حفظ الربح المتوقع','e');return false;}};
 
+const dealValue=t=>{
+  const usd=num(t.dollarsReceived),rate=num(t.dollarRate);
+  if(usd>0&&rate>0)return usd*rate;
+  const s=num(t.sellPrice),d=num(t.discount);
+  return s-s*d/100;
+};
 const calc=t=>{
-  const b=num(t.buyPrice),c=num(t.chargePrice),s=num(t.sellPrice),d=num(t.discount);
-  const f=s-s*d/100;
-  return t.isHalf?(f-c-b)/2:f-c-b;
+  const b=num(t.buyPrice),c=num(t.chargePrice);
+  const v=dealValue(t);
+  return t.isHalf?(v-c-b)/2:v-c-b;
+};
+const calcNet=t=>{
+  const c=num(t.chargePrice);
+  const v=dealValue(t);
+  return t.isHalf?(v-c)/2:v-c;
 };
 const expCalc=t=>{
   const cashUSD=num(t.cashUSD)||num(t.dollarsReceived);
@@ -1445,9 +1456,9 @@ function stats(){
     if(+t.year!==Y)return;
     n++;
     if(t.cancelled){cn++;return;}
-    if(t.done||num(t.sellPrice)>0)P+=calc(t);
+    if((t.done||num(t.sellPrice)>0||num(t.dollarsReceived)>0))P+=calc(t);
     B+=num(t.buyPrice);
-    if(t.done){dn++;P2+=calc(t);}
+    if(t.done){dn++;P2+=calcNet(t);}
     else{pe++;if(t.bookingDate)bk++;}
   });
   const H=S.hideData,HP=S.hideProfit||H;
@@ -1523,7 +1534,7 @@ function card(r,n){
     meta=parts.join('');
   }
   let m='';
-  if(t.done||num(t.sellPrice)>0){
+  if((t.done||num(t.sellPrice)>0||num(t.dollarsReceived)>0)){
     const p=calc(t);
     m+=HP?'<span class="tag">ربح •••••</span>':`<span class="tag ${p>=0?'g':'r'}">ربح ${fmt(p)}</span>`;
   }
@@ -2367,7 +2378,7 @@ function monthSeries(Y){
   const s=Array(12).fill(0);
   tx.forEach(t=>{
     if(+t.year!==Y||t.cancelled)return;
-    if(!(t.done||num(t.sellPrice)>0))return;
+    if(!((t.done||num(t.sellPrice)>0||num(t.dollarsReceived)>0)))return;
     const m=String(t.date||'').match(/^\d{1,2}\/(\d{1,2})\//);
     if(m){const i=+m[1]-1;if(i>=0&&i<12)s[i]+=calc(t);}
   });
@@ -2438,7 +2449,7 @@ $('bStat').onclick=()=>{
   },80);
 };
 function curN(Y){let n=0;tx.forEach(t=>{if(+t.year===Y)n++;});return n;}
-function curP(Y){let P=0;tx.forEach(t=>{if(+t.year===Y&&!t.cancelled&&(t.done||num(t.sellPrice)>0))P+=calc(t);});return P;}
+function curP(Y){let P=0;tx.forEach(t=>{if(+t.year===Y&&!t.cancelled&&((t.done||num(t.sellPrice)>0||num(t.dollarsReceived)>0)))P+=calc(t);});return P;}
 function curP2(Y){let P=0;tx.forEach(t=>{if(+t.year===Y&&!t.cancelled&&t.done)P+=calc(t);});return P;}
 function curB(Y){let B=0;tx.forEach(t=>{if(+t.year===Y&&!t.cancelled)B+=num(t.buyPrice);});return B;}
 
@@ -2870,13 +2881,13 @@ document.addEventListener('pointerdown',function(e){
 /* 3) زر الإضافة: يختفي عند النزول ويظهر عند الصعود */
 (function(){
   var fab=$('bAdd');if(!fab)return;
-  var lastY=scrollY,ticking=false;
+  var lastY=scrollY,ticking=false,hidden=false;
   addEventListener('scroll',function(){
     var y=scrollY;
     if(ticking)return;ticking=true;
     requestAnimationFrame(function(){
-      if(y>lastY+6&&y>150)fab.classList.add('hide');
-      else if(y<lastY-4||y<=150)fab.classList.remove('hide');
+      if(y>lastY+5&&y>140){if(!hidden){hidden=true;fab.classList.add('hide');}}
+      else if(y<lastY-3||y<=140){if(hidden){hidden=false;hp(8);fab.classList.remove('hide');}}
       lastY=y;ticking=false;
     });
   },{passive:true});
@@ -3202,9 +3213,9 @@ try{render();}catch(e){}
     tx.forEach(function(t){
       if(+t.year!==y)return;n++;
       if(t.cancelled){cn++;return;}
-      if(t.done||num(t.sellPrice)>0)P+=calc(t);
+      if((t.done||num(t.sellPrice)>0||num(t.dollarsReceived)>0))P+=calc(t);
       B+=num(t.buyPrice);
-      if(t.done){dn++;P2+=calc(t);}else pe++;
+      if(t.done){dn++;P2+=calcNet(t);}else pe++;
     });
     return{n:n,P:P,P2:P2,B:B,dn:dn,pe:pe,cn:cn};
   }
@@ -3236,11 +3247,22 @@ try{render();}catch(e){}
     var mcounts=Array(12).fill(0);
     tx.forEach(function(t){if(+t.year!==Y)return;var m=String(t.date||'').match(/^\d{1,2}\/(\d{1,2})\//);if(m)mcounts[+m[1]-1]++;});
     var maxM=Math.max.apply(null,mcounts.concat([1]));
-    html+='<div class="s2">خريطة النشاط الشهري</div><div class="hm">'+mcounts.map(function(c){var l=c===0?0:c/maxM<.25?1:c/maxM<.5?2:c/maxM<.75?3:4;return '<div class="hmc l'+l+'" title="'+c+'"></div>';}).join('')+'</div><div class="hmLegend"><span>أقل</span><span class="sw"></span><span class="sw l1"></span><span class="sw l2"></span><span class="sw l3"></span><span class="sw l4"></span><span>أكثر</span></div>';
+    html+='<div class="s2">عدد المعاملات في كل شهر — '+dispNum(Y)+'</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+    var _now=new Date();
+    for(var mi=0;mi<12;mi++){
+      var cnt=mcounts[mi];
+      var _cur=(Y===_now.getFullYear()&&mi===_now.getMonth());
+      html+='<div style="background:var(--bg);border:1.5px solid '+(_cur?'var(--ac)':'transparent')+';border-radius:15px;padding:10px 6px;text-align:center">'
+        +'<div style="font-size:11px;font-weight:800;color:'+(_cur?'var(--ac)':'var(--sub)')+'">'+MONTHS[mi]+'</div>'
+        +'<b style="display:block;font-size:18px;font-weight:900;font-variant-numeric:tabular-nums;color:'+(cnt?'var(--tx)':'var(--sub)')+';margin:2px 0 6px">'+dispNum(cnt)+'</b>'
+        +'<div class="distBar"><i style="width:'+(cnt?Math.max(10,Math.round(cnt/maxM*100)):0)+'%;background:'+(cnt?'var(--ac)':'var(--bd)')+'"></i></div>'
+        +'</div>';
+    }
+    html+='</div>';
     /* أفضل العملاء */
     var byName={};
     tx.forEach(function(t){
-      if(+t.year!==Y||t.cancelled||!(t.done||num(t.sellPrice)>0))return;
+      if(+t.year!==Y||t.cancelled||!((t.done||num(t.sellPrice)>0||num(t.dollarsReceived)>0)))return;
       var p=calc(t),nm=(t.name||'بدون اسم').trim();
       byName[nm]=byName[nm]||{p:0,n:0};byName[nm].p+=p;byName[nm].n++;
     });
