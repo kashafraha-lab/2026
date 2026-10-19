@@ -1545,8 +1545,17 @@ function card(r,n){
   if(t.isHalf)m+='<span class="tag">بالنصف</span>';
   if(t.notes)m+=`<span class="tag">${ic('note',12)}${H?'••••••':esc(String(t.notes).slice(0,24))}</span>`;
   if(t.clientId)m+=`<span class="tag" style="font-family:monospace;font-size:11px">${H?'••••••':esc(t.clientId)}</span>`;
-  const yearTotal=tx.filter(x=>+x.year===+t.year&&!x.cancelled).reduce((s,x)=>s+Math.max(0,calc(x)),0);
-  const pct=yearTotal>0?Math.max(0,calc(t))/yearTotal:0;
+  let stepsDone=0;
+  const stepsTotal=t.isHalf?2:3;
+  if(t.isHalf){
+    if(num(t.chargePrice)>0)stepsDone++;
+    if(num(t.sellPrice)>0||t.done)stepsDone++;
+  }else{
+    if(num(t.buyPrice)>0)stepsDone++;
+    if(num(t.chargePrice)>0)stepsDone++;
+    if(num(t.sellPrice)>0||t.done)stepsDone++;
+  }
+  const pct=c?0:stepsDone/stepsTotal;
   const acts=c?`<button class="ab ac" data-a="rest" ${k}>${ic('undo',17)}تفعيل المعاملة</button>`
     :`<button class="ab${t.done?'':' ac'}" data-a="sale" ${k}>${t.done?ic('undo',17)+'تراجع عن الإتمام':ic('check',17)+'إتمام البيع'}</button><button class="ab" data-a="book" ${k}>${ic('cal',17)}${t.done?'منتهي':t.bookingDate?'تم الحجز':'حجز موعد'}</button>`;
   const initial=H?'•':esc((t.name||'?').trim().charAt(0)||'?');
@@ -2882,13 +2891,12 @@ document.addEventListener('pointerdown',function(e){
 /* 3) زر الإضافة: يختفي عند النزول ويظهر عند الصعود */
 (function(){
   var fab=$('bAdd');if(!fab)return;
-  var hidden=false,lastAct=Date.now();
-  function show(){if(!hidden)return;hidden=false;hp(8);fab.classList.remove('hide');}
-  function hide(){if(hidden)return;hidden=true;fab.classList.add('hide');}
-  function activity(){
-    lastAct=Date.now();
-    if(scrollY<=120){show();return;}
-    hide();
+  var hidden=false,lastY=scrollY;
+  function setH(h){
+    if(h===hidden)return;
+    hidden=h;
+    if(h)fab.classList.add('hide');
+    else{hp(8);fab.classList.remove('hide');}
   }
   var ty=null;
   document.addEventListener('touchstart',function(e){
@@ -2897,20 +2905,20 @@ document.addEventListener('pointerdown',function(e){
   },{passive:true});
   document.addEventListener('touchmove',function(e){
     if(ty===null)return;
-    var y=e.touches[0].clientY;
-    if(Math.abs(y-ty)>2){ty=y;activity();}else ty=y;
+    var y=e.touches[0].clientY,dy=y-ty;ty=y;
+    if(scrollY<=0&&dy>0){setH(false);return;}   /* عند القمة */
+    if(dy<-4)setH(true);    /* إصبع يصعد = أنزل لمعاملات بالأسفل → اختفِ */
+    else if(dy>4)setH(false); /* إصبع ينزل = أعود لمعاملات بالأعلى → اظهر */
   },{passive:true});
   ['touchend','touchcancel'].forEach(function(ev){
-    document.addEventListener(ev,function(){
-      ty=null;
-      lastAct=Date.now()-900;
-    },{passive:true});
+    document.addEventListener(ev,function(){ty=null;},{passive:true});
   });
-  addEventListener('scroll',activity,{passive:true});
-  /* شبكة الأمان: مهما حدث، الزر يعود خلال ~1.3 ثانية من توقف الحركة */
-  setInterval(function(){
-    if(hidden&&Date.now()-lastAct>1300)show();
-  },400);
+  addEventListener('scroll',function(){
+    var y=scrollY,dy=y-lastY;lastY=y;
+    if(y<=0)setH(false);
+    else if(dy>6)setH(true);
+    else if(dy<-5)setH(false);
+  },{passive:true});
   fab.classList.remove('hide');
 })();
 /* 4) زر العودة للأعلى */
@@ -2955,14 +2963,14 @@ document.addEventListener('pointerdown',function(e){
     setTimeout(function(){ind.classList.remove('on','ready');ind.style.transform='';svg.style.transform='';},140);
   });
 })();
-/* 6) سحب للأسفل لإغلاق النوافذ (Sheets) */
+/* 6) سحب للأسفل لإغلاق النوافذ — يعمل من أي مكان في النافذة */
 document.addEventListener('touchstart',function(e){
   var sh=e.target.closest('.sh');if(!sh)return;
-  if(!e.target.closest('.handle,.th'))return;
   var bg=sh.closest('.bg');if(!bg)return;
   var y0=e.touches[0].clientY,ty=0,live=true;
   var mv=function(ev){
     if(!live)return;
+    if(sh.scrollTop>0)return;
     ty=Math.max(0,ev.touches[0].clientY-y0);
     sh.style.transition='none';
     sh.style.transform='translateY('+ty+'px)';
@@ -3283,7 +3291,7 @@ try{render();}catch(e){}
     /* أفضل العملاء */
     var byName={};
     tx.forEach(function(t){
-      if(+t.year!==Y||t.cancelled||!((t.done||num(t.sellPrice)>0||num(t.dollarsReceived)>0)))return;
+      if(+t.year!==Y||t.cancelled||!t.done)return;
       var p=calcNet(t),nm=(t.name||'بدون اسم').trim();
       byName[nm]=byName[nm]||{p:0,n:0};byName[nm].p+=p;byName[nm].n++;
     });
@@ -3291,7 +3299,7 @@ try{render();}catch(e){}
       .sort(function(a,b){return b.p-a.p;}).slice(0,5);
     if(tops.length){
       var maxP=Math.max.apply(null,tops.map(function(t){return Math.abs(t.p);}).concat([1]));
-      html+='<div class="s2">أفضل '+dispNum(Math.min(5,tops.length))+' عملاء بالربح</div><div style="background:var(--bg);border-radius:18px;padding:6px 14px 10px">';
+      html+='<div class="s2">أفضل العملاء — المكتملة فقط</div><div style="background:var(--bg);border-radius:18px;padding:6px 14px 10px">';
       tops.forEach(function(t,i){
         html+='<div class="topRow"><span class="rank">'+dispNum(i+1)+'</span><div style="flex:1;min-width:0"><b style="display:block;font-size:13px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(H?DOTS:esc(t.n))+'</b><div class="distBar" style="margin-top:5px"><i style="width:'+Math.round(Math.abs(t.p)/maxP*100)+'%;background:'+(t.p>=0?'var(--ok)':'var(--no)')+'"></i></div></div><b style="font-size:13px;font-weight:900;color:'+(t.p>=0?'var(--ok)':'var(--no)')+';font-variant-numeric:tabular-nums;white-space:nowrap">'+(HP?'••••':fmt(t.p))+'</b></div>';
       });
