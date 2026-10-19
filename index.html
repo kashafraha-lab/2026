@@ -581,11 +581,6 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 <div class="f w2"><label>IBAN</label><input id="f_iban" placeholder="مثال: IQ98NBIQ850123456789012"></div>
 <div class="f"><label>سعر شراء المعاملة</label><input type="number" step="any" inputmode="decimal" id="f_buyPrice"></div>
 <div class="f"><label>قيمة شحن المعاملة</label><input type="number" step="any" inputmode="decimal" id="f_chargePrice"></div>
-<div class="f"><label>سعر بيع المعاملة</label><input type="number" step="any" inputmode="decimal" id="f_sellPrice"></div>
-<div class="f"><label>الخصم %</label><input type="number" step="any" inputmode="decimal" id="f_discount"></div>
-<div class="f"><label>سعر البيع بالدولار</label><input type="number" step="any" inputmode="decimal" id="f_sellPriceUSD"></div>
-<div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="f_dollarRate"></div>
-<div class="f"><label>الدولار المستلم</label><input type="number" step="any" inputmode="decimal" id="f_dollarsReceived"></div>
 <div class="f"><label>السنة</label><input type="number" inputmode="numeric" id="f_year"></div>
 <div class="f w2"><label>ملاحظات</label><textarea id="f_notes" rows="2"></textarea></div>
 </div>
@@ -1895,24 +1890,21 @@ function attachSuggestion(inputId,target){
 }
 
 /* ============ FORM ============ */
-const F=['name','phone','account','nationalId','passport','iban','buyPrice','chargePrice','sellPrice','sellPriceUSD','discount','dollarRate','dollarsReceived','notes'];
+const F=['name','phone','account','nationalId','passport','iban','buyPrice','chargePrice','notes'];
 let edit=-1,formDirty=false;
 F.concat(['year']).forEach(k=>{$('f_'+k).addEventListener('input',()=>{formDirty=true;$('f_'+k).classList.remove('err');updatePreview();});});
 $('f_half').addEventListener('change',()=>{formDirty=true;updatePreview();});
 function updatePreview(){
   const b=num($('f_buyPrice').value),c=num($('f_chargePrice').value);
-  const usd=num($('f_dollarsReceived').value),rate=num($('f_dollarRate').value);
-  const half=$('f_half').checked;
   const cost=b+c;
-  const received=usd*rate;
-  const p=half?(received-cost)/2:received-cost;
   $('pvBuy').textContent=b>0?fmt(b):'—';
   $('pvCharge').textContent=c>0?fmt(c):'—';
   $('pvCost').textContent=cost>0?fmt(cost):'—';
-  $('pvUsd').textContent=(usd>0&&rate>0)?(fmt(usd)+' × '+fmt(rate)+' = '+fmt(received)):'—';
+  /* بيانات الدولار تُدخل لاحقاً عبر "إتمام البيع" أو التفاصيل */
+  $('pvUsd').textContent='يُدخل عند إتمام البيع';
   const el=$('pvProfit');
-  el.textContent=(usd>0&&rate>0)?fmt(p):'—';
-  el.classList.toggle('neg',p<0);
+  el.textContent='—';
+  el.classList.remove('neg');
 }
 function validateForm(){
   let ok=true;
@@ -1969,11 +1961,8 @@ $('fSave').onclick=()=>{
   const v=k=>$('f_'+k).value;
   if(!v('name').trim()){toast('الاسم مطلوب!','e');$('f_name').focus();return;}
   const o=edit>-1?tx[edit]:null;
-  const spRaw=String(v('sellPrice')).trim();
-  const sp=parseFloat(spRaw)||0;
-  let done=!!(o&&o.done);
-  if(spRaw!=='')done=sp>0;
-  if(num(v('dollarsReceived'))>0&&num(v('dollarRate'))>0)done=true;
+  /* حالة الإتمام لا تتغير من النموذج — تُحدد عبر خطوات "إتمام البيع" فقط */
+  const done=o?!!o.done:false;
   const y=parseInt(v('year'),10)||selYear();
   const d=Object.assign({},o||{},Object.fromEntries(F.map(k=>[k,k==='name'?v(k).trim():v(k)])),{
     id:o?o.id:uid(),
