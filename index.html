@@ -763,6 +763,7 @@ label{font-size:12px;color:var(--sub);font-weight:700}
   </div>
 </div>
 <div class="pc" id="expTotal" style="margin-top:0;margin-bottom:14px;border-radius:17px">إجمالي الربح المتوقع<b id="expTotalVal">0.00</b></div>
+<label class="tg"><span>تضمين المعاملات المكتملة</span><input type="checkbox" id="expShowDone"><i class="sw"></i></label>
 <div id="expList" style="max-height:45vh;overflow-y:auto;background:var(--cd);border:1px solid var(--bd);border-radius:17px;margin-bottom:14px"></div>
 <div class="ac2" style="margin-top:0"><button class="btn pr" id="expAddDeal" style="width:100%"><i data-ic="plus"></i>إضافة صفقة مبدئية</button></div>
 </div></div>
@@ -785,7 +786,7 @@ label{font-size:12px;color:var(--sub);font-weight:700}
   <div class="pvTotal"><span>المكسب المتوقع</span><b id="expD_profit">0.00</b></div>
   <div id="expFormula" style="font-size:11px;color:var(--sub);margin-top:8px;text-align:center"></div>
 </div>
-<div class="noteBox"><i data-ic="info" data-s="16"></i><div>تعديل الشراء أو الشحن هنا <b class="g">لا يؤثر</b> على الواجهة الرئيسية أو "صافي الربح".</div></div>
+<div class="noteBox"><i data-ic="info" data-s="16"></i><div>أي تعديل هنا (شراء، شحن، دولار كاش، سعر الدولار) يُحفظ في حساب <b>متوقع معزول</b> و<b class="g">لا يغيّر إطلاقاً</b> بيانات العميل الأساسية أو "صافي الربح" في البطاقة.</div></div>
 <div class="ac2">
   <button class="btn" id="expD_share"><i data-ic="share"></i>مشاركة</button>
   <button class="btn pr" id="expD_save"><i data-ic="check"></i>حفظ</button>
@@ -1196,8 +1197,9 @@ const calcNet=t=>{
   return t.isHalf?(v-c-b)/2:v-c-b;
 };
 const expCalc=t=>{
-  const cashUSD=num(t.cashUSD)||num(t.dollarsReceived);
-  const rate=num(t.dollarRate);
+  /* معزول: يفضّل حقول الربح المتوقع المخصصة (exp*) ولا يكتب فوق الأساسية أبداً */
+  const cashUSD=num(t.expCashUSD)||num(t.cashUSD)||num(t.dollarsReceived);
+  const rate=num(t.expRate)||num(t.dollarRate);
   const hasB=t.expBuyPrice!==undefined&&t.expBuyPrice!==null&&t.expBuyPrice!=='';
   const hasC=t.expChargePrice!==undefined&&t.expChargePrice!==null&&t.expChargePrice!=='';
   const buy=hasB?num(t.expBuyPrice):num(t.buyPrice);
@@ -2615,29 +2617,48 @@ $('fj').onchange=e=>{
 /* ============ EXPECTED PROFIT ============ */
 let curExpId=null,curDealId=null;
 function openExp(){
+  $('expShowDone').checked=!!S.showDoneInExp;
   renderExp();
   openM('expM');
 }
 function renderExp(){
   const Y=selYear();
-  /* الربح المتوقع منفصل: صفقات مبدئية فقط، لا علاقة لها بالمعاملات الأساسية */
-  const deals=expectedDeals
-    .filter(d=>+d.year===Y)
-    .map(d=>({t:d,r:expCalc(d)}));
-  let total=0;
-  deals.forEach(o=>{if(o.r.valid)total+=o.r.profit;});
-  deals.sort((a,b)=>{
+  const pending=[],done=[],deals=[];
+  let totalP=0,totalD=0,totalDeals=0;
+  tx.forEach((t,i)=>{
+    if(+t.year!==Y||t.cancelled)return;
+    const r=expCalc(t);
+    if(t.done){done.push({kind:'tx',t,i,r});if(r.valid)totalD+=r.profit;}
+    else{pending.push({kind:'tx',t,i,r});if(r.valid)totalP+=r.profit;}
+  });
+  expectedDeals.forEach(d=>{
+    if(+d.year!==Y)return;
+    const r=expCalc(d);
+    deals.push({kind:'deal',t:d,r});
+    if(r.valid)totalDeals+=r.profit;
+  });
+  const srt=(a,b)=>{
     if(!a.r.valid&&!b.r.valid)return 0;
     if(!a.r.valid)return 1;
     if(!b.r.valid)return -1;
     return b.r.profit-a.r.profit;
-  });
+  };
+  pending.sort(srt);done.sort(srt);deals.sort(srt);
   let html='';
   if(deals.length){
     html+=`<div class="sec-h"><span class="sec-t">${ic('star',14)} صفقات مبدئية</span><span class="sec-badge">${dispNum(deals.length)}</span></div>`;
     html+=deals.map(expRow).join('');
   }
-  $('expList').innerHTML=html||'<div class="em">'+ic('star',40)+'<p>لا توجد صفقات مبدئية لهذه السنة</p><p style="font-size:12px">أضف صفقة من الزر بالأسفل</p></div>';
+  if(pending.length){
+    html+=`<div class="sec-h"><span class="sec-t">${ic('clock',14)} معاملات العملاء (جارية)</span><span class="sec-badge">${dispNum(pending.length)}</span></div>`;
+    html+=pending.map(expRow).join('');
+  }
+  if(S.showDoneInExp&&done.length){
+    html+=`<div class="sec-h"><span class="sec-t">${ic('check',14)} معاملات العملاء (مكتملة)</span><span class="sec-badge">${dispNum(done.length)}</span></div>`;
+    html+=done.map(expRow).join('');
+  }
+  $('expList').innerHTML=html||'<div class="em">لا توجد بيانات لهذه السنة</div>';
+  const total=totalP+totalDeals+(S.showDoneInExp?totalD:0);
   const H=S.hideProfit||S.hideData;
   const val=$('expTotalVal');
   val.textContent=H?'•••••':((total>=0?'+':'')+fmt(total));
@@ -2669,8 +2690,8 @@ function openExpD(id){
   $('expDN').textContent=t.name||'تفاصيل متوقعة';
   $('expD_buy').value=t.expBuyPrice!==undefined?t.expBuyPrice:(t.buyPrice||'');
   $('expD_charge').value=t.expChargePrice!==undefined?t.expChargePrice:(t.chargePrice||'');
-  $('expD_cashUSD').value=num(t.cashUSD)||num(t.dollarsReceived)||'';
-  $('expD_rate').value=t.dollarRate||'';
+  $('expD_cashUSD').value=t.expCashUSD!==undefined?t.expCashUSD:(num(t.cashUSD)||num(t.dollarsReceived)||'');
+  $('expD_rate').value=t.expRate!==undefined?t.expRate:(t.dollarRate||'');
   $('expD_half').checked=(t.expIsHalf!==undefined)?t.expIsHalf:!!t.isHalf;
   calcExpPreview();
   openM('expD');
@@ -2693,11 +2714,11 @@ function calcExpPreview(){
 function saveExpD(){
   const t=tx.find(x=>x.id===curExpId);
   if(!t){toast('المعاملة غير موجودة','e');return;}
+  /* حفظ معزول بالكامل: حقول exp* خاصة بالربح المتوقع فقط */
   t.expBuyPrice=$('expD_buy').value;
   t.expChargePrice=$('expD_charge').value;
-  t.cashUSD=$('expD_cashUSD').value;
-  t.dollarRate=$('expD_rate').value;
-  t.dollarsReceived=$('expD_cashUSD').value;
+  t.expCashUSD=$('expD_cashUSD').value;
+  t.expRate=$('expD_rate').value;
   t.expIsHalf=$('expD_half').checked;
   save();closeM('expD');render();renderExp();
   toast('تم حفظ التغييرات للربح المتوقع');
@@ -2770,7 +2791,9 @@ $('expF_share').onclick=()=>{
 $('bExp').onclick=()=>{hp();openExp();};
 $('expList').onclick=e=>{
   const dr=e.target.closest('[data-deal-id]');
-  if(dr)openDealForm(dr.dataset.dealId);
+  if(dr){openDealForm(dr.dataset.dealId);return;}
+  const row=e.target.closest('[data-exp-id]');
+  if(row)openExpD(row.dataset.expId);
 };
 $('expShareBtn').onclick=()=>{
   const Y=selYear();
@@ -2780,9 +2803,15 @@ $('expShareBtn').onclick=()=>{
     const r=expCalc(d);
     if(r.valid){total+=r.profit;text+=`• ${d.name} (مبدئي): ${r.profit.toFixed(2)}\n`;}
   });
+  tx.forEach(t=>{
+    if(+t.year!==Y||t.cancelled||t.done)return;
+    const r=expCalc(t);
+    if(r.valid){total+=r.profit;text+=`• ${t.name}: ${r.profit.toFixed(2)}\n`;}
+  });
   text+=`\nإجمالي الربح المتوقع: ${total.toFixed(2)}`;
   share(text,'الربح المتوقع');
 };
+$('expShowDone').onchange=e=>{S.showDoneInExp=e.target.checked;saveS();renderExp();};
 $('expAddDeal').onclick=()=>openDealForm(null);
 $('expD_half').addEventListener('change',calcExpPreview);
 ['expD_buy','expD_charge','expD_cashUSD','expD_rate'].forEach(k=>$(k).addEventListener('input',calcExpPreview));
