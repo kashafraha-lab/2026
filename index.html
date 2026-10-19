@@ -563,7 +563,7 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 <div class="f"><label>الرقم الوطني</label><input id="f_nationalId" inputmode="numeric"></div>
 <div class="f"><label>جواز السفر</label><input id="f_passport"></div>
 <div class="f w2"><label>IBAN</label><input id="f_iban" placeholder="مثال: IQ98NBIQ850123456789012"></div>
-<div class="f"><label>سعر شراء البطاقة</label><input type="number" step="any" inputmode="decimal" id="f_buyPrice"></div>
+<div class="f"><label>سعر شراء المعاملة</label><input type="number" step="any" inputmode="decimal" id="f_buyPrice"></div>
 <div class="f"><label>قيمة شحن المعاملة</label><input type="number" step="any" inputmode="decimal" id="f_chargePrice"></div>
 <div class="f"><label>سعر بيع المعاملة</label><input type="number" step="any" inputmode="decimal" id="f_sellPrice"></div>
 <div class="f"><label>الخصم %</label><input type="number" step="any" inputmode="decimal" id="f_discount"></div>
@@ -591,7 +591,7 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 <div class="g2" id="dI"></div>
 <div class="s2">البيانات المالية</div>
 <div class="g2">
-<div class="f"><label>شراء البطاقة</label><input type="number" step="any" inputmode="decimal" id="d_buy"></div>
+<div class="f"><label>سعر شراء المعاملة</label><input type="number" step="any" inputmode="decimal" id="d_buy"></div>
 <div class="f"><label>قيمة الشحن</label><input type="number" step="any" inputmode="decimal" id="d_charge"></div>
 <div class="f"><label>سعر البيع</label><input type="number" step="any" inputmode="decimal" id="d_sell"></div>
 <div class="f"><label>الخصم %</label><input type="number" step="any" inputmode="decimal" id="d_disc"></div>
@@ -1180,9 +1180,9 @@ const calc=t=>{
   return t.isHalf?(v-c-b)/2:v-c-b;
 };
 const calcNet=t=>{
-  const c=num(t.chargePrice);
+  const b=num(t.buyPrice),c=num(t.chargePrice);
   const v=dealValue(t);
-  return t.isHalf?(v-c)/2:v-c;
+  return t.isHalf?(v-c-b)/2:v-c-b;
 };
 const expCalc=t=>{
   const cashUSD=num(t.cashUSD)||num(t.dollarsReceived);
@@ -1970,7 +1970,7 @@ function sale(i){
   $('qe_g').style.opacity=1;
   $('qe_half').checked=false;
   if(!t.isHalf&&!num(t.buyPrice)){
-    step='buy';$('qe_t').textContent='شراء البطاقة';
+    step='buy';$('qe_t').textContent='سعر شراء المعاملة';
     q.placeholder='سعر الشراء (أو اتركه فارغاً)';
     $('qe_hf').style.display='flex';
   }else if(!num(t.chargePrice)){
@@ -2882,20 +2882,13 @@ document.addEventListener('pointerdown',function(e){
 /* 3) زر الإضافة: يختفي عند النزول ويظهر عند الصعود */
 (function(){
   var fab=$('bAdd');if(!fab)return;
-  var hidden=false,showTimer=null,lastY=scrollY;
-  function setH(h){
-    if(h===hidden)return;
-    hidden=h;
-    clearTimeout(showTimer);showTimer=null;
-    if(h)fab.classList.add('hide');
-    else{hp(8);fab.classList.remove('hide');}
-  }
-  function moving(){
-    /* أي حركة أثناء التمرير → اختفِ فوراً لتقرأ براحتك */
-    if(scrollY<=120){setH(false);return;}
-    setH(true);
-    clearTimeout(showTimer);
-    showTimer=setTimeout(function(){setH(false);},1100); /* توقفت → عد بنقلة نابضية */
+  var hidden=false,lastAct=Date.now();
+  function show(){if(!hidden)return;hidden=false;hp(8);fab.classList.remove('hide');}
+  function hide(){if(hidden)return;hidden=true;fab.classList.add('hide');}
+  function activity(){
+    lastAct=Date.now();
+    if(scrollY<=120){show();return;}
+    hide();
   }
   var ty=null;
   document.addEventListener('touchstart',function(e){
@@ -2904,20 +2897,21 @@ document.addEventListener('pointerdown',function(e){
   },{passive:true});
   document.addEventListener('touchmove',function(e){
     if(ty===null)return;
-    var y=e.touches[0].clientY,dy=Math.abs(y-ty);ty=y;
-    if(dy>2)moving();
+    var y=e.touches[0].clientY;
+    if(Math.abs(y-ty)>2){ty=y;activity();}else ty=y;
   },{passive:true});
   ['touchend','touchcancel'].forEach(function(ev){
     document.addEventListener(ev,function(){
       ty=null;
-      clearTimeout(showTimer);
-      showTimer=setTimeout(function(){if(scrollY>120)setH(false);},500);
+      lastAct=Date.now()-900;
     },{passive:true});
   });
-  addEventListener('scroll',function(){
-    var y=scrollY,dy=Math.abs(y-lastY);lastY=y;
-    if(dy>2)moving();
-  },{passive:true});
+  addEventListener('scroll',activity,{passive:true});
+  /* شبكة الأمان: مهما حدث، الزر يعود خلال ~1.3 ثانية من توقف الحركة */
+  setInterval(function(){
+    if(hidden&&Date.now()-lastAct>1300)show();
+  },400);
+  fab.classList.remove('hide');
 })();
 /* 4) زر العودة للأعلى */
 (function(){
