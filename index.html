@@ -1536,22 +1536,23 @@ function card(r,n){
   if(H){meta='<i>••••••</i>';}
   else{
     const parts=[];
-    if(t.date)parts.push(`<i class="meta-date">${ic('note',11)}إدخال ${esc(t.date)}</i>`);
-    if(t.bookingDate&&!t.exchangeDate){
-      /* إذا اختيرت شركة الصرافة تُلغى حالة الانتظار تلقائياً */
-      const bi=bookingInfo(t);
-      if(bi){
-        if(bi.status==='future')parts.push('<i class="meta-status f">موعد حجز قادم</i>');
-        else if(bi.status==='overdue')parts.push(`<i class="meta-status d">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);
-        else parts.push(`<i class="meta-status w">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);
+    if(t.bookingDate){
+      parts.push(`<i class="meta-date" style="color:var(--ok);font-weight:700">${ic('cal',11)}تم الحجز ${dDisp(t.bookingDate)}</i>`);
+      if(t.exchangeDate)parts.push(`<i class="meta-date" style="color:var(--ok);font-weight:700">${ic('check',11)}تم اختيار شركة صرافة ${dDisp(t.exchangeDate)}</i>`);
+      else{
+        /* إذا اختيرت شركة الصرافة تُلغى حالة الانتظار تلقائياً */
+        const bi=bookingInfo(t);
+        if(bi){
+          if(bi.status==='future')parts.push('<i class="meta-status f">موعد حجز قادم</i>');
+          else if(bi.status==='overdue')parts.push(`<i class="meta-status d">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);
+          else parts.push(`<i class="meta-status w">بانتظار اختيار شركة صرافة (مضي ${dispNum(bi.passed)} يوم)</i>`);
+        }
       }
     }
     meta=parts.join('');
   }
   let m='';
   const bP=num(t.buyPrice),cP=num(t.chargePrice),uP=num(t.dollarsReceived),rP=num(t.dollarRate);
-  if(t.bookingDate)m+=H?'<span class="tag">تم الحجز ••••••</span>':`<span class="tag" style="background:color-mix(in srgb,var(--wn) 12%,transparent);color:var(--wn);font-weight:700">${ic('cal',12)}تم الحجز ${dDisp(t.bookingDate)}</span>`;
-  if(t.exchangeDate)m+=H?'<span class="tag">تم اختيار شركة صرافة ••••••</span>':`<span class="tag" style="background:color-mix(in srgb,var(--ok) 13%,transparent);color:var(--ok);font-weight:700">${ic('check',12)}تم اختيار شركة صرافة ${dDisp(t.exchangeDate)}</span>`;
   /* مرتبة حسب خطوات الحساب: التكلفة ثم الاستلام ثم الربح */
   if(!t.isHalf&&bP>0)m+=H?'<span class="tag">شراء •••••</span>':`<span class="tag">شراء ${fmt(bP)}</span>`;
   if(cP>0)m+=H?'<span class="tag">شحن •••••</span>':`<span class="tag">شحن ${fmt(cP)}</span>`;
