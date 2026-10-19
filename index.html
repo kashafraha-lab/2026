@@ -459,8 +459,8 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 .fab.hide{transform:translateY(calc(100% + 44px)) scale(.9);opacity:0;pointer-events:none;transition:transform .42s cubic-bezier(.3,.7,.4,1),opacity .34s ease}
 .fab:active{transform:scale(.94);transition-duration:.12s}
 
-/* زر العودة للأعلى: منخفض أكثر — لا يغطي آخر معاملة ولا يتداخل مع زر الإضافة */
-.btt{bottom:calc(env(safe-area-inset-bottom) + 84px)}
+/* زر العودة للأعلى: بنفس مستوى زر الإضافة تماماً — في الجانب على نفس الصف */
+.btt{bottom:calc(env(safe-area-inset-bottom) + 18px)}
 
 </style>
 <base target="_blank">
@@ -3001,7 +3001,24 @@ document.addEventListener('pointerdown',function(e){
   var b=document.createElement('button');b.className='btt';b.setAttribute('aria-label','العودة للأعلى');b.innerHTML=ic('chevUp',20);
   document.body.appendChild(b);
   b.onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};
-  addEventListener('scroll',function(){b.classList.toggle('show',scrollY>600);},{passive:true});
+  var lastY=scrollY,shown=false;
+  function setB(s){if(s===shown)return;shown=s;b.classList.toggle('show',s);}
+  /* نزول (تعمّق في القائمة) → يظهر | صعود أو قرب القمة → يختفي فوراً */
+  addEventListener('scroll',function(){
+    var y=scrollY,dy=y-lastY;lastY=y;
+    if(y<=600||dy<0)setB(false);
+    else if(dy>2)setB(true);
+  },{passive:true});
+  /* إخفاء فوري بمجرد تحريك الإصبع للأعلى — حتى قبل اكتمال التمرير */
+  var ty=null;
+  document.addEventListener('touchstart',function(e){
+    ty=(anyModalOpen()||$('lock').classList.contains('on'))?null:e.touches[0].clientY;
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(ty===null)return;
+    var y=e.touches[0].clientY,dy=y-ty;ty=y;
+    if(dy>4)setB(false);
+  },{passive:true});
 })();
 /* 5) سحب للتحديث */
 (function(){
