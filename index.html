@@ -265,6 +265,10 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 .f input:focus,.f textarea:focus{border-color:var(--ac);box-shadow:0 0 0 4px var(--acs);background:var(--cd2)}
 .f input:disabled{opacity:.4}
 .f input[readonly]{cursor:default}
+.qeDots{display:flex;gap:6px;justify-content:center;margin:-6px 0 14px}
+.qeDots i{width:7px;height:7px;border-radius:99px;background:var(--bd);transition:width .3s cubic-bezier(.2,.8,.3,1),background .3s}
+.qeDots i.on{background:var(--ac);width:22px;box-shadow:0 0 0 3px var(--acs)}
+.qeDots i.done{background:color-mix(in srgb,var(--ac) 50%,var(--bd))}
 .f input.err{border-color:var(--no);box-shadow:0 0 0 4px color-mix(in srgb,var(--no) 14%,transparent)}
 .tg{display:flex;align-items:center;justify-content:space-between;margin:12px 0;padding:13px 15px;border-radius:15px;background:var(--bg);color:var(--tx);font-size:14px;font-weight:700;cursor:pointer}
 .tg input{display:none}
@@ -616,6 +620,7 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 <!-- ===== QUICK ENTRY ===== -->
 <div class="bg" id="qe"><div class="sh"><div class="handle"></div>
 <div class="th"><h2 id="qe_t"></h2><button class="ib" data-x="qe" aria-label="إغلاق"><i data-ic="x"></i></button></div>
+<div class="qeDots" id="qeDots"></div>
 <div class="f" id="qe_g"><input type="number" step="any" inputmode="decimal" id="qe_in"></div>
 <label class="tg" id="qe_hf"><span>معاملة بالنصف</span><input type="checkbox" id="qe_half"><i class="sw"></i></label>
 <div class="ac2"><button class="btn pr" id="qe_ok">حفظ ومتابعة</button></div>
@@ -1544,6 +1549,8 @@ function card(r,n){
   if(num(t.sellPriceUSD)>0)m+=H?'<span class="tag">$ ••••</span>':`<span class="tag" style="color:var(--ok);font-weight:800">$ ${fmt(num(t.sellPriceUSD))}</span>`;
   if(!t.isHalf&&num(t.buyPrice)>0)m+=H?'<span class="tag">شراء •••••</span>':`<span class="tag">شراء ${fmt(num(t.buyPrice))}</span>`;
   if(num(t.chargePrice)>0)m+=H?'<span class="tag">شحن •••••</span>':`<span class="tag">شحن ${fmt(num(t.chargePrice))}</span>`;
+  if(num(t.dollarRate)>0)m+=H?'<span class="tag">سعر الدولار ••••</span>':`<span class="tag" style="color:var(--ac);font-weight:800">سعر الدولار ${fmt(num(t.dollarRate))}</span>`;
+  if(num(t.dollarsReceived)>0)m+=H?'<span class="tag">دولار مستلم ••••</span>':`<span class="tag" style="color:var(--ac)">دولار مستلم ${fmt(num(t.dollarsReceived))}</span>`;
   if(t.isHalf)m+='<span class="tag">بالنصف</span>';
   if(t.notes)m+=`<span class="tag">${ic('note',12)}${H?'••••••':esc(String(t.notes).slice(0,24))}</span>`;
   if(t.clientId)m+=`<span class="tag" style="font-family:monospace;font-size:11px">${H?'••••••':esc(t.clientId)}</span>`;
@@ -1997,8 +2004,22 @@ function showStep(st,idx,len){
     :st==='charge'?'قيمة الشحن (أو اتركها فارغاً للتخطي)'
     :st==='usd'?'مثال: 1950':'مثال: 10.08';
   $('qe_hf').style.display=st==='buy'?'flex':'none';
-  openM('qe');
-  setTimeout(()=>q.focus(),300);
+  const dots=$('qeDots');
+  if(dots)dots.innerHTML=Array.from({length:len},(_,j)=>'<i class="'+(j<idx?'done':j===idx?'on':'')+'"></i>').join('');
+  if(!$('qe').classList.contains('on'))openM('qe');
+  /* انزلاق ناعم للمحتوى بدل إغلاق النافذة وإعادة فتحها */
+  const sh=$('qe').querySelector('.sh');
+  sh.style.transition='none';
+  sh.style.transform='translateX(52px)';
+  sh.style.opacity='0';
+  const clear=()=>{sh.style.transition='';sh.style.transform='';sh.style.opacity='';sh.removeEventListener('transitionend',clear);};
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    sh.style.transition='transform .3s cubic-bezier(.2,.8,.3,1),opacity .22s ease';
+    sh.style.transform='translateX(0)';
+    sh.style.opacity='1';
+    sh.addEventListener('transitionend',clear);
+  }));
+  setTimeout(()=>{try{q.focus();}catch(e){}},230);
 }
 function finishSale(){
   const t=tx[cur];
@@ -2026,9 +2047,14 @@ $('qe_ok').onclick=()=>{
   const v=$('qe_in').value,h=$('qe_half').checked;
   const idx=cur;const t=tx[idx];
   if(!t)return;
+  const goNext=()=>{
+    const all=remainingSteps(t);
+    if(all.length){cur=idx;showStep(all[0],0,all.length);}
+    else{closeM('qe');setTimeout(finishSale,160);}
+  };
   if(step==='buy'&&h){
     t.isHalf=true;t.buyPrice='';
-    save();closeM('qe');setTimeout(()=>sale(idx),250);return;
+    save();hp(15);goNext();return;
   }
   if(step==='buy'){t.buyPrice=v||'';if(v)t.isHalf=false;}
   else if(step==='charge')t.chargePrice=v||'';
@@ -2048,10 +2074,7 @@ $('qe_ok').onclick=()=>{
     }
     t.dollarRate=v;
   }
-  save();closeM('qe');
-  const all=remainingSteps(t);
-  if(all.length)setTimeout(()=>{cur=idx;showStep(all[0],0,all.length);},250);
-  else finishSale();
+  save();hp(15);goNext();
 };
 
 /* ============ DETAILS ============ */
