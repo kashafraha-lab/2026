@@ -459,6 +459,9 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 .fab.hide{transform:translateY(calc(100% + 44px)) scale(.9);opacity:0;pointer-events:none;transition:transform .42s cubic-bezier(.3,.7,.4,1),opacity .34s ease}
 .fab:active{transform:scale(.94);transition-duration:.12s}
 
+/* زر العودة للأعلى: منخفض أكثر — لا يغطي آخر معاملة ولا يتداخل مع زر الإضافة */
+.btt{bottom:calc(env(safe-area-inset-bottom) + 84px)}
+
 </style>
 <base target="_blank">
 <base target="_blank">
@@ -1537,8 +1540,8 @@ function card(r,n){
   else{
     const parts=[];
     if(t.bookingDate){
-      parts.push(`<i class="meta-date" style="color:var(--ok);font-weight:700">${ic('cal',11)}تم الحجز ${dDisp(t.bookingDate)}</i>`);
-      if(t.exchangeDate)parts.push(`<i class="meta-date" style="color:var(--ok);font-weight:700">${ic('check',11)}تم اختيار شركة صرافة ${dDisp(t.exchangeDate)}</i>`);
+      parts.push(`<i class="meta-date" style="color:var(--ok);font-weight:800">${ic('cal',11)}تم الحجز ${dDisp(t.bookingDate)}</i>`);
+      if(t.exchangeDate)parts.push(`<i class="meta-date" style="color:var(--ok);font-weight:800">${ic('cal',11)}تم اختيار شركة صرافة ${dDisp(t.exchangeDate)}</i>`);
       else{
         /* إذا اختيرت شركة الصرافة تُلغى حالة الانتظار تلقائياً */
         const bi=bookingInfo(t);
@@ -2329,15 +2332,19 @@ $('list').onclick=e=>{
   }
 };
 /* لمس مطول: دخول وضع التحديد */
-let lpTimer=null,lpCard=null,lpStart=null;
+let lpTimer=null,lpCard=null,lpStart=null,lpScroll=0;
+const cancelLP=()=>{clearTimeout(lpTimer);lpTimer=null;lpCard=null;lpStart=null;};
 $('list').addEventListener('touchstart',e=>{
   const card=e.target.closest('.c');
   if(!card||e.target.closest('button'))return;
   lpCard=card;
   lpStart={x:e.touches[0].clientX,y:e.touches[0].clientY};
+  lpScroll=scrollY;
   clearTimeout(lpTimer);
   lpTimer=setTimeout(()=>{
     if(!lpCard)return;
+    /* لا تفعيل إذا تحرك التمرير أثناء الإمساك — خطأ شائع أثناء التصفح */
+    if(Math.abs(scrollY-lpScroll)>4){cancelLP();return;}
     hp([15,30,15]);
     enterSel(lpCard.dataset.id);
     lpCard=null;
@@ -2346,9 +2353,11 @@ $('list').addEventListener('touchstart',e=>{
 $('list').addEventListener('touchmove',e=>{
   if(!lpStart)return;
   const dx=Math.abs(e.touches[0].clientX-lpStart.x),dy=Math.abs(e.touches[0].clientY-lpStart.y);
-  if(dx>8||dy>8){clearTimeout(lpTimer);lpTimer=null;lpCard=null;lpStart=null;}
+  if(dx>12||dy>12)cancelLP();
 },{passive:true});
-['touchend','touchcancel'].forEach(ev=>$('list').addEventListener(ev,()=>{clearTimeout(lpTimer);lpTimer=null;lpCard=null;lpStart=null;}));
+/* أي تمرير للصفحة أثناء العد يلغي الضغط المطول فوراً */
+addEventListener('scroll',()=>{if(lpTimer)cancelLP();},{passive:true});
+['touchend','touchcancel'].forEach(ev=>$('list').addEventListener(ev,cancelLP));
 $('list').addEventListener('contextmenu',e=>{
   if(e.target.closest('input,textarea'))return;
   e.preventDefault();
