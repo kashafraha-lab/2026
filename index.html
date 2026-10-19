@@ -481,7 +481,7 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 <button class="eye-mini" id="pEye" aria-label="إظهار/إخفاء الأرباح"><i data-ic="eyeoff" data-s="15"></i></button>
 <div class="pfw">
   <div class="pf">
-    <span class="pf-lbl">الربح بعد الشراء</span>
+    <span class="pf-lbl">صافي الربح</span>
     <strong id="sP">•••••</strong>
     <div class="pf-sub">
       <span>صافي الربح</span>
@@ -774,7 +774,7 @@ label{font-size:12px;color:var(--sub);font-weight:700}
   <div class="pvTotal"><span>المكسب المتوقع</span><b id="expD_profit">0.00</b></div>
   <div id="expFormula" style="font-size:11px;color:var(--sub);margin-top:8px;text-align:center"></div>
 </div>
-<div class="noteBox"><i data-ic="info" data-s="16"></i><div>تعديل الشراء أو الشحن هنا <b class="g">لا يؤثر</b> على الواجهة الرئيسية أو "الربح بعد الشراء".</div></div>
+<div class="noteBox"><i data-ic="info" data-s="16"></i><div>تعديل الشراء أو الشحن هنا <b class="g">لا يؤثر</b> على الواجهة الرئيسية أو "صافي الربح".</div></div>
 <div class="ac2">
   <button class="btn" id="expD_share"><i data-ic="share"></i>مشاركة</button>
   <button class="btn pr" id="expD_save"><i data-ic="check"></i>حفظ</button>
@@ -1220,7 +1220,7 @@ function bookingInfo(t){
 const smartColor=t=>{
   if(/^#[0-9a-f]{6}$/i.test(t.rowColor||'')&&t.rowColor.toLowerCase()!=='#ffffff')return t.rowColor;
   if(t.cancelled)return 'var(--sub)';
-  if(t.done)return calc(t)>=0?'var(--ok)':'var(--no)';
+  if(t.done)return calcNet(t)>=0?'var(--ok)':'var(--no)';
   return 'var(--ac)';
 };
 
@@ -1368,7 +1368,7 @@ const SO={
   desc:(a,b)=>SO.asc(b,a),
   buyHigh:(a,b)=>num(b.t.buyPrice)-num(a.t.buyPrice),
   buyLow:(a,b)=>num(a.t.buyPrice)-num(b.t.buyPrice),
-  profitHigh:(a,b)=>calc(b.t)-calc(a.t),
+  profitHigh:(a,b)=>calcNet(b.t)-calcNet(a.t),
   pendingFirst:(a,b)=>(!!a.t.done)-(!!b.t.done),
   dateNew:(a,b)=>pd(b.t.date)-pd(a.t.date),
   dateOld:(a,b)=>pd(a.t.date)-pd(b.t.date)
@@ -1535,7 +1535,7 @@ function card(r,n){
   }
   let m='';
   if((t.done||num(t.sellPrice)>0||num(t.dollarsReceived)>0)){
-    const p=calc(t);
+    const p=calcNet(t);
     m+=HP?'<span class="tag">ربح •••••</span>':`<span class="tag ${p>=0?'g':'r'}">ربح ${fmt(p)}</span>`;
   }
   if(num(t.sellPrice)>0)m+=H?'<span class="tag">بيع •••••</span>':`<span class="tag">بيع ${fmt(num(t.sellPrice))}</span>`;
@@ -2051,8 +2051,9 @@ function dp(){
   if(cur<0)return;
   const b=num($('d_buy').value),c=num($('d_charge').value),s=num($('d_sell').value),d=num($('d_disc').value);
   const half=$('d_half').checked;
-  const f=s-s*d/100;
-  const p=half?(f-c-b)/2:f-c-b;
+  const usdd=num($('d_dollarsReceived').value),ratee=num($('d_dollarRate').value);
+  const v=(usdd>0&&ratee>0)?usdd*ratee:(s-s*d/100);
+  const p=half?(v-c)/2:v-c;
   $('dP').textContent=p.toFixed(2);
   $('dPc').style.background=p>=0?'linear-gradient(135deg,var(--ok),color-mix(in srgb,var(--ok) 70%,#000))':'linear-gradient(135deg,var(--no),color-mix(in srgb,var(--no) 70%,#000))';
   const rate=num($('d_dollarRate').value),received=num($('d_dollarsReceived').value);
@@ -2308,7 +2309,7 @@ function showList(type){
     const nameDisp=H?'••••••':esc(t.name||'-');
     let inf='',pl='';
     if(type==='profit'){
-      const p=calc(t);sum+=p;
+      const p=calcNet(t);sum+=p;
       inf=HP?'<b class="g">•••••</b>':`<b class="g">+${fmt(p)}</b>`;
       pl=HP?'الربح: ••••':('الربح: '+fmt(p));
     }else if(type==='purchases'){
@@ -2881,14 +2882,21 @@ document.addEventListener('pointerdown',function(e){
 /* 3) زر الإضافة: يختفي عند النزول ويظهر عند الصعود */
 (function(){
   var fab=$('bAdd');if(!fab)return;
-  var hidden=false,lastY=scrollY,tick=false;
+  var hidden=false,showTimer=null,lastY=scrollY;
   function setH(h){
     if(h===hidden)return;
     hidden=h;
+    clearTimeout(showTimer);showTimer=null;
     if(h)fab.classList.add('hide');
     else{hp(8);fab.classList.remove('hide');}
   }
-  /* رد فوري أثناء سحب الإصبع: يختفي/يظهر في نفس لحظة الحركة */
+  function moving(){
+    /* أي حركة أثناء التمرير → اختفِ فوراً لتقرأ براحتك */
+    if(scrollY<=120){setH(false);return;}
+    setH(true);
+    clearTimeout(showTimer);
+    showTimer=setTimeout(function(){setH(false);},1100); /* توقفت → عد بنقلة نابضية */
+  }
   var ty=null;
   document.addEventListener('touchstart',function(e){
     if(anyModalOpen()||$('lock').classList.contains('on')){ty=null;return;}
@@ -2896,22 +2904,19 @@ document.addEventListener('pointerdown',function(e){
   },{passive:true});
   document.addEventListener('touchmove',function(e){
     if(ty===null)return;
-    var y=e.touches[0].clientY,dy=y-ty;ty=y;
-    if(scrollY<=0&&dy>0){setH(false);return;}
-    if(dy<-3)setH(true);       /* الإصبع يصعد = أقرأ للأسفل → اختفِ فوراً */
-    else if(dy>3)setH(false);  /* الإصبع ينزل = أعود للأعلى → اظهر فوراً */
+    var y=e.touches[0].clientY,dy=Math.abs(y-ty);ty=y;
+    if(dy>2)moving();
   },{passive:true});
-  ['touchend','touchcancel'].forEach(function(ev){document.addEventListener(ev,function(){ty=null;},{passive:true});});
-  /* دعم عجلة الفأرة ولوحات التتبع + ضمان الظهور عند القمة */
+  ['touchend','touchcancel'].forEach(function(ev){
+    document.addEventListener(ev,function(){
+      ty=null;
+      clearTimeout(showTimer);
+      showTimer=setTimeout(function(){if(scrollY>120)setH(false);},500);
+    },{passive:true});
+  });
   addEventListener('scroll',function(){
-    var y=scrollY;
-    if(tick)return;tick=true;
-    requestAnimationFrame(function(){
-      if(y<=120)setH(false);
-      else if(y>lastY+8)setH(true);
-      else if(y<lastY-6)setH(false);
-      lastY=y;tick=false;
-    });
+    var y=scrollY,dy=Math.abs(y-lastY);lastY=y;
+    if(dy>2)moving();
   },{passive:true});
 })();
 /* 4) زر العودة للأعلى */
@@ -3251,8 +3256,8 @@ try{render();}catch(e){}
     var s=st(Y),tot=Math.max(s.n,1);
     /* الملخص */
     var html='<div class="s2">ملخص سنة '+dispNum(Y)+'</div><div class="statTiles">';
-    html+=tile('dollar','الربح بعد الشراء',M(s.P),s.P>=0?'var(--ok)':'var(--no)');
-    html+=tile('check','صافي الربح (المكتملة)',M(s.P2),s.P2>=0?'var(--ok)':'var(--no)');
+    html+=tile('check','صافي الربح',M(s.P2),s.P2>=0?'var(--ok)':'var(--no)');
+    html+=tile('chart','متوسط ربح المعاملة',M(s.dn?s.P2/s.dn:0),'var(--ac)');
     html+=tile('cart','إجمالي المشتريات',M2(s.B),'var(--ac)');
     html+=tile('inbox','عدد المعاملات',dispNum(s.n),'var(--wn)',1);
     html+='</div>';
@@ -3285,7 +3290,7 @@ try{render();}catch(e){}
     var byName={};
     tx.forEach(function(t){
       if(+t.year!==Y||t.cancelled||!((t.done||num(t.sellPrice)>0||num(t.dollarsReceived)>0)))return;
-      var p=calc(t),nm=(t.name||'بدون اسم').trim();
+      var p=calcNet(t),nm=(t.name||'بدون اسم').trim();
       byName[nm]=byName[nm]||{p:0,n:0};byName[nm].p+=p;byName[nm].n++;
     });
     var tops=Object.keys(byName).map(function(k){return{n:k,p:byName[k].p,c:byName[k].n};})
@@ -3301,10 +3306,10 @@ try{render();}catch(e){}
     /* ملخص السنوات */
     var g={n:0,P:0,P2:0,B:0};
     ys.forEach(function(y){
-      var sy=st(y);g.n+=sy.n;g.P+=sy.P;g.P2+=sy.P2;g.B+=sy.B;
+      var sy=st(y);g.n+=sy.n;g.P+=sy.P;g.P2+=sy.P2;g.B+=sy.B;g.dn=(g.dn||0)+sy.dn;
       html+='<div class="s2">سنة '+dispNum(y)+'</div><div class="statTiles">'
-        +tile('dollar','الربح بعد الشراء',M(sy.P),sy.P>=0?'var(--ok)':'var(--no)')
         +tile('check','صافي الربح',M(sy.P2),sy.P2>=0?'var(--ok)':'var(--no)')
+        +tile('chart','متوسط ربح المعاملة',M(sy.dn?sy.P2/sy.dn:0),'var(--ac)')
         +tile('cart','المشتريات',M2(sy.B),'var(--ac)')
         +tile('inbox','معاملات • مكتملة/جارية',dispNum(sy.n)+' • '+dispNum(sy.dn)+'/'+dispNum(sy.pe),'var(--wn)',1)
         +'</div>';
@@ -3312,8 +3317,8 @@ try{render();}catch(e){}
     /* الإجمالي العام */
     html+='<div class="s2">الإجمالي العام</div><div class="statTiles">'
       +tile('inbox','كل المعاملات',dispNum(g.n),'var(--ac)',1)
-      +tile('dollar','الربح بعد الشراء',M(g.P),g.P>=0?'var(--ok)':'var(--no)')
       +tile('check','صافي الربح',M(g.P2),g.P2>=0?'var(--ok)':'var(--no)')
+      +tile('chart','متوسط ربح المعاملة',M(g.dn?g.P2/g.dn:0),'var(--ac)')
       +tile('cart','كل المشتريات',M2(g.B),'var(--wn)')
       +'</div>';
     $('stB').innerHTML=html;
@@ -3339,6 +3344,38 @@ document.addEventListener('click',function(e){
   hp(10);
   try{$('bStat').click();}catch(err){}
 });
+
+
+/* ===== v7: صافي الربح فقط ===== */
+var _statsV7=stats;
+stats=function(){
+  _statsV7();
+  var sub=document.querySelector('.pf-sub');
+  if(sub)sub.style.display='none';
+  var lbl=document.querySelector('.pf-lbl');
+  if(lbl)lbl.textContent='صافي الربح';
+  var Y=selYear(),P2=0,dn=0;
+  tx.forEach(function(t){if(+t.year!==Y||t.cancelled||!t.done)return;dn++;P2+=calcNet(t);});
+  var el=$('sP'),HP=S.hideProfit||S.hideData;
+  if(HP){el.textContent=DOTS;el.classList.add('hid');el.classList.remove('neg');}
+  else{el.textContent=fmt(P2);el.classList.remove('hid');el.classList.toggle('neg',P2<0);}
+  var goal=num(S.goal);
+  var pct=goal>0?Math.max(0,Math.min(1,P2/goal)):0;
+  var arc=$('radArc'),C=2*Math.PI*34;
+  arc.setAttribute('stroke-dasharray',(pct*C).toFixed(1)+' '+C.toFixed(1));
+  $('radPct').textContent=HP?'••':(goal>0?dispNum(Math.round(pct*100))+'٪':'—');
+};
+/* الرسم الشهري بالصافي */
+var _msBase=monthSeries;
+monthSeries=function(Y){
+  var s=Array(12).fill(0);
+  tx.forEach(function(t){
+    if(+t.year!==Y||t.cancelled||!t.done)return;
+    var m=String(t.date||'').match(/^\d{1,2}\/(\d{1,2})\//);
+    if(m){var i=+m[1]-1;if(i>=0&&i<12)s[i]+=calcNet(t);}
+  });
+  return s.map(function(v){return Math.round(v*100)/100;});
+};
 
 </script>
 </body>
