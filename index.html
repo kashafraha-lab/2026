@@ -1976,28 +1976,45 @@ $('fCan').onclick=()=>{
 
 /* ============ QUICK SALE ============ */
 let cur=-1,step='';
-function sale(i){
-  cur=i;
-  const t=tx[i];if(!t)return;
+/* الخطوات المتبقية لإتمام البيع — تُحسب ديناميكياً وتتخطى المسجلة مسبقاً */
+function remainingSteps(t){
+  const all=[];
+  if(!t.isHalf&&!num(t.buyPrice))all.push('buy');
+  if(!num(t.chargePrice))all.push('charge');
+  if(!num(t.dollarsReceived))all.push('usd');
+  if(!num(t.dollarRate))all.push('rate');
+  return all;
+}
+function showStep(st,idx,len){
+  step=st;
   const q=$('qe_in');
   q.disabled=false;q.value='';q.classList.remove('err');
   $('qe_g').style.opacity=1;
   $('qe_half').checked=false;
-  if(!t.isHalf&&!num(t.buyPrice)){
-    step='buy';$('qe_t').textContent='سعر شراء المعاملة';
-    q.placeholder='سعر الشراء (أو اتركه فارغاً)';
-    $('qe_hf').style.display='flex';
-  }else if(!num(t.chargePrice)){
-    step='charge';$('qe_t').textContent='قيمة الشحن';
-    q.placeholder='قيمة الشحن (أو اتركه فارغاً)';
-    $('qe_hf').style.display='none';
-  }else{
-    step='sell';$('qe_t').textContent='إتمام البيع';
-    q.placeholder='أدخل سعر البيع';
-    $('qe_hf').style.display='none';
-  }
+  const names={buy:'سعر شراء المعاملة',charge:'قيمة شحن المعاملة',usd:'قيمة الدولار المستلم',rate:'سعر الدولار'};
+  $('qe_t').textContent='الخطوة '+dispNum(idx+1)+' من '+dispNum(len)+' — '+names[st];
+  q.placeholder=st==='buy'?'سعر الشراء (أو اتركه فارغاً للتخطي، أو فعّل "بالنصف")'
+    :st==='charge'?'قيمة الشحن (أو اتركها فارغاً للتخطي)'
+    :st==='usd'?'مثال: 1950':'مثال: 10.08';
+  $('qe_hf').style.display=st==='buy'?'flex':'none';
   openM('qe');
   setTimeout(()=>q.focus(),300);
+}
+function finishSale(){
+  const t=tx[cur];
+  if(!t)return;
+  const okSale=num(t.dollarsReceived)>0&&num(t.dollarRate)>0;
+  if(okSale)t.done=true;
+  save();render();
+  pulseCard(t.id);
+  toast(okSale?'تم إتمام البيع — انتقلت إلى المعاملات المكتملة':'اكتملت الخطوات — أدخل سعر البيع من "التفاصيل" لإتمام البيع','i');
+}
+function sale(i){
+  cur=i;
+  const t=tx[i];if(!t)return;
+  const all=remainingSteps(t);
+  if(!all.length){finishSale();return;}
+  showStep(all[0],0,all.length);
 }
 $('qe_half').onchange=()=>{
   const h=$('qe_half').checked;
@@ -2013,23 +2030,28 @@ $('qe_ok').onclick=()=>{
     t.isHalf=true;t.buyPrice='';
     save();closeM('qe');setTimeout(()=>sale(idx),250);return;
   }
-  if(step==='buy'){t.buyPrice=v||'0';t.isHalf=false;}
-  else if(step==='charge')t.chargePrice=v||'0';
-  else{
+  if(step==='buy'){t.buyPrice=v||'';if(v)t.isHalf=false;}
+  else if(step==='charge')t.chargePrice=v||'';
+  else if(step==='usd'){
     if(!(parseFloat(v)>0)){
       $('qe_in').classList.add('err');
-      toast('أدخل رقماً صحيحاً لإتمام البيع','e');
+      toast('أدخل قيمة الدولار المستلم','e');
       return;
     }
-    t.sellPrice=v;t.done=true;
+    t.dollarsReceived=v;
+  }
+  else if(step==='rate'){
+    if(!(parseFloat(v)>0)){
+      $('qe_in').classList.add('err');
+      toast('أدخل سعر الدولار','e');
+      return;
+    }
+    t.dollarRate=v;
   }
   save();closeM('qe');
-  if(step!=='sell')setTimeout(()=>sale(idx),250);
-  else{
-    render();
-    pulseCard(t.id);
-    toast('تم إتمام البيع — انتقلت إلى المعاملات المكتملة');
-  }
+  const all=remainingSteps(t);
+  if(all.length)setTimeout(()=>{cur=idx;showStep(all[0],0,all.length);},250);
+  else finishSale();
 };
 
 /* ============ DETAILS ============ */
