@@ -599,12 +599,9 @@ label{font-size:12px;color:var(--sub);font-weight:700}
 <div class="g2">
 <div class="f"><label>سعر شراء المعاملة</label><input type="number" step="any" inputmode="decimal" id="d_buy"></div>
 <div class="f"><label>قيمة الشحن</label><input type="number" step="any" inputmode="decimal" id="d_charge"></div>
-<div class="f"><label>سعر البيع</label><input type="number" step="any" inputmode="decimal" id="d_sell"></div>
-<div class="f"><label>الخصم %</label><input type="number" step="any" inputmode="decimal" id="d_disc"></div>
-<div class="f"><label>سعر البيع بالدولار</label><input type="number" step="any" inputmode="decimal" id="d_sellUSD"></div>
-<div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="d_dollarRate"></div>
 <div class="f"><label>الدولار المستلم</label><input type="number" step="any" inputmode="decimal" id="d_dollarsReceived"></div>
-<div class="f"><label>المكسب المتوقع (تلقائي)</label><input type="text" id="d_expProfit" readonly style="background:var(--bg);font-weight:800"></div>
+<div class="f"><label>سعر الدولار</label><input type="number" step="any" inputmode="decimal" id="d_dollarRate"></div>
+<div class="f w2"><label>صافي الربح (تلقائي)</label><input type="text" id="d_expProfit" readonly style="background:var(--bg);font-weight:800"></div>
 </div>
 <label class="tg"><span>معاملة بالنصف</span><input type="checkbox" id="d_half"><i class="sw"></i></label>
 <div class="pc" id="dPc">صافي الربح<b id="dP">0.00</b></div>
@@ -1541,16 +1538,18 @@ function card(r,n){
     meta=parts.join('');
   }
   let m='';
-  if((t.done||num(t.sellPrice)>0||num(t.dollarsReceived)>0)){
+  const bP=num(t.buyPrice),cP=num(t.chargePrice),uP=num(t.dollarsReceived),rP=num(t.dollarRate);
+  /* مرتبة حسب خطوات الحساب: التكلفة ثم الاستلام ثم الربح */
+  if(!t.isHalf&&bP>0)m+=H?'<span class="tag">شراء •••••</span>':`<span class="tag">شراء ${fmt(bP)}</span>`;
+  if(cP>0)m+=H?'<span class="tag">شحن •••••</span>':`<span class="tag">شحن ${fmt(cP)}</span>`;
+  if(!t.isHalf&&bP>0&&cP>0)m+=H?'<span class="tag">تكلفة •••••</span>':`<span class="tag" style="background:var(--acs);color:var(--ac);font-weight:700">تكلفة ${fmt(bP+cP)}</span>`;
+  if(uP>0)m+=H?'<span class="tag">دولار مستلم ••••</span>':`<span class="tag">دولار مستلم ${fmt(uP)}</span>`;
+  if(rP>0)m+=H?'<span class="tag">سعر الدولار ••••</span>':`<span class="tag">سعر الدولار ${fmt(rP)}</span>`;
+  if(uP>0&&rP>0)m+=H?'<span class="tag">المستلم •••••</span>':`<span class="tag" style="background:color-mix(in srgb,var(--ok) 13%,transparent);color:var(--ok);font-weight:700">المستلم ${fmt(uP*rP)}</span>`;
+  if(t.done||num(t.sellPrice)>0||uP>0){
     const p=calcNet(t);
-    m+=HP?'<span class="tag">ربح •••••</span>':`<span class="tag ${p>=0?'g':'r'}">ربح ${fmt(p)}</span>`;
+    m+=HP?'<span class="tag">ربح •••••</span>':`<span class="tag ${p>=0?'g':'r'}" style="font-weight:800">ربح ${p>=0?'+':''}${fmt(p)}</span>`;
   }
-  if(num(t.sellPrice)>0)m+=H?'<span class="tag">بيع •••••</span>':`<span class="tag">بيع ${fmt(num(t.sellPrice))}</span>`;
-  if(num(t.sellPriceUSD)>0)m+=H?'<span class="tag">$ ••••</span>':`<span class="tag" style="color:var(--ok);font-weight:800">$ ${fmt(num(t.sellPriceUSD))}</span>`;
-  if(!t.isHalf&&num(t.buyPrice)>0)m+=H?'<span class="tag">شراء •••••</span>':`<span class="tag">شراء ${fmt(num(t.buyPrice))}</span>`;
-  if(num(t.chargePrice)>0)m+=H?'<span class="tag">شحن •••••</span>':`<span class="tag">شحن ${fmt(num(t.chargePrice))}</span>`;
-  if(num(t.dollarRate)>0)m+=H?'<span class="tag">سعر الدولار ••••</span>':`<span class="tag" style="color:var(--ac);font-weight:800">سعر الدولار ${fmt(num(t.dollarRate))}</span>`;
-  if(num(t.dollarsReceived)>0)m+=H?'<span class="tag">دولار مستلم ••••</span>':`<span class="tag" style="color:var(--ac)">دولار مستلم ${fmt(num(t.dollarsReceived))}</span>`;
   if(t.isHalf)m+='<span class="tag">بالنصف</span>';
   if(t.notes)m+=`<span class="tag">${ic('note',12)}${H?'••••••':esc(String(t.notes).slice(0,24))}</span>`;
   if(t.clientId)m+=`<span class="tag" style="font-family:monospace;font-size:11px">${H?'••••••':esc(t.clientId)}</span>`;
@@ -1957,6 +1956,7 @@ $('fSave').onclick=()=>{
   const sp=parseFloat(spRaw)||0;
   let done=!!(o&&o.done);
   if(spRaw!=='')done=sp>0;
+  if(num(v('dollarsReceived'))>0&&num(v('dollarRate'))>0)done=true;
   const y=parseInt(v('year'),10)||selYear();
   const d=Object.assign({},o||{},Object.fromEntries(F.map(k=>[k,k==='name'?v(k).trim():v(k)])),{
     id:o?o.id:uid(),
@@ -2094,9 +2094,6 @@ function details(i){
   ].map(([l,v])=>{const val=v||'-';return `<button class="ii" data-cp="${esc(val)}"><small>${l}</small><b>${esc(val)}</b></button>`;}).join('');
   $('d_buy').value=t.buyPrice||'';
   $('d_charge').value=t.chargePrice||'';
-  $('d_sell').value=t.sellPrice||'';
-  $('d_sellUSD').value=t.sellPriceUSD||'';
-  $('d_disc').value=t.discount||'0';
   $('d_dollarRate').value=t.dollarRate||'';
   $('d_dollarsReceived').value=t.dollarsReceived||'';
   $('d_notes').value=t.notes||'';
@@ -2108,34 +2105,28 @@ function details(i){
 }
 function dp(){
   if(cur<0)return;
-  const b=num($('d_buy').value),c=num($('d_charge').value),s=num($('d_sell').value),d=num($('d_disc').value);
+  const b=num($('d_buy').value),c=num($('d_charge').value);
   const half=$('d_half').checked;
   const usdd=num($('d_dollarsReceived').value),ratee=num($('d_dollarRate').value);
-  const v=(usdd>0&&ratee>0)?usdd*ratee:(s-s*d/100);
-  const p=half?(v-c)/2:v-c;
+  const cost=b+c;
+  const v=(usdd>0&&ratee>0)?usdd*ratee:0;
+  const p=half?(v-cost)/2:v-cost;
   $('dP').textContent=p.toFixed(2);
   $('dPc').style.background=p>=0?'linear-gradient(135deg,var(--ok),color-mix(in srgb,var(--ok) 70%,#000))':'linear-gradient(135deg,var(--no),color-mix(in srgb,var(--no) 70%,#000))';
-  const rate=num($('d_dollarRate').value),received=num($('d_dollarsReceived').value);
   const expEl=$('d_expProfit');
   if(expEl){
-    if(rate>0&&received>0){
-      const val=received*rate;
-      const exp=half?(val-c-b)/2:val-c-b;
-      expEl.value=(exp>=0?'+':'')+exp.toFixed(2);
-      expEl.style.color=exp>=0?'var(--ok)':'var(--no)';
+    if(usdd>0&&ratee>0){
+      expEl.value=(p>=0?'+':'')+p.toFixed(2);
+      expEl.style.color=p>=0?'var(--ok)':'var(--no)';
     }else{expEl.value='—';expEl.style.color='';}
   }
 }
-['d_buy','d_charge','d_sell','d_disc','d_dollarRate','d_dollarsReceived'].forEach(k=>$(k).oninput=dp);
+['d_buy','d_charge','d_dollarRate','d_dollarsReceived'].forEach(k=>$(k).oninput=dp);
 $('d_half').onchange=dp;
 $('dSave').onclick=()=>{
   const t=tx[cur];if(!t)return;
   t.buyPrice=$('d_buy').value;
   t.chargePrice=$('d_charge').value;
-  const spRaw=String($('d_sell').value).trim();
-  t.sellPrice=spRaw;
-  t.sellPriceUSD=$('d_sellUSD').value;
-  t.discount=$('d_disc').value;
   t.dollarRate=$('d_dollarRate').value;
   t.dollarsReceived=$('d_dollarsReceived').value;
   t.notes=$('d_notes').value;
@@ -2148,8 +2139,8 @@ $('dSave').onclick=()=>{
     }
   }
   t.isHalf=$('d_half').checked;
-  const sp=parseFloat(spRaw)||0;
-  if(spRaw!=='')t.done=sp>0;
+  /* إتمام البيع يعتمد على الدولار: دولار مستلم وسعر صالحان */
+  t.done=(num(t.dollarsReceived)>0&&num(t.dollarRate)>0)||(parseFloat(t.sellPrice)||0)>0;
   save();render();toast('تم حفظ التعديلات بنجاح');closeM('det');
 };
 $('dDup').onclick=()=>{
