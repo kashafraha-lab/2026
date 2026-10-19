@@ -2929,9 +2929,39 @@ document.addEventListener('pointerdown',function(e){
   b.appendChild(s);
   setTimeout(function(){s.remove();b.style.overflow=oldOv;},560);
 },{passive:true});
-/* 3) زر الإضافة ثابت — لا يختفي عند التمرير */
+/* 3) زر الإضافة: مثبّت في الأسفل دائماً، يختفي عند النزول ويظهر عند الصعود (أسلوب شريط فيسبوك) */
 (function(){
   var fab=$('bAdd');if(!fab)return;
+  var hidden=false,lastY=scrollY;
+  function setH(h){
+    if(h===hidden)return;
+    hidden=h;
+    if(h)fab.classList.add('hide');
+    else{hp(8);fab.classList.remove('hide');}
+  }
+  /* لمس: إصبع يتحرك للأعلى = تصفح للأسفل → اختفِ، وإصبع للأسفل = عودة للأعلى → اظهر */
+  var ty=null;
+  document.addEventListener('touchstart',function(e){
+    if(anyModalOpen()||$('lock').classList.contains('on')){ty=null;return;}
+    ty=e.touches[0].clientY;
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(ty===null)return;
+    var y=e.touches[0].clientY,dy=y-ty;ty=y;
+    if(scrollY<=0&&dy>0){setH(false);return;}
+    if(dy<-4)setH(true);
+    else if(dy>4)setH(false);
+  },{passive:true});
+  ['touchend','touchcancel'].forEach(function(ev){
+    document.addEventListener(ev,function(){ty=null;},{passive:true});
+  });
+  /* عجلة الفأرة / التمرير العادي */
+  addEventListener('scroll',function(){
+    var y=scrollY,dy=y-lastY;lastY=y;
+    if(y<=0)setH(false);
+    else if(dy>6)setH(true);
+    else if(dy<-5)setH(false);
+  },{passive:true});
   fab.classList.remove('hide');
 })();
 /* 4) زر العودة للأعلى */
